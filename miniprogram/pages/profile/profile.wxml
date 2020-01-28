@@ -1,12 +1,12 @@
 <div class='container'>
   <div class='header'>
-    <div class='avatar'
-      style="background-image: url({{avatarUrl}})"
+    <image class='avatar'
+      src="{{userInfo.avatarUrl}}"
       >
       <button open-type="getUserInfo" 
       bindgetuserinfo="getUserInfo" 
       size="mini">{{authLogin}}</button>
-    </div>
+    </image>
     <div class='user_info'>
       <div class='username'>
         <text>昵称：</text>

@@ -140,6 +140,7 @@ Page({
           userInfo = utils.getUserInfo(globalData);
           userInfo['_id'] = userInfo.openid
           userInfo['userRole'] = formValues['userRole']
+          userInfo['score'] = 0
           debugLog('create a new user', userInfo)
           userApi.createUser(userInfo, result => {
             debugLog('insertResult', result)

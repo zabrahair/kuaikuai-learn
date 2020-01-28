@@ -26,7 +26,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    this.login();
   },
 
   /**
@@ -87,7 +87,6 @@ Page({
     let avatarUrl = e.detail.userInfo.avatarUrl
     let userInfo = e.detail.userInfo
     that.setData({
-      avatarUrl: avatarUrl,
       authLogin: ''
     })
     debugLog('userInfo1', userInfo)
@@ -102,7 +101,6 @@ Page({
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
-      avatarUrl: userInfo.avatarUrl,
       authLogin: '',
     })
     wx.getSetting({
@@ -167,7 +165,6 @@ Page({
               })
             }
           })
-
         }
       }
     })
