@@ -21,7 +21,7 @@
   </div>
   <div class='content'>
     <div class='game_item' bindtap="onClickMathDivide">
-      <text>九九除法联系</text>
+      <text>九九除法练习</text>
       <text>>>></text>
     </div>
   </div>

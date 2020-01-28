@@ -6,12 +6,11 @@
         本次: 
       </div>
       <div class='value'>
-        {{curScore}}
       </div>
     </div>
     <div class='total_score'>
+
       <div class='value'>
-        {{totalScore}}
       </div> 
       <div class='caption'>
         :总分
@@ -20,20 +19,17 @@
   </div>
   <div class='content'>
     <div class='question'>
-        {{curQuestion.op1}}
-        {{curQuestion.operator}}
-        {{curQuestion.op2}}
-        {{curQuestion.then}}
     </div>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
+      <div class='answer'>
+        <input class='input_answer'>
+        </input>
+      </div>
       <div class='buttons'>
         <button class="btn_reset"  formType="reset" type="warn" size='mini'>清空</button>
         <button class="btn_answer" formType="submit" type="primary" size='mini'>提交</button>
         <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini'>下一题</button>
 
-      </div>    
-      <div class='answer'>
-        <input name='answer' class='input_answer' placeholder="输入答案" placeholder-class="input_answer_ph" type="{{answerType}}" value="{{curAnswer}}"/>
       </div>
     </form>
   </div>

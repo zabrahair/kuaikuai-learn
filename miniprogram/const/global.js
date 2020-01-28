@@ -60,4 +60,10 @@ module.exports = {
     TEACHER: 'A46!KB',
     ADMIN: 'A45!KB',
   },
+  ANSWER_CORRECT: '/images/correct.png',
+  ANSWER_INCORRECT: '/images/incorrect.png',
+  ANSWER_TYPE: {
+    TEXT: 'text',
+    DIGIT: 'digit',
+  }
 }

@@ -90,7 +90,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 
   width: 80vw;
@@ -98,17 +98,15 @@
   margin-top: 3vh;
   border-radius: 3vw;
   padding: 3vw;
-  font-size: 14vw;
-  color: green;
-  font-weight: 800;
-  background-color: rgba(200, 200, 255, 0.9);
+
+  background-color: rgba(200, 200, 255, 0.6);
 }
 
 .answer {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 
   width: 80vw;
@@ -117,7 +115,7 @@
   border-radius: 3vw;
   padding: 3vw;
 
-  background-color: rgba(100, 100, 100, 0.90);
+  background-color: rgba(200, 255, 200, 0.6);
 }
 
 .input_answer {
@@ -130,9 +128,7 @@
   width: 80vw;
   height: 13vh;
   padding-left: 5vw;
-  font-size: 10vw;
-  font-weight: 900;
-  color: white;
+  font-size: 6vw;
   /* border: 1px solid black; */
 }
 
@@ -145,9 +141,7 @@
 
   width: 80vw;
   height: 13vh;
-  font-size: 10vw;
-  font-weight: 900;
-  color: darkgrey;
+  font-size: 6vw;
 }
 
 .buttons {

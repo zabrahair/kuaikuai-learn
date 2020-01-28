@@ -20,14 +20,7 @@ Page({
    */
   data: {
     questions: [],
-    curQuestionIndex: 0,
-    curQuestion: {},
     userInfo: null,
-    curScore: 0,
-    totalScore: 0,
-    curSeconds: 0,
-    curAnswer: '',
-    answerType: gConst.ANSWER_TYPE.DIGIT
   },
 
   /**
@@ -93,72 +86,32 @@ Page({
   /**
    * 提交答案
    */
-  submitAnswer: function(e){
+  submitAnswer: function (e) {
     let that = this
     let formValues = e.detail.value
-    try{
-      debugLog('formValues', formValues)
-      let curQuestion = that.data.curQuestion
-      debugLog('curQuestion', curQuestion)
-      let answer = parseFloat(formValues.answer)
-      if(answer == curQuestion.result){
-        wx.showToast({
-          image: gConst.ANSWER_CORRECT,
-          title: '完全正确',
-          duration: 500,
-        }, function(){
-
-        })
-        that.setData({
-          curScore: that.data.curScore + 1,
-          totalScore: that.data.totalScore + 1,
-        })
-      }else{
-        wx.showToast({
-          image: gConst.ANSWER_INCORRECT,
-          title: '继续努力',
-          duration: 500,
-        })
-      }
-      that.onClickNextQuestion()
-      that.setData({
-        curAnswer: '',
-      })
-    }catch(e){
-      errorLog('submitAnswer Error: ', e)
-    }
   },
 
   /**
    * 重置答案
    */
-  resetAnswer: function(e){
+  resetAnswer: function (e) {
     let that = this
     let formValues = e.detail.value
-    // that.setData({
-    //   curAnswer: ''
-    // })
   },
 
   /**
    * 下一题
    */
-  onClickNextQuestion: function(e){
+  onClickNextQuestion: function (e) {
     let that = this
-    let targetValues = e?e.target.dataset:null
+    let targetValues = e.target.dataset
 
-    let questions = this.data.questions
-    let curQuestionIndex = Math.floor(Math.random() * questions.length)
-    that.setData({
-      curQuestionIndex: curQuestionIndex,
-      curQuestion: questions[curQuestionIndex],
-    })
   },
 
   /**
    * 获取所有题目
    */
-  getQuestions: function(){
+  getQuestions: function () {
     let that = this
     let filters = {
       tags: '九九除法'
@@ -170,21 +123,15 @@ Page({
       },
       success: res => {
         debugLog('queryDish.success.res', res)
-        debugLog('queryDish.dishes.count', res.result.data.length)
-        if (res.result.data.length && res.result.data.length > 0){
-          let questions = res.result.data
-          that.setData({
-            questions: questions,
-          },function () {
-            // 生成下一道题目
-            that.onClickNextQuestion()
-          })
-        }
-
+        // debugLog('queryDish.dishes.count', res.result.data.length)
+        let questions = res.result.data
+        that.setData({
+          questions: questions
+        })
       },
       fail: err => {
         console.error('[云函数] 调用失败：', err)
       }
     })
-  },
+  }
 })
