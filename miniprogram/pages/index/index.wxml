@@ -1,0 +1,17 @@
+<!--miniprogram/pages/index/index.wxml-->
+<div class='container'>
+  <div class='header'>
+    <div class='avatar'>
+    </div>
+    <div class='my_score'>
+      <text>积分</text>
+      <text>9999</text>
+    </div>
+  </div>
+  <div class='content'>
+    <div class='game_item' bindtap="onClickMathDivide">
+      <text>九九除法联系</text>
+      <text>>>></text>
+    </div>
+  </div>
+</div>

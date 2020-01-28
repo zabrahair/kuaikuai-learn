@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/profile/profile",
+    "pages/history/history",
+    "pages/games/games",
+    "pages/gamesRoom/mathDivide/mathDivide",
+    "pages/register/register"
+  ],
+  "window": {
+    "backgroundColor": "#F6F6F6",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#F6F6F6",
+    "navigationBarTitleText": "快快學習",
+    "navigationBarTextStyle": "black"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "tabBar": {
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "selectedIconPath": "images/game.png",
+        "iconPath": "images/game_unselected.png",
+        "text": "游戏"
+      },
+      {
+        "pagePath": "pages/history/history",
+        "selectedIconPath": "images/history.png",
+        "iconPath": "images/history_unselected.png",
+        "text": "历史"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "selectedIconPath": "images/profile.png",
+        "iconPath": "images/profile_unselected.png",
+        "text": "我的"
+      }
+    ]
+  }
+}

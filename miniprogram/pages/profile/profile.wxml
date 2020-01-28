@@ -1,0 +1,18 @@
+<div class='container'>
+  <div class='header'>
+    <div class='avatar'>
+      {{authLogin}}
+    </div>
+    <div class='my_score'>
+      <div>{{userInfo.nickName}}</div>
+      <div><text>积分</text><text>{{userInfo.score}}</text></div>
+    </div>
+  </div>
+  <div class='content'>
+    <div class='buttons'>
+      <button class="" type='primary' bindtap='onClickRegister'>
+        注册      
+      </button>
+    </div>
+  </div>
+</div>
