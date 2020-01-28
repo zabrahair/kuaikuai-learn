@@ -11,7 +11,7 @@ const queryUser = function (filters, callback) {
   db.collection(TABLES.USERS).where(filters).get({
     success: res => {
       let result = res.data;
-      debugLog('user', result);
+      // debugLog('user', result);
       callback(result)
     },
     fail: err => {
@@ -26,20 +26,20 @@ const queryUser = function (filters, callback) {
 
 const createUser = function (insertData, callback) {
   const db = wx.cloud.database()
-  debugLog('insertData1', insertData)
+  // debugLog('insertData1', insertData)
   insertData = Object.assign(insertData, {
     _id: insertData.openId
   })
   let now = new Date();
   let nowTimeString = now.toString();
-  debugLog('insertData2', insertData)
+  // debugLog('insertData2', insertData)
   Object.assign(insertData, {
     createTimestamp: now.getTime(),
     createLocalTime: nowTimeString
   })
-  debugLog('insertData3', insertData)
+  // debugLog('insertData3', insertData)
   // 根据条件插入所有用户
-  db.collection(TABLES.USER).add({
+  db.collection(TABLES.USERS).add({
     data: insertData,
     success: res => {
       let result = res;
@@ -66,14 +66,14 @@ const updateUser = function (id, updateObj, callback) {
     createLocalTime: nowTimeString
   })
   delete updateObj._id
-  debugLog('id', id)
-  debugLog('updateObj', updateObj)
+  // debugLog('id', id)
+  // debugLog('updateObj', updateObj)
   // 根据条件更新所有用户
-  db.collection(TABLES.USER).doc(id).update({
+  db.collection(TABLES.USERS).doc(id).update({
     data: updateObj,
     success: res => {
       let result = res;
-      debugLog('user', result);
+      // debugLog('user', result);
       callback(result)
     },
     fail: err => {

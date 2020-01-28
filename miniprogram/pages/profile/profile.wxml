@@ -7,15 +7,21 @@
       bindgetuserinfo="getUserInfo" 
       size="mini">{{authLogin}}</button>
     </div>
-    <div class='my_score'>
-      <div>{{userInfo.nickName}}</div>
-      <div><text>积分</text><text>{{userInfo.score}}</text></div>
+    <div class='user_info'>
+      <div class='username'>
+        <text>昵称：</text>
+        <text>{{userInfo.nickName}}</text>
+      </div>
+      <div class='my_score' >
+        <text>积分：</text>
+        <text>{{userInfo.score}}</text>
+      </div>
     </div>
   </div>
   <div class='content'>
     <div class='buttons'>
-      <button class="" type='primary' bindtap='onClickRegister'>
-        注册      
+      <button class="" type='warn' bindtap='onLogout'>
+        注销
       </button>
     </div>
   </div>

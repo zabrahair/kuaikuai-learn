@@ -53,5 +53,11 @@ module.exports = {
   pageParams: pageParams,
   valueCSS: valueCSS,
   OPERATION: OPERATION,
-  WEEK_DAYS: WEEK_DAYS
+  WEEK_DAYS: WEEK_DAYS,
+  REGISTER_VERTIFY_CODE: {
+    STUDENT: 'A48!KB',
+    PARENT: 'A47!KB',
+    TEACHER: 'A46!KB',
+    ADMIN: 'A45!KB',
+  },
 }

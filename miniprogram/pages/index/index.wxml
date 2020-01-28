@@ -1,11 +1,22 @@
 <!--miniprogram/pages/index/index.wxml-->
 <div class='container'>
   <div class='header'>
-    <div class='avatar'>
+    <div class='avatar'
+      style="background-image: url({{avatarUrl}})"
+      >
+      <button open-type="getUserInfo" 
+      bindgetuserinfo="getUserInfo" 
+      size="mini">{{authLogin}}</button>
     </div>
-    <div class='my_score'>
-      <text>积分</text>
-      <text>9999</text>
+    <div class='user_info'>
+      <div class='username'>
+        <text>昵称：</text>
+        <text>{{userInfo.nickName}}</text>
+      </div>
+      <div class='my_score' >
+        <text>积分：</text>
+        <text>{{userInfo.score}}</text>
+      </div>
     </div>
   </div>
   <div class='content'>

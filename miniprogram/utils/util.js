@@ -1,3 +1,7 @@
+
+const gConst = require('../const/global.js');
+const USER_ROLE = require('../const/userRole.js')
+
 const debugLog = require('log.js').debug;
 
 const formatTime = date => {
@@ -88,7 +92,7 @@ const getUserInfo = function (globalData) {
 const setUserInfo = function (userInfo, globalData) {
   globalData.userInfo = userInfo
   wx.setStorageSync('userInfo', userInfo)
-  debugLog('setUserInfo', wx.getStorageSync('userInfo'))
+  // debugLog('setUserInfo', wx.getStorageSync('userInfo'))
 }
 
 const extractFileInfo = function (filePath) {
@@ -120,6 +124,21 @@ const extractFileInfo = function (filePath) {
 
 }
 
+const vertifyCodes = gConst.REGISTER_VERTIFY_CODE;
+const getUserRole = function(registerVertifyCode){
+  if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.STUDENT){
+    return USER_ROLE.STUDENT;
+  } else if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.PARENT){
+    return USER_ROLE.STUDENT;
+  } else if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.TEACHER) {
+    return USER_ROLE.TEACHER;
+  } else if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.ADMIN) {
+    return USER_ROLE.ADMIN;
+  } else {
+    return '';
+  }
+}
+
 module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
@@ -129,4 +148,5 @@ module.exports = {
   getUserInfo: getUserInfo,
   setUserInfo: setUserInfo,
   extractFileInfo: extractFileInfo,
+  getUserRole: getUserRole,
 }
