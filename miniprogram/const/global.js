@@ -1,7 +1,8 @@
 const UNSELECT = 'unselected';
 const SELECTED = 'selected';
 const storageKeys = {
-  userInfo: 'userInfo'
+  userInfo: 'userInfo',
+  totalScore: 'totalScore'
 }
 const userInfoObj = {
   userRole: '',
@@ -65,5 +66,5 @@ module.exports = {
   ANSWER_TYPE: {
     TEXT: 'text',
     DIGIT: 'digit',
-  }
+  },
 }

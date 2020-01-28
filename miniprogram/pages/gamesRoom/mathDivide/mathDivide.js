@@ -24,7 +24,7 @@ Page({
     curQuestion: {},
     userInfo: null,
     curScore: 0,
-    totalScore: 0,
+    totalScore: utils.getTotalScore(),
     curSeconds: 0,
     curAnswer: '',
     answerType: gConst.ANSWER_TYPE.DIGIT
@@ -37,6 +37,7 @@ Page({
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
+      totalScore: utils.getTotalScore(),
     })
     this.getQuestions()
   },
@@ -112,7 +113,10 @@ Page({
         that.setData({
           curScore: that.data.curScore + 1,
           totalScore: that.data.totalScore + 1,
+        }, function(res){
+          wx.setStorageSync(storeKeys.totalScore, that.data.totalScore)
         })
+        
       }else{
         wx.showToast({
           image: gConst.ANSWER_INCORRECT,

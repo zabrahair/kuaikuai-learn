@@ -1,7 +1,7 @@
 
 const gConst = require('../const/global.js');
 const USER_ROLE = require('../const/userRole.js')
-
+const storeKeys = require('../const/global.js').storageKeys;
 const debugLog = require('log.js').debug;
 
 const formatTime = date => {
@@ -139,6 +139,17 @@ const getUserRole = function(registerVertifyCode){
   }
 }
 
+const getTotalScore = function(){
+  try{
+    let totalScore = wx.getStorageSync(storeKeys.totalScore)
+    return totalScore
+  }catch(e){
+    wx.setStorageSync(storeKeys.totalScore, 0)
+    return 0
+  }
+  
+}
+
 module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
@@ -149,4 +160,5 @@ module.exports = {
   setUserInfo: setUserInfo,
   extractFileInfo: extractFileInfo,
   getUserRole: getUserRole,
+  getTotalScore: getTotalScore,
 }
