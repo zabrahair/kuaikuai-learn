@@ -1,7 +1,11 @@
 <div class='container'>
   <div class='header'>
-    <div class='avatar'>
-      {{authLogin}}
+    <div class='avatar'
+      style="background-image: url({{avatarUrl}})"
+      >
+      <button open-type="getUserInfo" 
+      bindgetuserinfo="getUserInfo" 
+      size="mini">{{authLogin}}</button>
     </div>
     <div class='my_score'>
       <div>{{userInfo.nickName}}</div>
