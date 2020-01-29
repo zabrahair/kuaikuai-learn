@@ -15,7 +15,7 @@
       </div>
       <div class='my_score' >
         <text>积分：</text>
-        <text>{{userInfo.score}}</text>
+        <text>{{totalScore}}</text>
       </div>
     </div>
   </div>

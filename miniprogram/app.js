@@ -39,7 +39,7 @@ App({
     const userApi = require('./api/user.js')
     wx.getSetting({
       success: res => {
-        debugLog('getSetting', res)
+        // debugLog('getSetting', res)
         if (res.authSetting['scope.userInfo']) {
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           // 在没有 open-type=getUserInfo 版本的兼容处理
@@ -56,7 +56,7 @@ App({
                 name: 'kuaiLogin',
                 data: {},
                 success: res => {
-                  debugLog('login', res)
+                  // debugLog('login', res)
                   // debugLog('[云函数] [login] user openid: ', res.result.openid)
                   userInfo['openId'] = res.result.openid
                   userInfo['appId'] = res.result.appid;
@@ -78,7 +78,7 @@ App({
                       globalData.userInfo = userInfo
                       wx.setStorageSync('userInfo', userInfo)
                     }
-                    debugLog('globalData.userInfo', globalData.userInfo)
+                    // debugLog('globalData.userInfo', globalData.userInfo)
                     that.checkUserExisted()
                   })
                 },

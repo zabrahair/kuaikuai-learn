@@ -20,6 +20,7 @@ Page({
    */
   data: {
     authLogin: '请授权',
+    totalScore: 0,
   },
 
   /**
@@ -27,6 +28,7 @@ Page({
    */
   onLoad: function (options) {
     this.login();
+
   },
 
   /**
@@ -108,6 +110,11 @@ Page({
     this.setData({
       userInfo: userInfo,
     })
+    utils.getTotalScore(userInfo, userScore => {
+      that.setData({
+        totalScore: userScore.score,
+      })
+    })
     wx.getSetting({
       success: res => {
         // debugLog('getSetting', res)
@@ -130,7 +137,7 @@ Page({
                 name: 'kuaiLogin',
                 data: {},
                 success: res => {
-                  debugLog('login', res)
+                  // debugLog('login', res)
                   // debugLog('[云函数] [login] user openid: ', res.result.openid)
                   userInfo['openId'] = res.result.openid
                   userInfo['appId'] = res.result.appid;
@@ -141,13 +148,13 @@ Page({
                   userApi.queryUser({
                     _id: userInfo.openId
                   }, result => {
-                    debugLog('queryUser', result)
-                    debugLog('userInfo4', userInfo)
+                    // debugLog('queryUser', result)
+                    // debugLog('userInfo4', userInfo)
                     if (result.length > 0) {
-                      debugLog('1')
-                      app.globalData.userInfo = result[0]
+                      // debugLog('1')
+                      globalData.userInfo = result[0]
                       wx.setStorageSync('userInfo', result[0])
-                      debugLog('2')
+                      // debugLog('2')
                       that.setData({
                         userInfo: result[0]
                       })
@@ -158,14 +165,18 @@ Page({
                         userInfo: userInfo
                       })
                     }
-                    debugLog('globalData.userInfo', globalData.userInfo)
+                    // debugLog('globalData.userInfo', globalData.userInfo)
                     that.checkUserExisted()
                   })
 
                   that.setData({
                     authLogin: ''
                   })
-
+                  utils.getTotalScore(userInfo, userScore => {
+                    that.setData({
+                      totalScore: userScore.score,
+                    })
+                  })
                 },
                 fail: err => {
                   // console.error('[云函数] [login] 调用失败', err)

@@ -44,33 +44,8 @@ Page({
     // score related
     
     curScore: 0,
-    totalScore: utils.getTotalScore(),
+    totalScore: 0,
     historyRecord: {}
-  },
-
-  /**
-   * 提交做题记录
-   */
-  recordHistory: function(question, answer){
-    let historyRecord = {};
-    question.tags.push(TABLES.MATH_DIVIDE)
-    delete question._id
-    Object.assign(historyRecord, question)
-    Object.assign(historyRecord, answer)
-    debugLog('historyRecord', historyRecord)
-    wx.cloud.callFunction({
-      name: 'kuaiLearnHistoryCreate',
-      data: {
-        hisRecord: historyRecord
-      },
-      success: res => {
-        debugLog('kuaiLearnHistoryCreate.success.res', res)
-      },
-      fail: err => {
-        errorLog('[云函数] 调用失败：', err)
-      }
-    })    
-
   },
 
   /**
@@ -81,7 +56,11 @@ Page({
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
-      totalScore: utils.getTotalScore(),
+    })
+    utils.getTotalScore(userInfo, userScore =>{
+      that.setData({
+        totalScore: userScore.score,
+      })
     })
     this.getQuestions()
     this.resetAnswer()
@@ -141,6 +120,31 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
+
+  },
+
+  /**
+     * 提交做题记录
+     */
+  recordHistory: function (question, answer) {
+    let historyRecord = {};
+    question.tags.push(TABLES.MATH_DIVIDE)
+    delete question._id
+    Object.assign(historyRecord, question)
+    Object.assign(historyRecord, answer)
+    // debugLog('historyRecord', historyRecord)
+    wx.cloud.callFunction({
+      name: 'kuaiLearnHistoryCreate',
+      data: {
+        hisRecord: historyRecord
+      },
+      success: res => {
+        // debugLog('kuaiLearnHistoryCreate.success.res', res)
+      },
+      fail: err => {
+        errorLog('[云函数] 调用失败：', err)
+      }
+    })
 
   },
 
@@ -274,6 +278,7 @@ Page({
           curDeciSecond: timer,
           thinkSeconds: thinkTimer,
           curDeciTimerStr: utils.formatDeciTimer(timer, 1),
+          // totalScore: utils.getTotalScore(that.data.userInfo),
         })
       }
     }, that.data.timerInterval)
@@ -307,9 +312,9 @@ Page({
       if (questions.length > 0){
         // If answer is correct then move to done.
         curQuestionIndex = Math.floor(Math.random() * questions.length)
-        debugLog('curQuestionIndex', curQuestionIndex)
+        // debugLog('curQuestionIndex', curQuestionIndex)
         question = questions[curQuestionIndex]
-        debugLog('question', question)
+        // debugLog('question', question)
       } else {
         for (let i in questionsDone){
           questions.push(questionsDone[i])

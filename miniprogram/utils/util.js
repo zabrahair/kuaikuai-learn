@@ -163,17 +163,41 @@ const getUserRole = function(registerVertifyCode){
   }
 }
 
-const getTotalScore = function(){
-  try{
-    let totalScore = wx.getStorageSync(storeKeys.totalScore)
-    if (!totalScore){
-      totalScore = 0
+const getTotalScore = function(userInfo, callback){
+  // try{
+    let openid = userInfo._openid
+    // 什么时机刷新积分
+    let refreshScoreInterval = Math.floor(new Date().getTime() / 1000) % 1
+    debugLog('refreshScoreInterval', refreshScoreInterval)
+    if (!wx.getStorageSync(storeKeys.totalScore)
+      || refreshScoreInterval >= 0){
+      debugLog('openid', openid)
+      if(!openid){return}
+      debugLog('get sync total score')
+      wx.cloud.callFunction({
+        name: 'kuaiLearnHistoryAggregate',
+        data: {
+          openid: openid
+        },
+        success: res => {
+          debugLog('kuaiLearnHistoryAggregate.success.res', res)
+          wx.setStorageSync(storeKeys.totalScore, res.result.score)
+          callback(res.result)
+        },
+        fail: err => {
+          errorLog('[云函数] 调用失败：', err)
+        }
+      })
+    }else{
+      callback({
+        openid: openid
+        ,score: wx.getStorageSync(storeKeys.totalScore)
+      })
+      return wx.getStorageSync(storeKeys.totalScore)
     }
-    return totalScore
-  }catch(e){
-    wx.setStorageSync(storeKeys.totalScore, 0)
-    return 0
-  }
+  // }catch(e){
+  //   // wx.setStorageSync(storeKeys.totalScore, 0)
+  // }
   
 }
 

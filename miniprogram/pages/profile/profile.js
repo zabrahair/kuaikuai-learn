@@ -20,6 +20,7 @@ Page({
    */
   data: {
     authLogin: '请授权',
+    totalScore: 0,
   },
 
   /**
@@ -99,6 +100,11 @@ Page({
     this.setData({
       userInfo: userInfo,
     })
+    utils.getTotalScore(userInfo, userScore => {
+      that.setData({
+        totalScore: userScore.score,
+      })
+    })
     wx.getSetting({
       success: res => {
         // debugLog('getSetting', res)
@@ -156,7 +162,11 @@ Page({
                   that.setData({
                     authLogin: ''
                   })
-
+                  utils.getTotalScore(userInfo, userScore => {
+                    that.setData({
+                      totalScore: userScore.score,
+                    })
+                  })
                 },
                 fail: err => {
                   // console.error('[云函数] [login] 调用失败', err)
