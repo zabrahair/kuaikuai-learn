@@ -12,6 +12,7 @@ const TABLES = require('../../const/collections.js')
 const USER_ROLE = require('../../const/userRole.js')
 const dbApi = require('../../api/db.js')
 const userApi = require('../../api/user.js')
+const learnHistoryApi = require('../../api/learnHistory.js')
 
 Page({
 
@@ -116,6 +117,24 @@ Page({
         totalScore: userScore.score,
       })
     })
+
+    learnHistoryApi.dailyStatistic(userInfo
+      , {}
+      // , {
+      //   openid: userInfo.openId
+      // }
+    , res=>{
+      debugLog('dailyStatistic[' + TABLES.LEARN_HISTORY + ']', res)
+    })
+
+    learnHistoryApi.tagsStatistic(userInfo
+      , {}
+      // , {
+      //   openid: userInfo.openId
+      // }
+      , res => {
+        debugLog('tagsStatistic[' + TABLES.LEARN_HISTORY + ']', res)
+      })
 
     wx.getSetting({
       success: res => {

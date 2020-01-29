@@ -86,14 +86,15 @@ const update = function (table, id, updateObj, callback) {
   })
 }
 
-const groupCount = function (table, matchObj, unwindObj, groupObj, projectObj, callback) {
-  db.collection('order')
+const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectObj, callback) {
+  db.collection(table)
     .aggregate()
     .match(matchObj)
     .unwind(unwindObj)
     .group(groupObj)
     .project(projectObj)
     .end().then(res => {
+      // debugLog('groupAggregate[' + table + ']', res)
       callback(res)
     })
 }
@@ -102,5 +103,5 @@ module.exports = {
   query: query,
   create: create,
   update: update,
-  groupCount: groupCount,
+  groupAggregate: groupAggregate,
 }
