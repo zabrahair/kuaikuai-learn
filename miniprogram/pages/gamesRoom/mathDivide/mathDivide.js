@@ -188,7 +188,7 @@ Page({
     // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
     // 开始计时
     that.setData({
-      startTime: new Date().getTime()
+      curDeciSecond: 0,
     })
     clearInterval(scoreTimer)
     scoreTimer = setInterval(function () {
