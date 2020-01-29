@@ -213,7 +213,7 @@ Page({
     let answerTime = new Date()
       that.recordHistory(curQuestion
       , {
-        openid: that.data.userInfo._openid,
+        openid: that.data.userInfo.openId,
         nickName: that.data.userInfo.nickName,
         userRole: that.data.userInfo.userRole,
         answer: answer,

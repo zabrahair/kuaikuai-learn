@@ -165,7 +165,7 @@ const getUserRole = function(registerVertifyCode){
 
 const getTotalScore = function(userInfo, callback){
   // try{
-    let openid = userInfo._openid
+    let openid = userInfo.openId
     // 什么时机刷新积分
     let refreshScoreInterval = Math.floor(new Date().getTime() / 1000) % 1
     debugLog('refreshScoreInterval', refreshScoreInterval)

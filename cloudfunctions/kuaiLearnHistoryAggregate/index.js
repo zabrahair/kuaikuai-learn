@@ -41,7 +41,12 @@ exports.main = async (event, context) => {
         // .get().then(res=>{
         .end()
       console.log('learn history aggregate res:', JSON.stringify(res, null, 4))
-      score = res.list[0].score
+      try{
+        score = res.list[0].score
+      }catch(e){
+        console.log('no learn history records:', JSON.stringify(res, null, 4))
+      }
+      
       try {
         await db.collection(USERS_TABLE).where({ _id: event.openid })
           .update({

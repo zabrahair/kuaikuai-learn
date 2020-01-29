@@ -132,13 +132,13 @@ Page({
       utils.setUserInfo(userInfo, globalData)
       // create or update user
       userApi.queryUser({
-        _id: userInfo.openid
+        _id: userInfo.openId
       }, result => {
         debugLog('queryUserResult', result)
         // If not found the user insert a new one.
         if (result.length <= 0) {
           userInfo = utils.getUserInfo(globalData);
-          userInfo['_id'] = userInfo.openid
+          userInfo['_id'] = userInfo.openId
           userInfo['userRole'] = formValues['userRole']
           userInfo['score'] = 0
           debugLog('create a new user', userInfo)
