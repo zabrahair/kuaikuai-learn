@@ -31,16 +31,22 @@
         {{curQuestion.operator}}
         {{curQuestion.op2}}
         {{curQuestion.then}}
+        <view class='left_questions_count'>
+          {{questions.length}}
+        </view>
     </view>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <view class='buttons' animation="{{fadeInOutQuestion}}">
         <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
-        <button class="btn_answer" formType="submit" type="primary" size='mini'>提交</button>
+        <button class="btn_answer" formType="submit" type="primary" size='mini' >提交</button>
         <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini'>下一题</button>
         <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
       </view>    
       <view class='answer' animation="{{fadeInOutQuestion}}">
-        <input name='answer' class='input_answer' placeholder="输入答案" placeholder-class="input_answer_ph" bindinput='onInputAnswer' type="{{answerType}}" disabled='{{inputAnswerDisabled}}' value="{{curAnswer}}"/>
+        <input name='answer' class='input_answer' 
+        placeholder="输入答案" placeholder-class="input_answer_ph" 
+        bindinput='onInputAnswer' bindconfirm="submitAnswer" 
+        type="{{answerType}}" disabled='{{inputAnswerDisabled}}' value="{{curAnswer}}"/>
       </view>
     </form>
   </view>

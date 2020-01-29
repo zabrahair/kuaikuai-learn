@@ -23,6 +23,7 @@ Page({
    */
   data: {
     questions: [],
+    questionsDone: [],
     curQuestionIndex: 0,
     curQuestion: {},
     userInfo: null,
@@ -136,15 +137,20 @@ Page({
       return;
     }
 
+    // debugLog('submitAnswer.e', e)
     let that = this
     let formValues = e.detail.value
-    try{
+    // try{
 
       // debugLog('formValues', formValues)
       let curQuestion = that.data.curQuestion
       // debugLog('curQuestion', curQuestion)
-      let answer = parseFloat(formValues.answer)
+      // 同時針對回車和Button提交
+      let inputAnswer = formValues.answer ? formValues.answer : formValues
+      let answer = parseFloat(inputAnswer)
+      let isCorrect = false
       if(answer == curQuestion.result){
+        isCorrect = true
         wx.showToast({
           image: gConst.ANSWER_CORRECT,
           title: '完全正确',
@@ -166,13 +172,13 @@ Page({
           duration: 500,
         })
       }
-      that.onClickNextQuestion()
+      that.onClickNextQuestion(null, isCorrect)
       that.setData({
         curAnswer: '',
       })
-    }catch(e){
-      errorLog('submitAnswer Error: ', e)
-    }
+    // }catch(e){
+    //   errorLog('submitAnswer Error: ', e)
+    // }
   },
 
   /**
@@ -185,6 +191,24 @@ Page({
 
     let that = this
     let formValues = e ? e.detail.value : {}
+    // Reset Questions
+    let questions = this.data.questions
+    let questionsDone = this.data.questionsDone
+    let question = this.data.curQuestion
+    let curQuestionIndex = this.data.curQuestionIndex
+    for (let i in questionsDone) {
+      questions.push(questionsDone[i])
+    }
+    questionsDone = []
+    curQuestionIndex = Math.floor(Math.random() * questions.length)
+    question = questions[curQuestionIndex]
+    that.setData({
+      questions: questions,
+      questionsDone: questionsDone,
+      curQuestionIndex: curQuestionIndex,
+      curQuestion: question,
+    })
+
     // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
     // 开始计时
     that.setData({
@@ -210,21 +234,46 @@ Page({
   /**
    * 下一题
    */
-  onClickNextQuestion: function(e){
+  onClickNextQuestion: function(e, isCorrect){
     if (this.checkPauseStatus()) {
       return;
     }
+    try{
+      let that = this
+      let targetValues = e?e.target.dataset:null
+      let questions = this.data.questions
+      let questionsDone = this.data.questionsDone
+      let question = this.data.curQuestion
+      let curQuestionIndex = this.data.curQuestionIndex
 
-    let that = this
-    let targetValues = e?e.target.dataset:null
+      if (isCorrect) {
+        questionsDone.push(question)
+        questions.splice(curQuestionIndex, 1)
+      }
 
-    let questions = this.data.questions
-    let curQuestionIndex = Math.floor(Math.random() * questions.length)
-    that.setData({
-      curQuestionIndex: curQuestionIndex,
-      curQuestion: questions[curQuestionIndex],
-    })
-
+      if (questions.length > 0){
+        // If answer is correct then move to done.
+        curQuestionIndex = Math.floor(Math.random() * questions.length)
+        debugLog('curQuestionIndex', curQuestionIndex)
+        question = questions[curQuestionIndex]
+        debugLog('question', question)
+      } else {
+        for (let i in questionsDone){
+          questions.push(questionsDone[i])
+        }
+        questionsDone = []
+        curQuestionIndex = 0
+        question = {}
+      }
+      that.setData({
+        questions: questions,
+        questionsDone: questionsDone,
+        curQuestionIndex: curQuestionIndex,
+        curQuestion: question,
+      })
+    }catch(e){
+      errorLog('onClickNextQuestion error:', e)
+    }
   },
 
   /**
