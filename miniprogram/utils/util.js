@@ -66,8 +66,8 @@ const log = function (object, message, tabs) {
 }
 
 const resetStatus = function (object, key, defaultValue, setValue) {
-  debugLog(object);
-  debugLog(setValue);
+  // debugLog(object);
+  // debugLog(setValue);
   for (let i in object) {
     if (i == key) {
       object[i] = setValue;
@@ -76,7 +76,7 @@ const resetStatus = function (object, key, defaultValue, setValue) {
     }
 
   }
-  debugLog(object);
+  // debugLog(object);
 }
 
 const cloneObj = function (source, target) {
@@ -120,7 +120,7 @@ const setUserInfo = function (userInfo, globalData) {
 }
 
 const extractFileInfo = function (filePath) {
-  debugLog('extractFileInfo.filePath', filePath)
+  // debugLog('extractFileInfo.filePath', filePath)
   let fileInfo = {
     path: filePath,
     directory: '',
@@ -130,7 +130,7 @@ const extractFileInfo = function (filePath) {
   }
   let regex = new RegExp("(.+/)(([^/]+)(\\.[^.]+))", "gim")
   let regexGroups = regex.exec(filePath)
-  debugLog('extractFileInfo.regexGroups', regexGroups)
+  // debugLog('extractFileInfo.regexGroups', regexGroups)
   if (regexGroups != undefined && regexGroups[1]) {
     fileInfo.directory = regexGroups[1]
   }
@@ -143,7 +143,7 @@ const extractFileInfo = function (filePath) {
   if (regexGroups != undefined && regexGroups[4]) {
     fileInfo.extension = regexGroups[4]
   }
-  debugLog('extractFileInfo.fileInfo', fileInfo)
+  // debugLog('extractFileInfo.fileInfo', fileInfo)
   return fileInfo
 
 }
@@ -168,19 +168,19 @@ const getTotalScore = function(userInfo, callback){
     let openid = userInfo.openId
     // 什么时机刷新积分
     let refreshScoreInterval = Math.floor(new Date().getTime() / 1000) % 1
-    debugLog('refreshScoreInterval', refreshScoreInterval)
+    // debugLog('refreshScoreInterval', refreshScoreInterval)
     if (!wx.getStorageSync(storeKeys.totalScore)
       || refreshScoreInterval >= 0){
-      debugLog('openid', openid)
+      // debugLog('openid', openid)
       if(!openid){return}
-      debugLog('get sync total score')
+      // debugLog('get sync total score')
       wx.cloud.callFunction({
         name: 'kuaiLearnHistoryAggregate',
         data: {
           openid: openid
         },
         success: res => {
-          debugLog('kuaiLearnHistoryAggregate.success.res', res)
+          // debugLog('kuaiLearnHistoryAggregate.success.res', res)
           wx.setStorageSync(storeKeys.totalScore, res.result.score)
           callback(res.result)
         },
@@ -198,7 +198,50 @@ const getTotalScore = function(userInfo, callback){
   // }catch(e){
   //   // wx.setStorageSync(storeKeys.totalScore, 0)
   // }
-  
+}
+
+/**
+ * 分类统计练习
+ * 
+ *  功能不可用，因为传过去的group没有起作用
+ */
+const getGamingStatistics = function (userInfo, callback) {
+  // try{
+  let openid = userInfo.openId
+  // 什么时机刷新积分
+  // debugLog('openid', openid)
+  if (!openid) { return }
+  // debugLog('get sync total score')
+  let db = wx.cloud.database()
+  let $ = db.command.aggregate
+  let _ = db.command
+  wx.cloud.callFunction({
+    name: 'kuaiLearnHistoryAggregate',
+    data: {
+      openid: openid,
+      matchOptions: {
+        openid: openid,
+      },
+      groupOptions: {
+        _id: {
+          openid: '$openid',
+          nickName: '$nickName'
+        },
+        score: $.sum('$score'),
+        thinkTime: $.avg('$thinkSeconds'),
+      },
+    },
+    success: res => {
+      // debugLog('kuaiLearnHistoryAggregate.success.res', res)
+      callback(res.result)
+    },
+    fail: err => {
+      errorLog('[云函数] 调用失败：', err)
+    }
+  })
+  // }catch(e){
+  //   errorLog("getGamingStatistics error", e)
+  // }
 }
 
 module.exports = {
@@ -213,4 +256,5 @@ module.exports = {
   extractFileInfo: extractFileInfo,
   getUserRole: getUserRole,
   getTotalScore: getTotalScore,
+  getGamingStatistics: getGamingStatistics,
 }

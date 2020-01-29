@@ -39,10 +39,10 @@ Page({
    */
   onLoad: function (options) {
     let userInfo = utils.getUserInfo(globalData)
-    debugLog('globalData.userInfo', userInfo);
+    // debugLog('globalData.userInfo', userInfo);
     this.setData({ userInfo: userInfo })
 
-    debugLog('this.data.userInfo', this.data.userInfo)
+    // debugLog('this.data.userInfo', this.data.userInfo)
 
     // debugLog('options', options)
     this.setData({
@@ -112,7 +112,7 @@ Page({
     let formValues = e.detail.value
     // debugLog('onRegister.formValue', formValues);
     var userInfo = utils.getUserInfo(globalData)
-    debugLog('userInfo', userInfo)
+    // debugLog('userInfo', userInfo)
     formValues['userRole'] = that.data.userRole
     Object.assign(userInfo, formValues)
     delete userInfo['_openid']
@@ -134,16 +134,16 @@ Page({
       userApi.queryUser({
         _id: userInfo.openId
       }, result => {
-        debugLog('queryUserResult', result)
+        // debugLog('queryUserResult', result)
         // If not found the user insert a new one.
         if (result.length <= 0) {
           userInfo = utils.getUserInfo(globalData);
           userInfo['_id'] = userInfo.openId
           userInfo['userRole'] = formValues['userRole']
           userInfo['score'] = 0
-          debugLog('create a new user', userInfo)
+          // debugLog('create a new user', userInfo)
           userApi.createUser(userInfo, result => {
-            debugLog('insertResult', result)
+            // debugLog('insertResult', result)
             utils.setUserInfo(userInfo, globalData)
             wx.navigateBack({
               
@@ -153,7 +153,7 @@ Page({
           userInfo = result[0]
           // else updat the user info with login time
           // debugLog('else updat the user info with login time','')
-          debugLog('updateUser', formValues)
+          // debugLog('updateUser', formValues)
           userApi.updateUser(userInfo._id,
             formValues,
             result => {

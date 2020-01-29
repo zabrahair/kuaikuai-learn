@@ -122,7 +122,7 @@ Page({
         filters: filters
       },
       success: res => {
-        debugLog('queryDish.success.res', res)
+        debugLog('kuaiMathDivideQuery.success.res', res)
         // debugLog('queryDish.dishes.count', res.result.data.length)
         let questions = res.result.data
         that.setData({

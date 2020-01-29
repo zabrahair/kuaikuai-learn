@@ -1,6 +1,6 @@
 <!--miniprogram/pages/index/index.wxml-->
-<div class='container'>
-  <div class='header'>
+<view class='container'>
+  <view class='header'>
     <image class='avatar'
       src="{{userInfo.avatarUrl}}"
       >
@@ -8,21 +8,21 @@
       bindgetuserinfo="getUserInfo" 
       size="mini">{{authLogin}}</button>
     </image>
-    <div class='user_info'>
-      <div class='username'>
-        <text>昵称：</text>
-        <text>{{userInfo.nickName}}</text>
-      </div>
-      <div class='my_score' >
-        <text>积分：</text>
-        <text>{{totalScore}}</text>
-      </div>
-    </div>
-  </div>
-  <div class='content'>
-    <div class='game_item' bindtap="onClickMathDivide">
+    <view class='user_info'>
+      <view class='username'>
+        <!-- <text class='caption'>昵称：</text> -->
+        <text class='value'>{{userInfo.nickName}}</text>
+      </view>
+      <view class='my_score' >
+        <image class='caption' src='{{scoreIcon}}'/>
+        <text class='value'>{{totalScore}}</text>
+      </view>
+    </view>
+  </view>
+  <scroll-view class='content' scroll-y='true'>
+    <view class='game_item' bindtap="onClickMathDivide">
       <text>九九除法练习</text>
       <text>>>></text>
-    </div>
-  </div>
-</div>
+    </view>
+  </scroll-view>
+</view>

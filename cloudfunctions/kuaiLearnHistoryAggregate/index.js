@@ -26,19 +26,34 @@ exports.main = async (event, context) => {
     console.log('(new Date().getTime():', new Date().getTime())
     console.log('lastUpdate:', lastUpdate)
     if((new Date().getTime() - lastUpdate) > 3000){
-      res = await db.collection(TABLE)
-        .aggregate()
-        .match({
-          openid: event.openid
-        })
-        .group({
+      let groupOptions = event.groupOptions
+      let matchOptions = event.matchOptions
+
+      if (!groupOptions){
+        groupOptions = {
           _id: {
             openid: '$openid',
             nickName: '$nickName'
           },
-          score: $.sum('$score')
-        }).limit(1)
-        // .get().then(res=>{
+          score: $.sum('$score'),
+          avgThinkTime: $.avg('$thinkSeconds'),
+        }
+      }
+
+      if (!matchOptions) {
+        matchOptions = {
+          openid: event.openid
+        }
+      }
+
+      console.log('groupOptions', JSON.stringify(groupOptions, null, 4))
+      console.log('matchOptions', JSON.stringify(matchOptions,null,4))
+
+      res = await db.collection(TABLE)
+        .aggregate()
+        .match(matchOptions)
+        .group(groupOptions)
+        .limit(1)
         .end()
       console.log('learn history aggregate res:', JSON.stringify(res, null, 4))
       try{
@@ -67,7 +82,8 @@ exports.main = async (event, context) => {
       openid: wxContext.OPENID,
       appid: wxContext.APPID,
       unionid: wxContext.UNIONID,
-      score: score
+      score: score,
+      data: res,
     }
     //   }) 
   }catch(e){

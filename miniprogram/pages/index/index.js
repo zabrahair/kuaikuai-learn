@@ -21,13 +21,14 @@ Page({
   data: {
     authLogin: '请授权',
     totalScore: 0,
+    scoreIcon: gConst.SCORE_ICON,
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    
   },
 
   /**
@@ -41,7 +42,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    debugLog('onShow', true)
+    // debugLog('onShow', true)
     this.login();
   },
 
@@ -115,6 +116,7 @@ Page({
         totalScore: userScore.score,
       })
     })
+
     wx.getSetting({
       success: res => {
         // debugLog('getSetting', res)
@@ -211,8 +213,8 @@ Page({
           {},
           result => {
             // debugLog('updateResult', result)
-            debugLog(storeKeys.userInfo)
-            debugLog('', userInfo)
+            // debugLog(storeKeys.userInfo)
+            // debugLog('', userInfo)
             globalData.userInfo = userInfo
             wx.setStorageSync('userInfo', userInfo)
             // wx.switchTab({

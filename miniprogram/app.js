@@ -115,8 +115,8 @@ App({
           {},
           result => {
             // debugLog('updateResult', result)
-            debugLog(storeKeys.userInfo)
-            debugLog('', userInfo)
+            // debugLog(storeKeys.userInfo)
+            // debugLog('', userInfo)
             globalData.userInfo = userInfo
             wx.setStorageSync('userInfo', userInfo)
             // wx.switchTab({

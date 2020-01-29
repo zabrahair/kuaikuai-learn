@@ -65,6 +65,8 @@ module.exports = {
   ANSWER_INCORRECT: '/images/incorrect.png',
   GAME_START_ICON: '/images/game_start.png',
   ALERT_ICON: '/images/alert.png',
+  SCORE_ICON: '/images/score.png',
+  DEFAULT_BACKGROUND: 'https://6c61-laiqiafanfan-z3fxt-1301085811.tcb.qcloud.la/kuai/whsmhhwpny.jpeg?sign=6db6f954feb1233dc5dd55e5087cf4d9&t=1580298598',
   ANSWER_TYPE: {
     TEXT: 'text',
     DIGIT: 'digit',
