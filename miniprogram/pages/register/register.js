@@ -124,7 +124,7 @@ Page({
     // debugLog('userInfo', userInfo)
 
 
-    let vertifyResult = utils.getUserRole(formValues.companyVertify)
+    let vertifyResult = utils.getUserRole(formValues.vertifyCode)
     if (vertifyResult != '') {
       // debugLog('openId', userInfo.openId)
       formValues['userRole'] = vertifyResult
@@ -219,14 +219,6 @@ Page({
     })
   },
 
-  /**
-   * Select company
-   */
-  onCompanyChange: function (e) {
-    this.setData({
-      selectCompanyIndex: e.detail.value
-    })
-  },
 
   
 

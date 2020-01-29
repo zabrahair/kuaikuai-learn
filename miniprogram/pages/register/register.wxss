@@ -70,19 +70,7 @@
   
 }
 
-.company_picker {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-items: center;
 
-  width: 80vw;
-  height: 6vh;  
-  border: 1px solid black;
-  border-radius: 2vw;
-  padding-left: 5vw;
-}
 
 .mobile_field {
   display: flex;
@@ -143,9 +131,6 @@
   color: grey;
 }
 
-.company_name {
-
-}
 
 .contact_name {
 

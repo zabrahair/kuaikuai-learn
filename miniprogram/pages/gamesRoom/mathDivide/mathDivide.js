@@ -27,10 +27,13 @@ Page({
     curQuestionIndex: 0,
     curQuestion: {},
     userInfo: null,
-    curScore: 0,
-    totalScore: utils.getTotalScore(),
+
+    // Time related
     timerInterval: 1000,
     curDeciSecond: 0,
+    thinkSeconds: 0,
+
+    // Answer Related
     curAnswer: '',
     answerType: gConst.ANSWER_TYPE.DIGIT,
     isPause: false,
@@ -38,8 +41,37 @@ Page({
     inputAnswerDisabled: false,
     fadeInOutQuestion: null,
     fadeInOutPauseBtn: null,
+    // score related
+    
+    curScore: 0,
+    totalScore: utils.getTotalScore(),
+    historyRecord: {}
   },
 
+  /**
+   * 提交做题记录
+   */
+  recordHistory: function(question, answer){
+    let historyRecord = {};
+    question.tags.push(TABLES.MATH_DIVIDE)
+    delete question._id
+    Object.assign(historyRecord, question)
+    Object.assign(historyRecord, answer)
+    debugLog('historyRecord', historyRecord)
+    wx.cloud.callFunction({
+      name: 'kuaiLearnHistoryCreate',
+      data: {
+        hisRecord: historyRecord
+      },
+      success: res => {
+        debugLog('kuaiLearnHistoryCreate.success.res', res)
+      },
+      fail: err => {
+        errorLog('[云函数] 调用失败：', err)
+      }
+    })    
+
+  },
 
   /**
    * 生命周期函数--监听页面加载
@@ -158,9 +190,10 @@ Page({
         }, function(){
 
         })
+        let score = that.data.curQuestion.score ? that.data.curQuestion.score : 1
         that.setData({
-          curScore: that.data.curScore + 1,
-          totalScore: that.data.totalScore + 1,
+          curScore: that.data.curScore + score,
+          totalScore: that.data.totalScore + score,
         }, function(res){
           wx.setStorageSync(storeKeys.totalScore, that.data.totalScore)
         })
@@ -172,9 +205,26 @@ Page({
           duration: 500,
         })
       }
+      // Record History
+    let answerTime = new Date()
+      that.recordHistory(curQuestion
+      , {
+        openid: that.data.userInfo._openid,
+        nickName: that.data.userInfo.nickName,
+        userRole: that.data.userInfo.userRole,
+        answer: answer,
+        isCorrect: isCorrect,
+        answerTime: answerTime.getTime(),
+        answerTimeStr: utils.formatDate(answerTime),
+        // 减去一个计时间隔，作为操作时间
+        thinkSeconds: that.data.thinkSeconds - that.data.timerInterval,
+      })
+
+      // Next Question
       that.onClickNextQuestion(null, isCorrect)
       that.setData({
         curAnswer: '',
+        thinkSeconds: 0,
       })
     // }catch(e){
     //   errorLog('submitAnswer Error: ', e)
@@ -213,13 +263,16 @@ Page({
     // 开始计时
     that.setData({
       curDeciSecond: 0,
+      thinkSeconds: 0,
     })
     clearInterval(scoreTimer)
     scoreTimer = setInterval(function () {
       if (that.data.isPause == false){
         let timer = that.data.curDeciSecond + that.data.timerInterval
+        let thinkTimer = that.data.thinkSeconds + that.data.timerInterval
         that.setData({
           curDeciSecond: timer,
+          thinkSeconds: thinkTimer,
           curDeciTimerStr: utils.formatDeciTimer(timer, 1),
         })
       }
@@ -270,6 +323,7 @@ Page({
         questionsDone: questionsDone,
         curQuestionIndex: curQuestionIndex,
         curQuestion: question,
+        thinkSeconds: 0,
       })
     }catch(e){
       errorLog('onClickNextQuestion error:', e)
@@ -290,8 +344,8 @@ Page({
         filters: filters
       },
       success: res => {
-        // debugLog('queryDish.success.res', res)
-        // debugLog('queryDish.dishes.count', res.result.data.length)
+        // debugLog('kuaiMathDivideQuery.success.res', res)
+        // debugLog('kuaiMathDivideQuery.questions.count', res.result.data.length)
         if (res.result.data.length && res.result.data.length > 0){
           let questions = res.result.data
           that.setData({

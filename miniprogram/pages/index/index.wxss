@@ -25,6 +25,7 @@
 }
 
 .avatar {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -41,14 +42,18 @@
 }
 
 .avatar button{
+  position: absolute;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-
+  top: 7.3vh;
+  left: 2.5vw;
+  width: 25vw;
+  font-weight: 300;
   font-size: 5vw;
-  color:  greenyellow;
+  color:  white;
 }
 
 .user_info {

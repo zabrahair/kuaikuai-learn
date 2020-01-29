@@ -19,7 +19,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-
+    authLogin: '请授权',
   },
 
   /**
@@ -88,6 +88,18 @@ Page({
   },
 
   /**
+     * 获得用户信息
+     */
+  getUserInfo: function (e) {
+    var that = this;
+    // debugLog('auth.event', e.detail)
+    let avatarUrl = e.detail.userInfo.avatarUrl
+    let userInfo = e.detail.userInfo
+    // debugLog('userInfo1', userInfo)
+    this.login()
+  },
+
+  /**
    * 登陆
    */
   login: function () {
@@ -95,37 +107,36 @@ Page({
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
-      avatarUrl: userInfo.avatarUrl
     })
     wx.getSetting({
       success: res => {
-        debugLog('getSetting', res)
+        // debugLog('getSetting', res)
         if (res.authSetting['scope.userInfo']) {
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称，不会弹框
           // 在没有 open-type=getUserInfo 版本的兼容处理
           wx.getUserInfo({
             success: res => {
-              debugLog('getUserInfo', res)
+              // debugLog('getUserInfo', res)
               userInfo = res.userInfo;
-              debugLog('userInfo2', userInfo)
+              // debugLog('userInfo2', userInfo)
               that.setData({
                 userInfo: userInfo
               })
               globalData.userInfo = userInfo
-              debugLog('getUserInfo', globalData.userInfo)
+              // debugLog('getUserInfo', globalData.userInfo)
               // 登陆当前用户
               // 调用云函数
               wx.cloud.callFunction({
                 name: 'kuaiLogin',
                 data: {},
                 success: res => {
-                  // debugLog('login', res)
+                  debugLog('login', res)
                   // debugLog('[云函数] [login] user openid: ', res.result.openid)
                   userInfo['openId'] = res.result.openid
                   userInfo['appId'] = res.result.appid;
-                  debugLog('userInfo3', userInfo)
+                  // debugLog('userInfo3', userInfo)
                   that.setData({
-                    userInfo: userInfo,
+                    userInfo: userInfo
                   })
                   userApi.queryUser({
                     _id: userInfo.openId
@@ -151,6 +162,9 @@ Page({
                     that.checkUserExisted()
                   })
 
+                  that.setData({
+                    authLogin: ''
+                  })
 
                 },
                 fail: err => {
@@ -159,8 +173,41 @@ Page({
               })
             }
           })
-
         }
+      }
+    })
+  },
+
+  /**
+ * 判断用户是否存在于数据库
+ */
+  checkUserExisted: function () {
+    let that = this
+    let userInfo = globalData.userInfo
+    userApi.queryUser({
+      _id: userInfo.openId
+    }, result => {
+      // debugLog('queryUserResult', result)
+      // If not found the user insert a new one.
+      if (result.length <= 0) {
+        wx.navigateTo({
+          url: '../register/register'
+        })
+      } else {
+        userInfo = result[0]
+        // else update the user info with login time
+        userApi.updateUser(result[0]._id,
+          {},
+          result => {
+            // debugLog('updateResult', result)
+            debugLog(storeKeys.userInfo)
+            debugLog('', userInfo)
+            globalData.userInfo = userInfo
+            wx.setStorageSync('userInfo', userInfo)
+            // wx.switchTab({
+            //   url: '../menuList/menuList'
+            // })
+          })
       }
     })
   },
