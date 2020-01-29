@@ -26,14 +26,15 @@ Page({
     curQuestionIndex: 0,
     curQuestion: {},
     userInfo: null,
-    curScore: '',
+    curScore: 0,
     totalScore: utils.getTotalScore(),
     timerInterval: 1000,
     curDeciSecond: 0,
     curAnswer: '',
     answerType: gConst.ANSWER_TYPE.DIGIT,
     isPause: false,
-    pauseBtnText: '暂停'
+    pauseBtnText: '暂停',
+    inputAnswerDisabled: false,
   },
 
   /**
@@ -257,13 +258,24 @@ Page({
       that.setData({
         isPause: false,
         pauseBtnText: '暂停',
+        inputAnswerDisabled: false,
       })
     }else{
       that.setData({
         isPause: true,
-        pauseBtnText: '继续'
+        pauseBtnText: '继续',
+        inputAnswerDisabled: true,
       })
     }
 
+  },
+
+  /**
+   * When Input Answer
+   */
+  onInputAnswer: function(e){
+    if (this.checkPauseStatus()) {
+      return;
+    }    
   }
 })

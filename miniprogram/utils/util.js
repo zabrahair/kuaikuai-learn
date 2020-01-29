@@ -166,6 +166,9 @@ const getUserRole = function(registerVertifyCode){
 const getTotalScore = function(){
   try{
     let totalScore = wx.getStorageSync(storeKeys.totalScore)
+    if (!totalScore){
+      totalScore = 0
+    }
     return totalScore
   }catch(e){
     wx.setStorageSync(storeKeys.totalScore, 0)

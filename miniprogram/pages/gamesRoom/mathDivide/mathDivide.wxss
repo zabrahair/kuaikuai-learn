@@ -66,6 +66,12 @@
 }
 
 .total_score .value{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center; 
+
   font-size: 3vw;
   color: white;
 }

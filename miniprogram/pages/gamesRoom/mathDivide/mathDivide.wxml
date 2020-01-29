@@ -40,7 +40,7 @@
         <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
       </div>    
       <div class='answer'>
-        <input name='answer' class='input_answer' placeholder="输入答案" placeholder-class="input_answer_ph" type="{{answerType}}" value="{{curAnswer}}"/>
+        <input name='answer' class='input_answer' placeholder="输入答案" placeholder-class="input_answer_ph" bindinput='onInputAnswer' type="{{answerType}}" disabled='{{inputAnswerDisabled}}' value="{{curAnswer}}"/>
       </div>
     </form>
   </div>
