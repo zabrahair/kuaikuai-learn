@@ -1,47 +1,48 @@
 <!--miniprogram/pages/index/index.wxml-->
-<div class='container'>
-  <div class='header'>
-    <div class='current_score'>
-      <div class='caption'>
+<view class='container'>
+  <view class='header'>
+    <view class='current_score'>
+      <view class='caption'>
         本次: 
-      </div>
-      <div class='value'>
+      </view>
+      <view class='value'>
         {{curScore}}
-      </div>
-    </div>
-    <div class='current_timer'>
-      <!-- <div class='caption'>
-      </div> -->
-      <div class='value'>
+      </view>
+    </view>
+    <view class='current_timer'>
+      <!-- <view class='caption'>
+      </view> -->
+      <view class='value'>
         {{curDeciTimerStr}}
-      </div>
-    </div>
-    <div class='total_score'>
-      <div class='value'>
+      </view>
+    </view>
+    <view class='total_score'>
+      <view class='value'>
         {{totalScore}}
-      </div> 
-      <div class='caption'>
+      </view> 
+      <view class='caption'>
         :总分
-      </div>   
-    </div>
-  </div>
-  <div class='content'>
-    <div class='question'>
+      </view>   
+    </view>
+  </view>
+  <view class='content'>
+    <view class='question' animation="{{fadeInOutQuestion}}">
         {{curQuestion.op1}}
         {{curQuestion.operator}}
         {{curQuestion.op2}}
         {{curQuestion.then}}
-    </div>
+    </view>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
-      <div class='buttons'>
+      <view class='buttons' animation="{{fadeInOutQuestion}}">
         <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
         <button class="btn_answer" formType="submit" type="primary" size='mini'>提交</button>
         <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini'>下一题</button>
         <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
-      </div>    
-      <div class='answer'>
+      </view>    
+      <view class='answer' animation="{{fadeInOutQuestion}}">
         <input name='answer' class='input_answer' placeholder="输入答案" placeholder-class="input_answer_ph" bindinput='onInputAnswer' type="{{answerType}}" disabled='{{inputAnswerDisabled}}' value="{{curAnswer}}"/>
-      </div>
+      </view>
     </form>
-  </div>
-</div>
+  </view>
+  <button class="btn_continue" bindtap='onClickPause' type="primary" size='default' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
+</view>

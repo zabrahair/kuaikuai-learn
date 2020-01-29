@@ -35,7 +35,10 @@ Page({
     isPause: false,
     pauseBtnText: '暂停',
     inputAnswerDisabled: false,
+    fadeInOutQuestion: null,
+    fadeInOutPauseBtn: null,
   },
+
 
   /**
    * 生命周期函数--监听页面加载
@@ -49,6 +52,14 @@ Page({
     })
     this.getQuestions()
     this.resetAnswer()
+
+    // 隐藏暂停按钮
+    that.fadeInOut('fadeInOutPauseBtn', {
+      duration: 10,
+      timingFunction: 'ease-in',
+      rotateY: 0,
+      opacity: 0,
+    });
   },
 
   /**
@@ -260,12 +271,40 @@ Page({
         pauseBtnText: '暂停',
         inputAnswerDisabled: false,
       })
+      that.fadeInOut('fadeInOutQuestion',{
+        duration: 1000,
+        timingFunction: 'ease-out',
+        rotateY: 0,
+        opacity: 1,
+      });
+
+      that.fadeInOut('fadeInOutPauseBtn', {
+        duration: 1,
+        timingFunction: 'ease-in',
+        rotateY: 0,
+        opacity: 0,
+      })
+
     }else{
       that.setData({
         isPause: true,
         pauseBtnText: '继续',
         inputAnswerDisabled: true,
       })
+
+      that.fadeInOut('fadeInOutQuestion',{
+        duration: 1000,
+        timingFunction: 'ease-in',
+        rotateY: 180,
+        opacity: 0,
+      }, that.fadeInOut('fadeInOutPauseBtn', {
+        duration: 1500,
+        timingFunction: 'ease-out',
+        rotateY: 0,
+        opacity: 1,
+      }));
+
+      
     }
 
   },
@@ -277,5 +316,30 @@ Page({
     if (this.checkPauseStatus()) {
       return;
     }    
-  }
+  },
+
+  /**
+   * Fade In Out Question
+   */
+  fadeInOut: function(animationName, fadeOptions, callback){
+    let that = this;
+    let option = {
+      duration: fadeOptions.duration, // 动画执行时间
+      timingFunction: fadeOptions.timingFunction // 动画执行效果
+    };
+    var fadeInOut = wx.createAnimation(option)
+    fadeInOut.rotateY(fadeOptions.rotateY);
+    // moveOne.translateX('100vw');
+    fadeInOut.opacity(fadeOptions.opacity).step();
+    that.setData({
+      [animationName]: fadeInOut.export(),// 开始执行动画
+    }, function(){
+      if(callback){
+        callback()
+      };
+    })
+  },
+
+
+
 })
