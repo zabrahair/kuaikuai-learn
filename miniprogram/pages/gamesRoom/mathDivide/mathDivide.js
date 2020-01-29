@@ -13,6 +13,9 @@ const USER_ROLE = require('../../../const/userRole.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 
+// 练习计时器
+var scoreTimer =  null;
+
 Page({
 
   /**
@@ -23,23 +26,28 @@ Page({
     curQuestionIndex: 0,
     curQuestion: {},
     userInfo: null,
-    curScore: 0,
+    curScore: '',
     totalScore: utils.getTotalScore(),
-    curSeconds: 0,
+    timerInterval: 1000,
+    curDeciSecond: 0,
     curAnswer: '',
-    answerType: gConst.ANSWER_TYPE.DIGIT
+    answerType: gConst.ANSWER_TYPE.DIGIT,
+    isPause: false,
+    pauseBtnText: '暂停'
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    let that = this
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
       totalScore: utils.getTotalScore(),
     })
     this.getQuestions()
+    this.resetAnswer()
   },
 
   /**
@@ -92,15 +100,37 @@ Page({
   },
 
   /**
+   * 暂停判断
+   */
+  checkPauseStatus: function(){
+    let that = this
+    if(that.data.isPause == true) {
+      wx.showToast({
+        image: gConst.ALERT_ICON,
+        title: '点继续开始!',
+        duration: 1000,
+      })
+      return true;
+    }else{
+      return false;
+    }
+  },
+
+  /**
    * 提交答案
    */
   submitAnswer: function(e){
+    if (this.checkPauseStatus()) {
+      return;
+    }
+
     let that = this
     let formValues = e.detail.value
     try{
-      debugLog('formValues', formValues)
+
+      // debugLog('formValues', formValues)
       let curQuestion = that.data.curQuestion
-      debugLog('curQuestion', curQuestion)
+      // debugLog('curQuestion', curQuestion)
       let answer = parseFloat(formValues.answer)
       if(answer == curQuestion.result){
         wx.showToast({
@@ -137,17 +167,42 @@ Page({
    * 重置答案
    */
   resetAnswer: function(e){
+    if (this.checkPauseStatus()) {
+      return;
+    }
+
     let that = this
-    let formValues = e.detail.value
-    // that.setData({
-    //   curAnswer: ''
-    // })
+    let formValues = e ? e.detail.value : {}
+    // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
+    // 开始计时
+    that.setData({
+      startTime: new Date().getTime()
+    })
+    clearInterval(scoreTimer)
+    scoreTimer = setInterval(function () {
+      if (that.data.isPause == false){
+        let timer = that.data.curDeciSecond + that.data.timerInterval
+        that.setData({
+          curDeciSecond: timer,
+          curDeciTimerStr: utils.formatDeciTimer(timer, 1),
+        })
+      }
+    }, that.data.timerInterval)
+    wx.showToast({
+      image: gConst.GAME_START_ICON,
+      title: '',
+      duration: 1000,
+    })
   },
 
   /**
    * 下一题
    */
   onClickNextQuestion: function(e){
+    if (this.checkPauseStatus()) {
+      return;
+    }
+
     let that = this
     let targetValues = e?e.target.dataset:null
 
@@ -157,6 +212,7 @@ Page({
       curQuestionIndex: curQuestionIndex,
       curQuestion: questions[curQuestionIndex],
     })
+
   },
 
   /**
@@ -173,8 +229,8 @@ Page({
         filters: filters
       },
       success: res => {
-        debugLog('queryDish.success.res', res)
-        debugLog('queryDish.dishes.count', res.result.data.length)
+        // debugLog('queryDish.success.res', res)
+        // debugLog('queryDish.dishes.count', res.result.data.length)
         if (res.result.data.length && res.result.data.length > 0){
           let questions = res.result.data
           that.setData({
@@ -191,4 +247,23 @@ Page({
       }
     })
   },
+
+  /**
+   * 暂停
+   */
+  onClickPause: function(e){
+    let that = this
+    if (that.data.isPause){
+      that.setData({
+        isPause: false,
+        pauseBtnText: '暂停',
+      })
+    }else{
+      that.setData({
+        isPause: true,
+        pauseBtnText: '继续'
+      })
+    }
+
+  }
 })

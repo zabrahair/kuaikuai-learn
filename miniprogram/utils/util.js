@@ -30,6 +30,30 @@ const formatNumber = n => {
   return n[1] ? n : '0' + n
 }
 
+const formatDeciTimer = function(pDeciSecond, unitStartIdx){
+  try{
+    if (!unitStartIdx){
+      unitStartIdx = 0
+    }
+    let nextUnitValue = pDeciSecond
+    let formatDeciTimerStr = ''
+    let timeUnits = gConst.TIME_UNITS
+    let timeUnitIdx = 0
+    do{
+      if (unitStartIdx <= timeUnitIdx){
+        formatDeciTimerStr = nextUnitValue % timeUnits[timeUnitIdx].interval + timeUnits[timeUnitIdx].name + formatDeciTimerStr
+      }
+      // debugLog('timeUnits[timeUnitIdx].interval', timeUnits[timeUnitIdx].interval)
+      nextUnitValue = Math.floor(nextUnitValue / timeUnits[timeUnitIdx].interval)
+      timeUnitIdx +=1
+      // debugLog('nextUnitValue', nextUnitValue)
+    } while (nextUnitValue > 0)
+    return formatDeciTimerStr
+  }catch(e){
+    return '00时00分00秒0毫秒'
+  }
+}
+
 const log = function (object, message, tabs) {
   if (tabs == undefined) {
     tabs = 4
@@ -153,6 +177,7 @@ const getTotalScore = function(){
 module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
+  formatDeciTimer: formatDeciTimer,
   resetStatus: resetStatus,
   cloneObj: cloneObj,
   pickerMaker: pickerMaker,

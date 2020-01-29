@@ -63,8 +63,19 @@ module.exports = {
   },
   ANSWER_CORRECT: '/images/correct.png',
   ANSWER_INCORRECT: '/images/incorrect.png',
+  GAME_START_ICON: '/images/game_start.png',
+  ALERT_ICON: '/images/alert.png',
   ANSWER_TYPE: {
     TEXT: 'text',
     DIGIT: 'digit',
   },
+  TIME_UNITS: [
+    { name: '毫秒', interval: 1000 }
+    , { name: '秒', interval: 60 }
+    , { name: '分', interval: 60 }
+    , { name: '时', interval: 24 }
+    , { name: '天', interval: 30 }
+    , { name: '月', interval: 12 }
+    , { name: '年', interval: 100 }
+  ],
 }

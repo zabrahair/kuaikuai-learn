@@ -9,6 +9,13 @@
         {{curScore}}
       </div>
     </div>
+    <div class='current_timer'>
+      <!-- <div class='caption'>
+      </div> -->
+      <div class='value'>
+        {{curDeciTimerStr}}
+      </div>
+    </div>
     <div class='total_score'>
       <div class='value'>
         {{totalScore}}
@@ -27,10 +34,10 @@
     </div>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <div class='buttons'>
-        <button class="btn_reset"  formType="reset" type="warn" size='mini'>清空</button>
+        <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
         <button class="btn_answer" formType="submit" type="primary" size='mini'>提交</button>
         <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini'>下一题</button>
-
+        <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
       </div>    
       <div class='answer'>
         <input name='answer' class='input_answer' placeholder="输入答案" placeholder-class="input_answer_ph" type="{{answerType}}" value="{{curAnswer}}"/>
