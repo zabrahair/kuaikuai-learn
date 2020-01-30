@@ -26,6 +26,21 @@
     </view>
   </view>
   <view class='content'>
+    <view class="filters" 
+          wx:if="{{gameMode != gConst.GAME_MODE.NORMAL}}">
+      <image class='filters_icon' src='{{gConst.FILTERS_ICON}}'/>
+      <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{userConfigs.filterQuesLastDate}}" bindchange="bindLastDateChange">
+        <view class="picker">
+          {{lastDate}}
+        </view>
+      </picker>
+      <picker class='filter_time' mode="time" value="{{lastTime}}" start="00:00" end="{{userConfigs.filterQuesLastTime}}" bindchange="bindLastTimeChange">
+        <view class="picker">
+          {{lastTime}}
+        </view>
+      </picker>
+      <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch"/>
+    </view>
     <view class='question' animation="{{fadeInOutQuestion}}">
         {{curQuestion.op1}}
         {{curQuestion.operator}}

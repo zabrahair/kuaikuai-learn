@@ -24,5 +24,9 @@
       <text>九九除法练习</text>
       <text>>>></text>
     </view>
+    <view class='game_item' bindtap="onClickMathDivideWrongSlow">
+      <text>九九除法练习(错慢)</text>
+      <text>>>></text>
+    </view>
   </scroll-view>
 </view>

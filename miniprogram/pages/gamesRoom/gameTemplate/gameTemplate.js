@@ -117,12 +117,12 @@ Page({
       tags: '九九除法'
     }
     wx.cloud.callFunction({
-      name: 'kuaiMathDivideQuery',
+      name: 'mathDivideQuery',
       data: {
         filters: filters
       },
       success: res => {
-        debugLog('kuaiMathDivideQuery.success.res', res)
+        debugLog('mathDivideQuery.success.res', res)
         // debugLog('queryDish.dishes.count', res.result.data.length)
         let questions = res.result.data
         that.setData({

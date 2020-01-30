@@ -3,7 +3,6 @@
     "pages/index/index",
     "pages/profile/profile",
     "pages/history/history",
-    "pages/games/games",
     "pages/gamesRoom/mathDivide/mathDivide",
     "pages/register/register",
     "pages/gamesRoom/gameTemplate/gameTemplate"

@@ -12,6 +12,11 @@ const TABLES = require('../../../const/collections.js')
 const USER_ROLE = require('../../../const/userRole.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
+const learnHistoryApi = require('../../../api/learnHistory.js')
+// db related
+const db = wx.cloud.database()
+const $ = db.command.aggregate
+const _ = db.command
 
 // 练习计时器
 var scoreTimer =  null;
@@ -41,11 +46,19 @@ Page({
     inputAnswerDisabled: false,
     fadeInOutQuestion: null,
     fadeInOutPauseBtn: null,
+
     // score related
-    
     curScore: 0,
     totalScore: 0,
-    historyRecord: {}
+    historyRecord: {},
+    userConfigs: utils.getUserConfigs(),
+
+    // gConst
+    gConst: gConst,
+
+    // filters
+    lastDate: utils.getUserConfigs().filterQuesLastDate,
+    lastTime: '00:00',
   },
 
   /**
@@ -53,25 +66,12 @@ Page({
    */
   onLoad: function (options) {
     let that = this
+    let gameMode = options.gameMode;
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
+      gameMode: gameMode,
     })
-    utils.getTotalScore(userInfo, userScore =>{
-      that.setData({
-        totalScore: userScore.score,
-      })
-    })
-    this.getQuestions()
-    this.resetAnswer()
-
-    // 隐藏暂停按钮
-    that.fadeInOut('fadeInOutPauseBtn', {
-      duration: 10,
-      timingFunction: 'ease-in',
-      rotateY: 0,
-      opacity: 0,
-    });
   },
 
   /**
@@ -85,7 +85,24 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    let that = this
+    let userInfo = that.data.userInfo
+    let gameMode = that.data.gameMode
+    utils.getTotalScore(userInfo, userScore => {
+      that.setData({
+        totalScore: userScore.score,
+      })
+    })
+    this.getQuestions(gameMode)
+    this.resetAnswer()
 
+    // 隐藏暂停按钮
+    that.fadeInOut('fadeInOutPauseBtn', {
+      duration: 10,
+      timingFunction: 'ease-in',
+      rotateY: 0,
+      opacity: 0,
+    });
   },
 
   /**
@@ -128,18 +145,19 @@ Page({
      */
   recordHistory: function (question, answer) {
     let historyRecord = {};
-    question.tags.push(TABLES.MATH_DIVIDE)
-    delete question._id
-    Object.assign(historyRecord, question)
+    historyRecord['table'] = TABLES.MATH_DIVIDE
+    historyRecord['question'] = question
+    // delete question._id
+    // Object.assign(historyRecord, question)
     Object.assign(historyRecord, answer)
     // debugLog('historyRecord', historyRecord)
     wx.cloud.callFunction({
-      name: 'kuaiLearnHistoryCreate',
+      name: 'learnHistoryCreate',
       data: {
         hisRecord: historyRecord
       },
       success: res => {
-        // debugLog('kuaiLearnHistoryCreate.success.res', res)
+        // debugLog('learnHistoryCreate.success.res', res)
       },
       fail: err => {
         errorLog('[云函数] 调用失败：', err)
@@ -338,24 +356,37 @@ Page({
   /**
    * 获取所有题目
    */
-  getQuestions: function(){
+  getQuestions: function(gameMode){
+    let that = this
+
+    if(gameMode == gConst.GAME_MODE.NORMAL){
+      this.getNormalQuestions();
+    } else if (gameMode == gConst.GAME_MODE.WRONG_SLOW){
+      this.getWrongSlowQuestions();
+    }
+  },
+
+  /**
+   * Get Normal Question
+   */
+  getNormalQuestions: function(){
     let that = this
     let filters = {
       tags: '九九除法'
     }
     wx.cloud.callFunction({
-      name: 'kuaiMathDivideQuery',
+      name: 'mathDivideQuery',
       data: {
         filters: filters
       },
       success: res => {
-        // debugLog('kuaiMathDivideQuery.success.res', res)
-        // debugLog('kuaiMathDivideQuery.questions.count', res.result.data.length)
-        if (res.result.data.length && res.result.data.length > 0){
+        // debugLog('mathDivideQuery.success.res', res)
+        // debugLog('mathDivideQuery.questions.count', res.result.data.length)
+        if (res.result.data.length && res.result.data.length > 0) {
           let questions = res.result.data
           that.setData({
             questions: questions,
-          },function () {
+          }, function () {
             // 生成下一道题目
             that.onClickNextQuestion()
           })
@@ -366,6 +397,53 @@ Page({
         console.error('[云函数] 调用失败：', err)
       }
     })
+  },
+
+  /**
+   * 获得做的慢的错的题目
+   */
+  getWrongSlowQuestions: function(){
+    let that = this
+    let userInfo = that.data.userInfo
+    debugLog('that.data.lastDate', that.data.lastDate)
+    debugLog('that.data.lastTime', that.data.lastTime)
+    let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
+    debugLog('getWrongSlowQuestions.filterDate', filterDate)
+    learnHistoryApi.getHistoryQuestions(userInfo
+      , _.and(
+        {
+          openid: userInfo.openId,
+          table: 'math-divide',
+          question: _.exists(true),
+          answerTime: _.gte(filterDate)
+        },
+        _.or([{ isCorrect: false },
+          { thinkSeconds: _.gt(that.data.userConfigs.divideSpeedFloor) }
+      ]))
+      , res => {
+        debugLog('mathDivide.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
+        try {
+          if (res.list.length >= 0) {
+            let questions = []
+            for(let i in res.list){
+              questions.push(res.list[i]._id.question)
+            }
+            that.setData({
+              questions: questions,
+            }, function () {
+              // 生成下一道题目
+              that.onClickNextQuestion()
+            })
+          }
+        } catch (e) {
+          wx.showToast({
+            image: gConst.ERROR_ICON,
+            title: MSG.SOME_EXCEPTION,
+            duration: 1000,
+          })
+        }
+
+      })
   },
 
   /**
@@ -448,6 +526,46 @@ Page({
     })
   },
 
+  /**
+   * 
+   */
+  bindLastDateChange: function(e){
+    let that = this
+    debugLog('bindLastDateChange.e',e)
+    let lastDate = e.detail.value;
+    let lastTime = that.data.lastTime;
+    let date = utils.mergeDateTime(lastDate, lastTime)
+    that.setData({
+      lastDate: lastDate,
+      lastDateObj: date,
+    })
 
+  },
 
+  /**
+   * 
+   */
+  bindLastTimeChange: function(e){
+    let that = this
+    debugLog('bindLastTimeChange.e', e)
+    let lastDate = that.data.lastDate;
+    let lastTime = e.detail.value;
+    let date = utils.mergeDateTime(lastDate, lastTime)
+    that.setData({
+      lastTime: lastTime,
+      lastDateObj: date,
+    })
+
+  },
+
+  /**
+   * Search questions with filter 
+   * 
+   */
+  onClickSearch: function(e){
+    let that = this
+    debugLog('search now...')
+    that.getQuestions(that.data.gameMode);
+    that.resetAnswer();
+  }
 })

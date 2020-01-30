@@ -18,15 +18,17 @@ function dailyStatistic(userInfo, whereFilter, callback){
       _id: {
         openid: '$openid',
         nickName: '$nickName',
-        date: '$answerTimeStr',
+        answerDate: '$answerTimeStr',
       },
       score: $.sum('$score'),
-      avgThinkTime: $.avg('$thinkSeconds')
+      avgThinkTime: $.avg('$thinkSeconds'),
+      answerDate: $.first('$answerTimeStr'),
     }
     , {
       _id: 1,
       score: 1,
       avgThinkTime: 1,
+      answerDate: 1,
     }
     , callback);
 }
@@ -52,7 +54,23 @@ function tagsStatistic(userInfo, whereFilter, callback){
     , callback);
 }
 
+function getHistoryQuestions(userInfo, whereFilter, callback){
+  dbApi.groupAggregate(TABLES.LEARN_HISTORY
+    , whereFilter
+    , '$openid'
+    , {
+      _id: {
+        question: '$question'
+      },
+    }
+    , {
+      _id: 1,
+    }
+    , callback);
+}
+
 module.exports = {
   dailyStatistic: dailyStatistic,
   tagsStatistic: tagsStatistic,
+  getHistoryQuestions: getHistoryQuestions,
 }

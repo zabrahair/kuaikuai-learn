@@ -10,6 +10,32 @@ const USER_ROLE = require('./const/userRole.js')
 // const dbApi = require('./api/db.js')
 // const userApi = require('./api/user.js')
 
+const updateManager = wx.getUpdateManager()
+/**
+ * 小程序升级检测
+ */
+updateManager.onCheckForUpdate(function (res) {
+  // 请求完新版本信息的回调
+  debugLog("onCheckForUpdate", res.hasUpdate)
+})
+
+updateManager.onUpdateReady(function () {
+  wx.showModal({
+    title: '更新提示',
+    content: '新版本已经准备好，是否重启应用？',
+    success: function (res) {
+      if (res.confirm) {
+        // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+        updateManager.applyUpdate()
+      }
+    }
+  })
+})
+
+updateManager.onUpdateFailed(function () {
+  // 新版本下载失败
+})
+
 App({
   onLaunch: function () {
     
@@ -53,7 +79,7 @@ App({
               // 登陆当前用户
               // 调用云函数
               wx.cloud.callFunction({
-                name: 'kuaiLogin',
+                name: 'login',
                 data: {},
                 success: res => {
                   // debugLog('login', res)

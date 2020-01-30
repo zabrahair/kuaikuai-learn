@@ -1,6 +1,6 @@
 module.exports = {
-  MATH_DIVIDE: 'kuai-math-divide',
-  USERS: 'kuai-users',
-  SCORE_STANDARD: 'kuai-score-standard',
-  LEARN_HISTORY: 'kuai-learn-history',
+  MATH_DIVIDE: 'math-divide',
+  USERS: 'users',
+  SCORE_STANDARD: 'score-standard',
+  LEARN_HISTORY: 'learn-history',
 }

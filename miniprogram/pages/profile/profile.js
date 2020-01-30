@@ -126,7 +126,7 @@ Page({
               // 登陆当前用户
               // 调用云函数
               wx.cloud.callFunction({
-                name: 'kuaiLogin',
+                name: 'login',
                 data: {},
                 success: res => {
                   // debugLog('login', res)

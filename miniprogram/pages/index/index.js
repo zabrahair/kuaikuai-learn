@@ -12,7 +12,6 @@ const TABLES = require('../../const/collections.js')
 const USER_ROLE = require('../../const/userRole.js')
 const dbApi = require('../../api/db.js')
 const userApi = require('../../api/user.js')
-const learnHistoryApi = require('../../api/learnHistory.js')
 
 Page({
 
@@ -87,7 +86,16 @@ Page({
    */
   onClickMathDivide: function(e){
     wx.navigateTo({
-      url: '/pages/gamesRoom/mathDivide/mathDivide',
+      url: '/pages/gamesRoom/mathDivide/mathDivide?gameMode=' + gConst.GAME_MODE.NORMAL,
+    })
+  },
+
+/**
+ * 九九除法
+ */
+  onClickMathDivideWrongSlow: function (e) {
+    wx.navigateTo({
+      url: '/pages/gamesRoom/mathDivide/mathDivide?gameMode=' + gConst.GAME_MODE.WRONG_SLOW,
     })
   },
 
@@ -118,24 +126,6 @@ Page({
       })
     })
 
-    learnHistoryApi.dailyStatistic(userInfo
-      , {}
-      // , {
-      //   openid: userInfo.openId
-      // }
-    , res=>{
-      debugLog('dailyStatistic[' + TABLES.LEARN_HISTORY + ']', res)
-    })
-
-    learnHistoryApi.tagsStatistic(userInfo
-      , {}
-      // , {
-      //   openid: userInfo.openId
-      // }
-      , res => {
-        debugLog('tagsStatistic[' + TABLES.LEARN_HISTORY + ']', res)
-      })
-
     wx.getSetting({
       success: res => {
         // debugLog('getSetting', res)
@@ -155,7 +145,7 @@ Page({
               // 登陆当前用户
               // 调用云函数
               wx.cloud.callFunction({
-                name: 'kuaiLogin',
+                name: 'login',
                 data: {},
                 success: res => {
                   // debugLog('login', res)

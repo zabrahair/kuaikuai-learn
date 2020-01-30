@@ -3,6 +3,7 @@ const gConst = require('../const/global.js');
 const USER_ROLE = require('../const/userRole.js')
 const storeKeys = require('../const/global.js').storageKeys;
 const debugLog = require('log.js').debug;
+const errorLog = require('log.js').error;
 
 const formatTime = date => {
   const year = date.getFullYear()
@@ -13,6 +14,14 @@ const formatTime = date => {
   const second = date.getSeconds()
 
   return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
+}
+
+function mergeDateTime(dateStr, timeStr){
+  let date = new Date(dateStr + 'T' + timeStr + ':00Z');
+  date.setHours(date.getHours() - 8)
+  // debugLog('bindLastDateChange.date', date)
+  // debugLog('bindLastDateChange.date', date.toLocaleString())
+  return date;
 }
 
 const formatDate = (date, seperator = '/') => {
@@ -175,12 +184,12 @@ const getTotalScore = function(userInfo, callback){
       if(!openid){return}
       // debugLog('get sync total score')
       wx.cloud.callFunction({
-        name: 'kuaiLearnHistoryAggregate',
+        name: 'learnHistoryAggregate',
         data: {
           openid: openid
         },
         success: res => {
-          // debugLog('kuaiLearnHistoryAggregate.success.res', res)
+          // debugLog('learnHistoryAggregate.success.res', res)
           wx.setStorageSync(storeKeys.totalScore, res.result.score)
           callback(res.result)
         },
@@ -216,7 +225,7 @@ const getGamingStatistics = function (userInfo, callback) {
   let $ = db.command.aggregate
   let _ = db.command
   wx.cloud.callFunction({
-    name: 'kuaiLearnHistoryAggregate',
+    name: 'learnHistoryAggregate',
     data: {
       openid: openid,
       matchOptions: {
@@ -232,7 +241,7 @@ const getGamingStatistics = function (userInfo, callback) {
       },
     },
     success: res => {
-      // debugLog('kuaiLearnHistoryAggregate.success.res', res)
+      // debugLog('learnHistoryAggregate.success.res', res)
       callback(res.result)
     },
     fail: err => {
@@ -244,10 +253,28 @@ const getGamingStatistics = function (userInfo, callback) {
   // }
 }
 
+function getUserConfigs(ifRefresh){
+  const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+  let config = {
+    divideSpeedFloor: 4000,
+    filterQuesLastDate: new Date().toLocaleDateString('zh-CN', options).replace(/\//g,'-'),
+    filterQuesLastTime: '23:59'
+  }
+
+  //需要去数据库刷新
+  if (ifRefresh){
+
+  }else{
+  // 不需要从数据库刷新，从Storage取
+    return config
+  }
+}
+
 module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
   formatDeciTimer: formatDeciTimer,
+  mergeDateTime: mergeDateTime,
   resetStatus: resetStatus,
   cloneObj: cloneObj,
   pickerMaker: pickerMaker,
@@ -257,4 +284,5 @@ module.exports = {
   getUserRole: getUserRole,
   getTotalScore: getTotalScore,
   getGamingStatistics: getGamingStatistics,
+  getUserConfigs: getUserConfigs,
 }

@@ -1,2 +1,32 @@
-<!--miniprogram/pages/history/history.wxml-->
-<text>miniprogram/pages/history/history.wxml</text>
+<!--miniprogram/pages/index/index.wxml-->
+<view class='container'>
+  <view class='header'>
+    <view class='total_score'>
+      <image class='caption' src='{{scoreIcon}}'/>  
+      <view class='value'>
+        {{totalScore}}
+      </view>  
+    </view>
+  </view>
+  <view class='content'>
+    <scroll-view class='history' scroll-y='true'>
+      <view class='daily_statistic' wx:for-items='{{dailyRecords}}' wx:key="answerDate" wx:for-item='dailyRecord' wx:for-index='dailyRecIndx' data-option-idx='{{answerDate}}'>
+        <view class='item_date'>
+         {{dailyRecord.formatAnswerDate}}
+        </view>
+        <view class='item_think_time'>
+          <image class='caption' src='{{thinkIcon}}'/>  
+          <view class='value'>
+          {{dailyRecord.avgThinkTime}}秒
+          </view>
+        </view>
+        <view class='item_score'>
+          <image class='caption' src='{{expIcon}}'/>  
+          <view class='value'>
+          {{dailyRecord.score}}
+          </view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>
