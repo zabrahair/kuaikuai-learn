@@ -94,7 +94,7 @@
 				},
 				{
 					"id": 6,
-					"name": "gameMode=NORMAL",
+					"name": "spellEnglishWords - NORMAL",
 					"pathName": "pages/gamesRoom/spellEnglishWords/spellEnglishWords",
 					"query": "gameMode=NORMAL",
 					"scene": null
