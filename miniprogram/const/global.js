@@ -1,3 +1,4 @@
+const DEFAULT_DATE_FORMAT_OPTIONS = { year: 'numeric', month: '2-digit', day: '2-digit' };
 const UNSELECT = 'unselected';
 const SELECTED = 'selected';
 const storageKeys = {
@@ -91,5 +92,12 @@ module.exports = {
     NORMAL: 'NORMAL',
     SLOW: 'SLOW',
     WRONG_SLOW: 'WRONG_SLOW'
-  }
+  },
+  DEFAULT_USER_CONFIGS: {
+    divideSpeedFloor: 4000,
+    // filterQuesLastDays: 1,
+    filterQuesLastDate: new Date().toLocaleDateString('zh-CN', DEFAULT_DATE_FORMAT_OPTIONS).replace(/\//g, '-'),
+    filterQuesLastTime: '23:59'
+  },
+  DEFAULT_DATE_FORMAT_OPTIONS: DEFAULT_DATE_FORMAT_OPTIONS
 }

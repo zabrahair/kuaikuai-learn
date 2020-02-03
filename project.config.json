@@ -72,16 +72,31 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "pages/gamesRoom/mathDivide/mathDivide",
+					"id": 3,
+					"name": "mathDivide-NORMAL",
 					"pathName": "pages/gamesRoom/mathDivide/mathDivide",
-					"query": "",
+					"query": "gameMode=NORMAL",
 					"scene": null
 				},
 				{
 					"id": -1,
 					"name": "pages/history/history",
 					"pathName": "pages/history/history",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 5,
+					"name": "mathDivide-WRONG_SLOW",
+					"pathName": "pages/gamesRoom/mathDivide/mathDivide",
+					"query": "gameMode=WRONG_SLOW",
+					"scene": null
+				},
+				{
+					"id": 6,
+					"name": "gameMode=NORMAL",
+					"pathName": "pages/gamesRoom/spellEnglishWords/spellEnglishWords",
+					"query": "gameMode=NORMAL",
 					"scene": null
 				}
 			]

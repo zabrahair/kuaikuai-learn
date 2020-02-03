@@ -86,8 +86,70 @@ const updateUser = function (id, updateObj, callback) {
   })
 }
 
+function getUserConfigs(openid, callback){
+  const db = wx.cloud.database()
+  if(!openid){
+    return
+  }
+  // 根据条件查询所有用户
+  db.collection(TABLES.USERS).where({
+    _id: openid
+  }).get({
+    success: res => {
+      let result = res.data;
+      // debugLog('getUserCofigs', result);
+      if(result.length > 0){
+        callback(result[0].userConfigs)
+      }else{
+        callback(undefined)
+      }
+
+    },
+    fail: err => {
+      wx.showToast({
+        icon: 'none',
+        title: '查询记录失败'
+      })
+      errorLog('[数据库USER] [查询记录] 失败：', err)
+    }
+  })
+}
+
+function updateUserConfigs(openid, userConfigs, callback){
+  const db = wx.cloud.database()
+  let now = new Date();
+  let nowTimeString = now.toString();
+
+  let updateObj = {
+    userConfigs: userConfigs,
+    createTimestamp: now.getTime(),
+    createLocalTime: nowTimeString
+  }
+  delete updateObj._id
+  // debugLog('id', id)
+  // debugLog('updateObj', updateObj)
+  // 根据条件更新所有用户
+  db.collection(TABLES.USERS).doc(openid).update({
+    data: updateObj,
+    success: res => {
+      let result = res;
+      // debugLog('user', result);
+      callback(result)
+    },
+    fail: err => {
+      wx.showToast({
+        icon: 'none',
+        title: '更新记录失败'
+      })
+      errorLog('[数据库USER] [更新记录] 失败：', err)
+    }
+  })
+}
+
 module.exports = {
   queryUser: queryUser,
   createUser: createUser,
   updateUser: updateUser,
+  getUserConfigs: getUserConfigs,
+  updateUserConfigs: updateUserConfigs,
 }

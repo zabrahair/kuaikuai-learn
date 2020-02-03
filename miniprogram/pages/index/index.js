@@ -100,6 +100,14 @@ Page({
   },
 
   /**
+   * 英语单词拼写
+   */
+  onClickSpellEnglishWords: function(e){
+    wx.navigateTo({
+      url: '/pages/gamesRoom/spellEnglishWords/spellEnglishWords?gameMode=' + gConst.GAME_MODE.NORMAL,
+    })    
+  },
+  /**
      * 获得用户信息
      */
   getUserInfo: function (e) {

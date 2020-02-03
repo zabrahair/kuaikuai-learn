@@ -16,7 +16,7 @@ const updateManager = wx.getUpdateManager()
  */
 updateManager.onCheckForUpdate(function (res) {
   // 请求完新版本信息的回调
-  debugLog("onCheckForUpdate", res.hasUpdate)
+  // debugLog("onCheckForUpdate", res.hasUpdate)
 })
 
 updateManager.onUpdateReady(function () {
@@ -52,7 +52,7 @@ App({
         traceUser: true,
       })
       this.login();
-      
+      utils.getUserConfigs(true)
     }
   },
   /**

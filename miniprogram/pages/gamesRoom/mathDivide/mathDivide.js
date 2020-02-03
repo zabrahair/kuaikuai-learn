@@ -20,7 +20,10 @@ const _ = db.command
 
 // 练习计时器
 var scoreTimer =  null;
-
+const titles = {
+}
+titles[gConst.GAME_MODE.NORMAL] = '九九除法练习';
+titles[gConst.GAME_MODE.WRONG_SLOW] = '九九除法练习-错题'
 Page({
 
   /**
@@ -360,8 +363,14 @@ Page({
     let that = this
 
     if(gameMode == gConst.GAME_MODE.NORMAL){
+      wx.setNavigationBarTitle({
+        title: titles[gConst.GAME_MODE.NORMAL]
+      })
       this.getNormalQuestions();
     } else if (gameMode == gConst.GAME_MODE.WRONG_SLOW){
+      wx.setNavigationBarTitle({
+        title: titles[gConst.GAME_MODE.WRONG_SLOW]
+      })
       this.getWrongSlowQuestions();
     }
   },
