@@ -61,7 +61,7 @@
         <input name='answer' class='input_answer' 
         placeholder="输入答案" placeholder-class="input_answer_ph" 
         bindinput='onInputAnswer' bindconfirm="submitAnswer" 
-        type="{{answerType}}" disabled='{{inputAnswerDisabled}}' value="{{curAnswer}}"/>
+        type="{{answerType}}" adjust-position="{{ false }}" disabled='{{inputAnswerDisabled}}' value="{{curAnswer}}"/>
       </view>
     </form>
   </view>
