@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "英语单词拼写练习"
+  "navigationBarTitleText": "英语单词拼写练习",
+  "enablePullDownRefresh": false
 }

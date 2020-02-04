@@ -1,6 +1,6 @@
 const app = getApp()
 const globalData = app.globalData
-
+// System Const Variables
 const MSG = require('../../../const/message.js')
 const debugLog = require('../../../utils/log.js').debug;
 const errorLog = require('../../../utils/log.js').error;
@@ -8,12 +8,12 @@ const gConst = require('../../../const/global.js');
 const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
 const TABLES = require('../../../const/collections.js')
-
+// Api Handler
 const USER_ROLE = require('../../../const/userRole.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
-// db related
+// DB Related
 const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
@@ -22,18 +22,53 @@ const _ = db.command
 var scoreTimer = null;
 const titles = {
 }
+
+// Titles
 titles[gConst.GAME_MODE.NORMAL] = '英语拼写练习';
 titles[gConst.GAME_MODE.WRONG_SLOW] = '英语拼写练习-错题'
+
+// Alphabet Variables
+const alphabet = "abcdefghijklmnopqrstuvwxyz"
+const alphabetArray = alphabet.split('')
+const card_x_offset = 0;
+const card_y_offset = 300;
+const card_width = 50;
+const card_height = 60;
+
+// Page Const Value
+const BLANK_EMPTY = '_'
+const CARD_STATE = {
+  UNUSED: 'card_unused',
+  USED: 'card_used',
+}
+const cardObjectTemplate = {
+  id: 0,
+  letter: '',
+  cardState: CARD_STATE.UNUSED,
+  x: 0,
+  y: 0,
+  isUsed: false,
+  blankValue: BLANK_EMPTY,
+  usedCardIdx: false,
+  usedBlankIdx: false,
+  tempCardIdx: false,
+}
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
+    // Question Related
+    alphabetArray: alphabetArray,
     questions: [],
     questionsDone: [],
     curQuestionIndex: 0,
     curQuestion: {},
+    curSpellCards: [],
+    selectedCard: null,
+
+    // User Info related
     userInfo: null,
 
     // Time related
@@ -187,6 +222,15 @@ Page({
   },
 
   /**
+   * 组合拼写结果
+   */
+  combineSpellAnswer: function(spellAnswer){
+    if (spellAnswer && spellAnswer.length > 0){
+      let answerWord = spellAnswer.map(card=> card.blankValue).join('')
+      return answerWord;
+    }
+  },
+  /**
    * 提交答案
    */
   submitAnswer: function (e) {
@@ -196,17 +240,18 @@ Page({
 
     // debugLog('submitAnswer.e', e)
     let that = this
-    let formValues = e.detail.value
+
     // try{
 
     // debugLog('formValues', formValues)
     let curQuestion = that.data.curQuestion
     // debugLog('curQuestion', curQuestion)
     // 同時針對回車和Button提交
-    let inputAnswer = formValues.answer ? formValues.answer : formValues
-    let answer = parseFloat(inputAnswer)
+    let curSpellCards = that.data.curSpellCards
+    let answer = that.combineSpellAnswer(curSpellCards)
+    debugLog('answer', answer)
     let isCorrect = false
-    if (answer == curQuestion.result) {
+    if (answer == curQuestion.word) {
       isCorrect = true
       wx.showToast({
         image: gConst.ANSWER_CORRECT,
@@ -314,11 +359,11 @@ Page({
    * 下一题
    */
   onClickNextQuestion: function (e, isCorrect) {
-    if (this.checkPauseStatus()) {
+    let that = this
+    if (that.checkPauseStatus()) {
       return;
     }
     try {
-      let that = this
       let targetValues = e ? e.target.dataset : null
       let questions = this.data.questions
       let questionsDone = this.data.questionsDone
@@ -344,15 +389,56 @@ Page({
         curQuestionIndex = 0
         question = {}
       }
+      // 重置变量
       that.setData({
         questions: questions,
         questionsDone: questionsDone,
         curQuestionIndex: curQuestionIndex,
         curQuestion: question,
+        curAnswer: '',
+        selectedCard: false,
+        curSpellCards: false,
         thinkSeconds: 0,
+      }, res=>{
+        that.processCurrentQuestion(question)
       })
     } catch (e) {
       errorLog('onClickNextQuestion error:', e)
+    }
+  },
+
+  /**
+   * 处理当前题目
+   * 7 cards in every line
+   */
+  processCurrentQuestion: function (question){
+    let that = this
+    that.setData({
+      curSpellCards: []
+    })
+    if ( typeof question.word == 'string'){
+      let letters = question.word.split('');
+      let curSpellCards = []
+      let length = letters.length
+      // debugLog('length', length)
+      for (let idx = 0; idx < length; idx++ ) {
+        // debugLog('letters', letters)
+        let i = Math.floor(Math.random() * letters.length)
+        // debugLog('i', i)
+        let cardObject = {}
+        Object.assign(cardObject,cardObjectTemplate)
+        cardObject.id = idx
+        cardObject.letter = letters[i]
+        // cardObject.x = card_x_offset + idx % 7 * card_width
+        // cardObject.y = card_y_offset + Math.floor(idx/7) * card_height
+        // debugLog('cardObject', cardObject)
+        curSpellCards.push(cardObject)
+        letters.splice(i,1)
+      }
+
+      that.setData({
+        curSpellCards: curSpellCards
+      })
     }
   },
 
@@ -460,6 +546,11 @@ Page({
    */
   onClickPause: function (e) {
     let that = this
+    // 对于继续按钮做特殊处理，防止误触发
+    if (e.target.dataset.isContinueButton 
+      && that.data.isPause == false){
+      return;
+    }
     if (that.data.isPause) {
       that.setData({
         isPause: false,
@@ -498,10 +589,7 @@ Page({
         rotateY: 0,
         opacity: 1,
       }));
-
-
     }
-
   },
 
   /**
@@ -576,5 +664,130 @@ Page({
     debugLog('search now...')
     that.getQuestions(that.data.gameMode);
     that.resetAnswer();
+  },
+
+  /**
+   * 点击拼写空档
+   */
+  onTapSpellBlank: function(e){
+    let dataset = e.target.dataset;
+    // debugLog('onTapSpellBlank.dataset', dataset)
+    let that = this
+    
+    let blankIdx = dataset.blankIdx
+    let selectedBlank = dataset.spellBlank
+    let selectedCard = that.data.selectedCard
+    let curSpellCards = that.data.curSpellCards;
+    let curBlank = curSpellCards[blankIdx]
+
+    if (selectedCard){
+      let usedCardIdx = selectedCard.tempCardIdx;
+      curBlank.blankValue = selectedCard.letter
+      curBlank.usedCardIdx = usedCardIdx;
+      curSpellCards[curBlank.usedCardIdx].usedBlankIdx = blankIdx
+      selectedCard = false
+
+    }else{
+      if (curBlank.usedCardIdx && curBlank.usedCardIdx != 0){
+        // Mockup click spell card and call onTapAnswerCard
+        this.onTapAnswerCard({
+          target: {
+            dataset: {
+              cardIdx: curBlank.usedCardIdx,
+              spellCard: curSpellCards[curBlank.usedCardIdx]
+          }
+          }
+        })
+      }
+   
+    }
+    that.setData({
+      selectedCard: selectedCard,
+      curSpellCards: curSpellCards,
+    })
+  },
+
+  /**
+   * 点击字母卡片
+   */
+  onTapAnswerCard: function(e, callback){
+    let dataset = e.target.dataset;
+    // debugLog('onTapAnswerCard.dataset', dataset)
+    let that = this
+    let curSpellCards = that.data.curSpellCards;
+    let cardIdx = dataset.cardIdx
+    let curCard = curSpellCards[cardIdx];
+    // 如果没有填写空档就选下一个
+
+    if (that.data.selectedCard 
+      && that.data.selectedCard.id != curCard.id) {
+      wx.showToast({
+        image: gConst.ERROR_ICON,
+        title: MSG.CLICK_BLANK_FIRST,
+        duration: 1000,
+      })
+      return;
+    }
+
+    let selectedCard = dataset.spellCard
+
+    if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED){
+      selectedCard.tempCardIdx = cardIdx
+      curCard.cardState = CARD_STATE.USED
+    } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED){
+      curCard.cardState = CARD_STATE.UNUSED
+      if (curCard.usedBlankIdx){
+        curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
+        curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
+        curCard.usedBlankIdx = false
+      }
+      selectedCard = false
+    }
+    // debugLog('selectCard', selectedCard)
+    that.setData({
+      curSpellCards: curSpellCards,
+      selectedCard: selectedCard,
+    })
+    if(typeof callback == 'function')callback()
+  },
+
+  /**
+   * 通过拖曳卡片填写答案
+   * 自动填写到左起第一个空格上
+   */
+  onLongPressAnswerCard: function(e){
+    // debugLog('onTouchMoveAnswerCard.e', e.target.dataset);
+    let that = this
+    let dataset = e.target.dataset
+    let cardIdx = dataset.cardIdx
+    let spellCard = dataset.spellCard
+    that.onTapAnswerCard({
+      target: {
+        dataset: {
+          cardIdx: cardIdx,
+          spellCard: spellCard,          
+        }
+      }
+    }, res=>{
+      let blankIdx = -1;
+      let spellBlank = false
+      let curSpellCards = that.data.curSpellCards;
+      for (let i in curSpellCards){
+        if (curSpellCards[i].blankValue == BLANK_EMPTY){
+          spellBlank = curSpellCards[i]
+          blankIdx = i
+          that.onTapSpellBlank({
+            target: {
+              dataset: {
+                blankIdx: blankIdx,
+                spellBlank: spellBlank,
+              }
+            }
+          })
+          break;
+        }
+      }
+      
+    })
   }
 })
