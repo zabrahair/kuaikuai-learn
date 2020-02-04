@@ -13,6 +13,7 @@ const USER_ROLE = require('../../../const/userRole.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
+const HISTORY_TABLE = TABLES.ENGLISH_WORDS
 // DB Related
 const db = wx.cloud.database()
 const $ = db.command.aggregate
@@ -183,7 +184,7 @@ Page({
      */
   recordHistory: function (question, answer) {
     let historyRecord = {};
-    historyRecord['table'] = TABLES.MATH_DIVIDE
+    historyRecord['table'] = HISTORY_TABLE
     historyRecord['question'] = question
     // delete question._id
     // Object.assign(historyRecord, question)
@@ -255,7 +256,7 @@ Page({
       isCorrect = true
       wx.showToast({
         image: gConst.ANSWER_CORRECT,
-        title: '完全正确',
+        title: MSG.CORRECT_ALERT,
         duration: 500,
       }, function () {
 
@@ -271,7 +272,7 @@ Page({
     } else {
       wx.showToast({
         image: gConst.ANSWER_INCORRECT,
-        title: '继续努力',
+        title: MSG.INCORRECT_ALERT,
         duration: 500,
       })
     }
@@ -322,18 +323,20 @@ Page({
     questionsDone = []
     curQuestionIndex = Math.floor(Math.random() * questions.length)
     question = questions[curQuestionIndex]
-    that.setData({
-      questions: questions,
-      questionsDone: questionsDone,
-      curQuestionIndex: curQuestionIndex,
-      curQuestion: question,
-    })
+    that.onClickNextQuestion()
+    // that.setData({
+    //   questions: questions,
+    //   questionsDone: questionsDone,
+    //   curQuestionIndex: curQuestionIndex,
+    //   curQuestion: question,
+    // })
 
     // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
     // 开始计时
     that.setData({
       curDeciSecond: 0,
       thinkSeconds: 0,
+
     })
     clearInterval(scoreTimer)
     scoreTimer = setInterval(function () {
@@ -388,6 +391,13 @@ Page({
         questionsDone = []
         curQuestionIndex = 0
         question = {}
+        wx.showToast({
+          image: gConst.ANSWER_CORRECT,
+          title: MSG.FINISH_ALL_QUESTIONS,
+          duration: 1000,
+        }, function () {
+
+        })
       }
       // 重置变量
       that.setData({
@@ -453,11 +463,11 @@ Page({
         title: titles[gConst.GAME_MODE.NORMAL]
       })
       this.getNormalQuestions();
-    } else if (gameMode == gConst.GAME_MODE.WRONG_SLOW) {
+    } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.WRONG_SLOW]
+        title: titles[gConst.GAME_MODE.WRONG]
       })
-      this.getWrongSlowQuestions();
+      this.getWrongQuestions();
     }
   },
 
@@ -475,8 +485,8 @@ Page({
         filters: filters
       },
       success: res => {
-        // debugLog('mathDivideQuery.success.res', res)
-        // debugLog('mathDivideQuery.questions.count', res.result.data.length)
+        // debugLog('spellEnglishWordsQuery.success.res', res)
+        // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
         if (res.result.data.length && res.result.data.length > 0) {
           let questions = res.result.data
           that.setData({
@@ -495,9 +505,9 @@ Page({
   },
 
   /**
-   * 获得做的慢的错的题目
+   * 获得做地错的题目
    */
-  getWrongSlowQuestions: function () {
+  getWrongQuestions: function () {
     let that = this
     let userInfo = that.data.userInfo
     debugLog('that.data.lastDate', that.data.lastDate)
@@ -508,15 +518,15 @@ Page({
       , _.and(
         {
           openid: userInfo.openId,
-          table: 'math-divide',
+          table: HISTORY_TABLE,
           question: _.exists(true),
           answerTime: _.gte(filterDate)
         },
         _.or([{ isCorrect: false },
-        { thinkSeconds: _.gt(that.data.userConfigs.divideSpeedFloor) }
+        // { thinkSeconds: _.gt('$question.minFinishTime') }
         ]))
       , res => {
-        debugLog('mathDivide.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
+        debugLog('spellEnglishWords.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
         try {
           if (res.list.length >= 0) {
             let questions = []

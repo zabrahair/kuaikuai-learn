@@ -38,11 +38,33 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+  
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function () {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
     let that = this
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
     })
+    if (!userInfo.openId) {
+      this.setData({
+        userInfo: null,
+        totalScore: 0,
+        dailyRecords: [],
+      })
+      return;
+    }
     utils.getTotalScore(userInfo, userScore => {
       that.setData({
         totalScore: userScore.score,
@@ -70,21 +92,7 @@ Page({
           })
         }
 
-      })
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-    
+      })  
   },
 
   /**

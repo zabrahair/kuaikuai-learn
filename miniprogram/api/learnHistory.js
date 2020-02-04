@@ -20,12 +20,13 @@ function dailyStatistic(userInfo, whereFilter, callback){
         nickName: '$nickName',
         answerDate: '$answerTimeStr',
       },
-      score: $.sum('$score'),
+      score: $.sum($.sum(['$question.score', '$score'])),
       avgThinkTime: $.avg('$thinkSeconds'),
       answerDate: $.first('$answerTimeStr'),
     }
     , {
       _id: 1,
+      oldScore: 1,
       score: 1,
       avgThinkTime: 1,
       answerDate: 1,

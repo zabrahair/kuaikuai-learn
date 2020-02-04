@@ -35,7 +35,7 @@ exports.main = async (event, context) => {
             openid: '$openid',
             nickName: '$nickName'
           },
-          score: $.sum('$score'),
+          score: $.sum($.sum(['$question.score', '$score'])),
           avgThinkTime: $.avg('$thinkSeconds'),
         }
       }
@@ -66,7 +66,7 @@ exports.main = async (event, context) => {
         await db.collection(USERS_TABLE).where({ _id: event.openid })
           .update({
             data: {
-              score: res.list[0].score,
+              score: score,
               lastUpdate: new Date().getTime(),
             }
           })

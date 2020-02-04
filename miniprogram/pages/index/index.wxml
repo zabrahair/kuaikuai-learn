@@ -13,7 +13,7 @@
         <!-- <text class='caption'>昵称：</text> -->
         <text class='value'>{{userInfo.nickName}}</text>
       </view>
-      <view class='my_score' >
+      <view class='my_score' wx:if="{{totalScore > 0}}">
         <image class='caption' src='{{scoreIcon}}'/>
         <text class='value'>{{totalScore}}</text>
       </view>
@@ -30,6 +30,10 @@
     </view>
     <view class='game_item' bindtap="onClickSpellEnglishWords">
       <text>英语单词拼写</text>
+      <text>>>></text>
+    </view>
+    <view class='game_item' bindtap="onClickSpellEnglishWordsWrong">
+      <text>英语单词拼写(错)</text>
       <text>>>></text>
     </view>
   </scroll-view>

@@ -12,7 +12,7 @@
         <!-- <text class='caption'>昵称：</text> -->
         <text class='value'>{{userInfo.nickName}}</text>
       </view>
-      <view class='my_score' >
+      <view class='my_score' wx:if="{{totalScore > 0}}">
         <image class='caption' src='{{scoreIcon}}'/>
         <text class='value'>{{totalScore}}</text>
       </view>
@@ -20,8 +20,8 @@
   </view>
   <view class='content'>
     <view class='buttons'>
-      <button class="" type='warn' bindtap='onLogout'>
-        注销
+      <button wx:if="{{isSignIn}}" class="" type='warn' bindtap='toSignOut'>
+        登出
       </button>
     </view>
   </view>

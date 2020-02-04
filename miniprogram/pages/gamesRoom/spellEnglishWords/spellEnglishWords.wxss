@@ -357,5 +357,12 @@
   left: 25vw;
   top: 25vh;
   font-size: 10vh;
+}
 
+.true {
+  display: flex;
+}
+
+.false {
+  display: none;
 }

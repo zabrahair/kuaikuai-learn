@@ -60,7 +60,8 @@
         wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
-        bindtap="onTapAnswerCard" bindtouchmove="onLongPressAnswerCard">
+        bindtap="onTapAnswerCard" bindtouchmove="onLongPressAnswerCard"
+        bindlongpress="onLongPressAnswerCard">
         {{spellCard.letter}}
         </view>
       </view>
@@ -75,5 +76,5 @@
       </view>    
     </form>
   </view>
-  <button class="btn_continue" bindtap='onClickPause' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
+  <button class="btn_continue {{isPause}}" bindtap='onClickPause' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
 </view>

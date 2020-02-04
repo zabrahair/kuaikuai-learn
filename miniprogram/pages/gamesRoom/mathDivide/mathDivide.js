@@ -13,6 +13,8 @@ const USER_ROLE = require('../../../const/userRole.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
+const HISTORY_TABLE = TABLES.MATH_DIVIDE
+
 // db related
 const db = wx.cloud.database()
 const $ = db.command.aggregate
@@ -148,7 +150,7 @@ Page({
      */
   recordHistory: function (question, answer) {
     let historyRecord = {};
-    historyRecord['table'] = TABLES.MATH_DIVIDE
+    historyRecord['table'] = TABLES.HISTORY_TABLE
     historyRecord['question'] = question
     // delete question._id
     // Object.assign(historyRecord, question)
@@ -422,12 +424,13 @@ Page({
       , _.and(
         {
           openid: userInfo.openId,
-          table: 'math-divide',
+          table: HISTORY_TABLE,
           question: _.exists(true),
           answerTime: _.gte(filterDate)
         },
         _.or([{ isCorrect: false },
-          { thinkSeconds: _.gt(that.data.userConfigs.divideSpeedFloor) }
+          { thinkSeconds: _.gt('$question.minFinishTime') }
+          // { thinkSeconds: _.gt(that.data.userConfigs.divideSpeedFloor) }
       ]))
       , res => {
         debugLog('mathDivide.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)

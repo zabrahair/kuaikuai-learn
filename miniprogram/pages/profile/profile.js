@@ -22,6 +22,7 @@ Page({
     authLogin: '请授权',
     totalScore: 0,
     scoreIcon: gConst.SCORE_ICON,
+    isSignIn: false,
   },
 
   /**
@@ -42,6 +43,10 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    this.setData({
+      authLogin: '请授权',
+      totalScore: 0,
+    })
     debugLog('onShow', true)
     this.login();
   },
@@ -162,7 +167,8 @@ Page({
                   })
 
                   that.setData({
-                    authLogin: ''
+                    authLogin: '',
+                    isSignIn: true,
                   })
                   utils.getTotalScore(userInfo, userScore => {
                     that.setData({
@@ -214,4 +220,42 @@ Page({
       }
     })
   },
+  /**
+   * 登出
+   */
+  toSignOut: function(e){
+    let that = this
+    wx.showModal({
+      title: MSG.CONFIRM_TITLE,
+      content: MSG.SIGNOUT_CONFIRM_MSG,
+      success(res) {
+        if (res.confirm) {
+          debugLog('用户点击确定')
+          wx.openSetting({
+            success(res) {
+              console.log(res.authSetting)
+              delete globalData.userInfo
+              debugLog('globalData', globalData)
+              wx.clearStorage({
+                complete: function(e){
+                  wx.switchTab({
+                    url: '/pages/index/index',
+                  })
+                },
+
+              });
+              // res.authSetting = {
+              //   "scope.userInfo": true,
+              //   "scope.userLocation": true
+              // }
+
+            }
+          })
+
+        } else if (res.cancel) {
+          errorLog('用户点击取消')
+        }
+      }
+    })
+  }
 })

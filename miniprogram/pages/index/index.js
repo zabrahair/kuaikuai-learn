@@ -43,6 +43,10 @@ Page({
    */
   onShow: function () {
     // debugLog('onShow', true)
+    this.setData({
+      authLogin: '请授权',
+      totalScore: 0,
+    })
     this.login();
   },
 
@@ -91,7 +95,7 @@ Page({
   },
 
 /**
- * 九九除法
+ * 九九除法(错慢)
  */
   onClickMathDivideWrongSlow: function (e) {
     wx.navigateTo({
@@ -106,6 +110,14 @@ Page({
     wx.navigateTo({
       url: '/pages/gamesRoom/spellEnglishWords/spellEnglishWords?gameMode=' + gConst.GAME_MODE.NORMAL,
     })    
+  },
+  /**
+ * 英语单词拼写(错)
+ */
+  onClickSpellEnglishWordsWrong: function (e) {
+    wx.navigateTo({
+      url: '/pages/gamesRoom/spellEnglishWords/spellEnglishWords?gameMode=' + gConst.GAME_MODE.WRONG,
+    })
   },
   /**
      * 获得用户信息
@@ -241,4 +253,5 @@ Page({
       }
     })
   },
+
 })
