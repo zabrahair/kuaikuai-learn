@@ -681,7 +681,7 @@ Page({
    */
   onTapSpellBlank: function(e){
     let dataset = e.target.dataset;
-    // debugLog('onTapSpellBlank.dataset', dataset)
+    debugLog('onTapSpellBlank.dataset', dataset)
     let that = this
     
     let blankIdx = dataset.blankIdx
@@ -698,7 +698,7 @@ Page({
       selectedCard = false
 
     }else{
-      if (curBlank.usedCardIdx && curBlank.usedCardIdx != 0){
+      if (typeof curBlank.usedCardIdx == 'number'){
         // Mockup click spell card and call onTapAnswerCard
         this.onTapAnswerCard({
           target: {
@@ -722,7 +722,7 @@ Page({
    */
   onTapAnswerCard: function(e, callback){
     let dataset = e.target.dataset;
-    // debugLog('onTapAnswerCard.dataset', dataset)
+    debugLog('onTapAnswerCard.dataset', dataset)
     let that = this
     let curSpellCards = that.data.curSpellCards;
     let cardIdx = dataset.cardIdx
@@ -746,7 +746,8 @@ Page({
       curCard.cardState = CARD_STATE.USED
     } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED){
       curCard.cardState = CARD_STATE.UNUSED
-      if (curCard.usedBlankIdx){
+      if (typeof curCard.usedBlankIdx == 'number'){
+        // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
         curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
         curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
         curCard.usedBlankIdx = false
@@ -766,7 +767,7 @@ Page({
    * 自动填写到左起第一个空格上
    */
   onLongPressAnswerCard: function(e){
-    // debugLog('onTouchMoveAnswerCard.e', e.target.dataset);
+    debugLog('onTouchMoveAnswerCard.e', e.target.dataset);
     let that = this
     let dataset = e.target.dataset
     let cardIdx = dataset.cardIdx
