@@ -684,7 +684,8 @@ Page({
     debugLog('onTapSpellBlank.dataset', dataset)
     let that = this
     
-    let blankIdx = dataset.blankIdx
+    let blankIdx = parseInt(dataset.blankIdx)
+    debugLog('typeof blankIdx', typeof blankIdx)
     let selectedBlank = dataset.spellBlank
     let selectedCard = that.data.selectedCard
     let curSpellCards = that.data.curSpellCards;
@@ -725,7 +726,7 @@ Page({
     debugLog('onTapAnswerCard.dataset', dataset)
     let that = this
     let curSpellCards = that.data.curSpellCards;
-    let cardIdx = dataset.cardIdx
+    let cardIdx = parseInt(dataset.cardIdx)
     let curCard = curSpellCards[cardIdx];
     // 如果没有填写空档就选下一个
 
@@ -772,6 +773,9 @@ Page({
     let dataset = e.target.dataset
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
+    if(spellCard.cardState == CARD_STATE.USED){
+      return;
+    }
     that.onTapAnswerCard({
       target: {
         dataset: {
@@ -780,7 +784,7 @@ Page({
         }
       }
     }, res=>{
-      let blankIdx = -1;
+      let blankIdx = false;
       let spellBlank = false
       let curSpellCards = that.data.curSpellCards;
       for (let i in curSpellCards){
