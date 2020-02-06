@@ -63,6 +63,8 @@ module.exports = {
     ADMIN: 'A45!KB',
   },
   // icons relate
+  FAVORITED_ICON: '/images/favorited.png',
+  NOT_FAVORITED_ICON: '/images/not-favorited.png',
   ANSWER_CORRECT: '/images/correct.png',
   ANSWER_INCORRECT: '/images/incorrect.png',
   GAME_START_ICON: '/images/game_start.png',
@@ -91,7 +93,8 @@ module.exports = {
     WRONG: 'WRONG',
     NORMAL: 'NORMAL',
     SLOW: 'SLOW',
-    WRONG_SLOW: 'WRONG_SLOW'
+    WRONG_SLOW: 'WRONG_SLOW',
+    FAVORITES: 'FAVORITES',
   },
   DEFAULT_USER_CONFIGS: {
     divideSpeedFloor: 4000,
@@ -99,5 +102,6 @@ module.exports = {
     filterQuesLastDate: new Date().toLocaleDateString('zh-CN', DEFAULT_DATE_FORMAT_OPTIONS).replace(/\//g, '-'),
     filterQuesLastTime: '23:59'
   },
-  DEFAULT_DATE_FORMAT_OPTIONS: DEFAULT_DATE_FORMAT_OPTIONS
+  DEFAULT_DATE_FORMAT_OPTIONS: DEFAULT_DATE_FORMAT_OPTIONS,
+  IS_FAVORITED: '收藏',
 }

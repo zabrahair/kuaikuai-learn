@@ -62,6 +62,7 @@ Page({
     gConst: gConst,
 
     // filters
+    tags: ['九九除法'],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
   },
@@ -383,7 +384,7 @@ Page({
   getNormalQuestions: function(){
     let that = this
     let filters = {
-      tags: '九九除法'
+      tags: that.data.tags
     }
     wx.cloud.callFunction({
       name: 'mathDivideQuery',
@@ -416,8 +417,8 @@ Page({
   getWrongSlowQuestions: function(){
     let that = this
     let userInfo = that.data.userInfo
-    debugLog('that.data.lastDate', that.data.lastDate)
-    debugLog('that.data.lastTime', that.data.lastTime)
+    // debugLog('that.data.lastDate', that.data.lastDate)
+    // debugLog('that.data.lastTime', that.data.lastTime)
     let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
     debugLog('getWrongSlowQuestions.filterDate', filterDate)
     learnHistoryApi.getHistoryQuestions(userInfo
@@ -426,12 +427,17 @@ Page({
           openid: userInfo.openId,
           table: HISTORY_TABLE,
           question: _.exists(true),
-          answerTime: _.gte(filterDate)
+          answerTime: _.gte(filterDate),
+          question: {
+            tags:_.all(that.data.tags)
+          },
         },
-        _.or([{ isCorrect: false },
+        _.or([
+          { isCorrect: false },
           { thinkSeconds: _.gt('$question.minFinishTime') }
           // { thinkSeconds: _.gt(that.data.userConfigs.divideSpeedFloor) }
-      ]))
+        ])
+      )
       , res => {
         debugLog('mathDivide.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
         try {

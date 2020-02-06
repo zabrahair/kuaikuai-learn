@@ -13,6 +13,7 @@ const USER_ROLE = require('../../../const/userRole.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
+const favoritesApi = require('../../../api/favorites.js')
 const HISTORY_TABLE = TABLES.ENGLISH_WORDS
 // DB Related
 const db = wx.cloud.database()
@@ -60,6 +61,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+
     // Question Related
     alphabetArray: alphabetArray,
     questions: [],
@@ -85,6 +87,7 @@ Page({
     inputAnswerDisabled: false,
     fadeInOutQuestion: null,
     fadeInOutPauseBtn: null,
+    isFavorited: false,
 
     // score related
     curScore: 0,
@@ -96,6 +99,7 @@ Page({
     gConst: gConst,
 
     // filters
+    tags: ['英语单词', '拼写', '拖曳'],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
   },
@@ -104,12 +108,20 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    debugLog('onLoad.options', options)
     let that = this
     let gameMode = options.gameMode;
+    let tags = that.data.tags
+    if (options.filterTags){
+      let filterTagsStr = options.filterTags;
+      tags = tags.concat(filterTagsStr.split(','))
+      debugLog('onLoad.tags', tags)
+    }
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
       gameMode: gameMode,
+      tags: tags,
     })
   },
 
@@ -202,7 +214,6 @@ Page({
         errorLog('[云函数] 调用失败：', err)
       }
     })
-
   },
 
   /**
@@ -399,6 +410,16 @@ Page({
 
         })
       }
+
+      let isFavorited = false
+      if (question._id) {
+        let tags = question.tags
+        
+        if (tags.includes(gConst.IS_FAVORITED)) {
+          isFavorited = true
+        }
+      }
+
       // 重置变量
       that.setData({
         questions: questions,
@@ -409,6 +430,7 @@ Page({
         selectedCard: false,
         curSpellCards: false,
         thinkSeconds: 0,
+        isFavorited: isFavorited,
       }, res=>{
         that.processCurrentQuestion(question)
       })
@@ -462,12 +484,19 @@ Page({
       wx.setNavigationBarTitle({
         title: titles[gConst.GAME_MODE.NORMAL]
       })
-      this.getNormalQuestions();
+      this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
+
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
         title: titles[gConst.GAME_MODE.WRONG]
       })
-      this.getWrongQuestions();
+      this.getHistoryQuestions(gConst.GAME_MODE.WRONG);
+
+    } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
+      wx.setNavigationBarTitle({
+        title: titles[gConst.GAME_MODE.FAVORITES]
+      })
+      this.getFavoritesQuestions(gConst.GAME_MODE.FAVORITES);
     }
   },
 
@@ -476,13 +505,12 @@ Page({
    */
   getNormalQuestions: function () {
     let that = this
-    let filters = {
-      tags: _.and(['英语单词', '拼写','拖曳'])
-    }
     wx.cloud.callFunction({
       name: 'spellEnglishWordsQuery',
       data: {
-        filters: filters
+        filters: {
+          tags: that.data.tags
+        }
       },
       success: res => {
         // debugLog('spellEnglishWordsQuery.success.res', res)
@@ -505,26 +533,77 @@ Page({
   },
 
   /**
+   * 获得收藏题目
+   */
+  getFavoritesQuestions: function(mode){
+    let that = this
+    let userInfo = that.data.userInfo
+    debugLog('that.data.lastDate', that.data.lastDate)
+    debugLog('that.data.lastTime', that.data.lastTime)
+    let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
+    debugLog('getFavoritesQuestions.filterDate', filterDate)
+    let wherefilters
+    if (gConst.GAME_MODE.FAVORITES == mode) {
+      wherefilters = {
+        tags: that.data.tags
+      }
+    }
+    favoritesApi.getFavorites(TABLES.ENGLISH_WORDS
+      , wherefilters
+      , res => {
+        debugLog('favoritesApi.getFavorites', res)
+        try {
+          if (res.length >= 0) {
+            let questions = []
+            for (let i in res) {
+              questions.push(res[i].thing)
+            }
+            that.setData({
+              questions: questions,
+            }, function () {
+              // 生成下一道题目
+              that.onClickNextQuestion()
+            })
+          }
+        } catch (e) {
+          wx.showToast({
+            image: gConst.ERROR_ICON,
+            title: MSG.SOME_EXCEPTION,
+            duration: 1000,
+          })
+        }
+
+      })
+  },
+
+  /**
    * 获得做地错的题目
    */
-  getWrongQuestions: function () {
+  getHistoryQuestions: function (mode) {
     let that = this
     let userInfo = that.data.userInfo
     debugLog('that.data.lastDate', that.data.lastDate)
     debugLog('that.data.lastTime', that.data.lastTime)
     let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
     debugLog('getWrongSlowQuestions.filterDate', filterDate)
-    learnHistoryApi.getHistoryQuestions(userInfo
-      , _.and(
+    let wherefilters
+    if(gConst.GAME_MODE.WRONG == mode ){
+      wherefilters = _.and(
         {
           openid: userInfo.openId,
           table: HISTORY_TABLE,
           question: _.exists(true),
-          answerTime: _.gte(filterDate)
+          answerTime: _.gte(filterDate),
+          question: {
+            tags: _.all(that.data.tags)
+          }
         },
         _.or([{ isCorrect: false },
-        // { thinkSeconds: _.gt('$question.minFinishTime') }
+          // { thinkSeconds: _.gt('$question.minFinishTime') }
         ]))
+    }
+    learnHistoryApi.getHistoryQuestions(userInfo
+      , wherefilters
       , res => {
         debugLog('spellEnglishWords.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
         try {
@@ -804,5 +883,43 @@ Page({
       }
       
     })
+  },
+  clickFavoriteSwitch: function(e){
+    let that = this
+    debugLog('clickFavoriteSwitch.dataset', e.target.dataset)
+    let dataset = e.target.dataset
+    let curQuesId = dataset.curQuestionIndex
+    
+    if(that.data.isFavorited == true){
+      let curQuestion = that.data.curQuestion
+      let tags = curQuestion.tags
+      // delete favorite tag
+      tags = tags.filter(ele => {
+        return ele != gConst.IS_FAVORITED
+      })
+      debugLog('curQuestion tags removed', tags)
+      favoritesApi.removeFavorite(TABLES.ENGLISH_WORDS, curQuestion, res=>{
+        that.setData({
+          isFavorited: false,
+          curQuestion: curQuestion,
+        })
+      })
+
+    } else if (that.data.isFavorited == false){
+      // set to favorited
+      let curQuestion = that.data.curQuestion
+      let tags = curQuestion.tags
+      if (!tags.includes(gConst.IS_FAVORITED)) {
+        tags.push(gConst.IS_FAVORITED)
+      }
+      debugLog('curQuestion tags', tags)
+      favoritesApi.createFavorite(TABLES.ENGLISH_WORDS, curQuestion, res => {
+        that.setData({
+          isFavorited: true,
+          curQuestion: curQuestion,
+        })  
+      })
+  
+    }
   }
 })

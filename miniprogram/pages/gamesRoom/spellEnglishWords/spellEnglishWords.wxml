@@ -39,9 +39,12 @@
           {{lastTime}}
         </view>
       </picker>
-      <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch"/>
+      <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
     </view>
     <movable-area class='question' animation="{{fadeInOutQuestion}}">
+      <image class="favorite" data-question-id="{{curQuestion._id}}"
+      src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
+      bindtap="clickFavoriteSwitch"/>
       <text class="meaning_text">{{curQuestion.meaning}}</text>
       <view class='left_questions_count'>
         {{questions.length}}

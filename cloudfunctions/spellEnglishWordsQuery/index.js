@@ -13,10 +13,13 @@ const TABLE = 'english-words'
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   let filters = event.filters
-  console.log('event', JSON.stringify(event, null, 4))
+  console.log('event.filters', JSON.stringify(event.filters, null, 4))
   try {
-    let result = await db.collection(TABLE).where(filters).get()
-    console.log('spellEnglishWordsQuery Result:', JSON.stringify(result, null, 4))
+    let result = await db.collection(TABLE).where({
+      tags: _.all(filters.tags)
+    }).get()
+    console.log('spellEnglishWordsQuery Result counts:', JSON.stringify(result.data.length, null, 4))
+    // console.log('spellEnglishWordsQuery Result:', JSON.stringify(result, null, 4))
     return result;
   } catch (e) {
     console.error(e)

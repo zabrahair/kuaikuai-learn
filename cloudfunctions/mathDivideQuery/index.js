@@ -15,7 +15,9 @@ exports.main = async (event, context) => {
   let filters = event.filters
   console.log('event', JSON.stringify(event, null, 4))
   try {
-    let result = await db.collection(TABLE).where(filters).get()
+    let result = await db.collection(TABLE).where({
+      tags: _.all(filters.tags)
+    }).get()
     console.log('mathDivideQuery Result:', JSON.stringify(result, null, 4))
     return result;
   } catch (e) {

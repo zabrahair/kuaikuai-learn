@@ -111,12 +111,21 @@ Page({
       url: '/pages/gamesRoom/spellEnglishWords/spellEnglishWords?gameMode=' + gConst.GAME_MODE.NORMAL,
     })    
   },
+
   /**
  * 英语单词拼写(错)
  */
   onClickSpellEnglishWordsWrong: function (e) {
     wx.navigateTo({
       url: '/pages/gamesRoom/spellEnglishWords/spellEnglishWords?gameMode=' + gConst.GAME_MODE.WRONG,
+    })
+  },
+  /**
+ * 检索收藏的单词
+ */
+  onClickSpellEnglishWordsFavorites: function(e){
+    wx.navigateTo({
+      url: '/pages/gamesRoom/spellEnglishWords/spellEnglishWords?gameMode=' + gConst.GAME_MODE.FAVORITES + '&filterTags=收藏',
     })
   },
   /**

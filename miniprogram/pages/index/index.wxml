@@ -36,5 +36,9 @@
       <text>英语单词拼写(错)</text>
       <text>>>></text>
     </view>
+    <view class='game_item' bindtap="onClickSpellEnglishWordsFavorites">
+      <text>英语单词拼写(收藏)</text>
+      <text>>>></text>
+    </view>
   </scroll-view>
 </view>

@@ -4,4 +4,5 @@ module.exports = {
   USERS: 'users',
   SCORE_STANDARD: 'score-standard',
   LEARN_HISTORY: 'learn-history',
+  FAVORITES: 'favorites'
 }
