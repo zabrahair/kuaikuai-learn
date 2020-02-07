@@ -98,6 +98,13 @@
 					"pathName": "pages/gamesRoom/spellEnglishWords/spellEnglishWords",
 					"query": "gameMode=NORMAL",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "gameMode=NORMAL",
+					"pathName": "pages/gamesRoom/ChineseWords/ChineseWords",
+					"query": "gameMode=NORMAL",
+					"scene": null
 				}
 			]
 		}

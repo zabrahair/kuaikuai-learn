@@ -1,0 +1,83 @@
+<!--miniprogram/pages/index/index.wxml-->
+<view class='container'>
+  <view class='header'>
+    <view class='current_score'>
+      <view class='caption'>
+        本次: 
+      </view>
+      <view class='value'>
+        {{curScore}}
+      </view>
+    </view>
+    <view class='current_timer'>
+      <!-- <view class='caption'>
+      </view> -->
+      <view class='value'>
+        {{curDeciTimerStr}}
+      </view>
+    </view>
+    <view class='total_score'>
+      <view class='value'>
+        {{totalScore}}
+      </view> 
+      <view class='caption'>
+        :总分
+      </view>   
+    </view>
+  </view>
+  <view class='content'>
+    <view class="filters" 
+          wx:if="{{gameMode != gConst.GAME_MODE.NORMAL}}">
+      <image class='filters_icon' src='{{gConst.FILTERS_ICON}}'/>
+      <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{userConfigs.filterQuesLastDate}}" bindchange="bindLastDateChange">
+        <view class="picker">
+          {{lastDate}}
+        </view>
+      </picker>
+      <picker class='filter_time' mode="time" value="{{lastTime}}" start="00:00" end="{{userConfigs.filterQuesLastTime}}" bindchange="bindLastTimeChange">
+        <view class="picker">
+          {{lastTime}}
+        </view>
+      </picker>
+      <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
+    </view>
+    <movable-area class='question' animation="{{fadeInOutQuestion}}">
+      <image class="favorite" data-question-id="{{curQuestion._id}}"
+      src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
+      bindtap="clickFavoriteSwitch"/>
+      <text class="meaning_text">{{curQuestion.meaning}}</text>
+      <view class='left_questions_count'>
+        {{questions.length}}
+      </view>
+      <!-- <view class="spell_positions">
+        <view class='spell_letter_position' 
+      wx:for-items='{{curSpellCards}}' wx:for-item='spellBlank' 
+      wx:for-index='idx' wx:key="id" 
+      data-spell-blank='{{spellBlank}}' data-blank-idx='{{idx}}'
+      bindtap="onTapSpellBlank">
+          {{spellBlank.blankValue}}
+        </view>
+      </view> -->
+      <view class="alphabet_cards">
+        <view class='alphabet_card {{spellCard.cardState}}'
+        wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
+        wx:for-index='idx' wx:key="id" 
+        data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
+        bindtap="onTapAnswerCard" bindtouchmove="onLongPressAnswerCard"
+        bindlongpress="onLongPressAnswerCard">
+        {{spellCard.letter}}
+        </view>
+      </view>
+
+    </movable-area>
+    <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
+      <view class='buttons' animation="{{fadeInOutQuestion}}">
+        <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
+        <button class="btn_answer" formType="submit" type="primary" size='mini' >提交</button>
+        <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini'>下一题</button>
+        <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
+      </view>    
+    </form>
+  </view>
+  <button class="btn_continue {{isPause}}" bindtap='onClickPause' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
+</view>
