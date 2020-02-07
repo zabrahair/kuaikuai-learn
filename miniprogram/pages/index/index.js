@@ -22,6 +22,7 @@ Page({
     authLogin: '请授权',
     totalScore: 0,
     scoreIcon: gConst.SCORE_ICON,
+    gConst: gConst,
   },
 
   /**
@@ -121,11 +122,19 @@ Page({
     })
   },
   /**
- * 检索收藏的单词
- */
+   * 检索收藏的单词
+   */
   onClickSpellEnglishWordsFavorites: function(e){
     wx.navigateTo({
       url: '/pages/gamesRoom/spellEnglishWords/spellEnglishWords?gameMode=' + gConst.GAME_MODE.FAVORITES + '&filterTags=收藏',
+    })
+  },
+  /**
+   * 语文知识学习
+   */
+  onClickChineseKnowledge: function(e){
+    wx.navigateTo({
+      url: '/pages/gamesRoom/ChineseKnowledge/ChineseKnowledge?gameMode=' + gConst.GAME_MODE.NORMAL,
     })
   },
   /**

@@ -6,7 +6,8 @@
     "pages/gamesRoom/mathDivide/mathDivide",
     "pages/register/register",
     "pages/gamesRoom/gameTemplate/gameTemplate",
-    "pages/gamesRoom/spellEnglishWords/spellEnglishWords"
+    "pages/gamesRoom/spellEnglishWords/spellEnglishWords",
+    "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",

@@ -155,13 +155,38 @@
   justify-content: space-between;
   align-items: center;
 
-  width: 90vw;
-  height: 10vh;
+  width: 85vw;
+  height: 7vh;
+  margin-left: 2vw;
   margin-top: 2vh;
   background-color: rgba(200, 200, 250, 0.5);
 
   color: peru;
-  font-size: 8vw;
+  font-size: 5vw;
   padding-left: 5vw;
   padding-right: 5vw;
+  border-radius: 3vw;
+}
+
+.goto_icon {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 5vw;
+  height: 5vw;
+}
+
+.goto_icon_hover {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 5vw;
+  height: 5vw;
+
 }

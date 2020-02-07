@@ -1,4 +1,4 @@
-.container {
+.component-container {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -204,7 +204,6 @@
 
   width: 86.5%;
   height: 12vw;
-  margin-left: 5%;
 
   font-size: 5vw;
   color: green;

@@ -26,51 +26,21 @@ const titles = {
 }
 
 // Titles
-titles[gConst.GAME_MODE.NORMAL] = '英语拼写练习';
-titles[gConst.GAME_MODE.WRONG] = '英语拼写练习-错题'
-titles[gConst.GAME_MODE.FAVORITES] = '英语拼写练习-收藏'
+titles[gConst.GAME_MODE.NORMAL] = '语文知识练习';
 
-// Alphabet Variables
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
-const alphabetArray = alphabet.split('')
-const card_x_offset = 0;
-const card_y_offset = 300;
-const card_width = 50;
-const card_height = 60;
 
 // Page Const Value
-const BLANK_EMPTY = '_'
-const CARD_STATE = {
-  UNUSED: 'card_unused',
-  USED: 'card_used',
-}
-const cardObjectTemplate = {
-  id: 0,
-  letter: '',
-  cardState: CARD_STATE.UNUSED,
-  x: 0,
-  y: 0,
-  isUsed: false,
-  blankValue: BLANK_EMPTY,
-  usedCardIdx: false,
-  usedBlankIdx: false,
-  tempCardIdx: false,
-}
 Page({
-
   /**
    * 页面的初始数据
    */
   data: {
 
     // Question Related
-    alphabetArray: alphabetArray,
     questions: [],
     questionsDone: [],
     curQuestionIndex: 0,
     curQuestion: {},
-    curSpellCards: [],
-    selectedCard: null,
 
     // User Info related
     userInfo: null,
@@ -81,11 +51,8 @@ Page({
     thinkSeconds: 0,
 
     // Answer Related
-    curAnswer: '',
-    answerType: gConst.ANSWER_TYPE.DIGIT,
     isPause: false,
     pauseBtnText: '暂停',
-    inputAnswerDisabled: false,
     fadeInOutQuestion: null,
     fadeInOutPauseBtn: null,
     isFavorited: false,
@@ -100,7 +67,7 @@ Page({
     gConst: gConst,
 
     // filters
-    tags: ['英语单词', '拼写', '拖曳'],
+    tags: ['语文', '文史'],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
   },
@@ -113,7 +80,7 @@ Page({
     let that = this
     let gameMode = options.gameMode;
     let tags = that.data.tags
-    if (options.filterTags){
+    if (options.filterTags) {
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
       debugLog('onLoad.tags', tags)
@@ -192,30 +159,7 @@ Page({
 
   },
 
-  /**
-     * 提交做题记录
-     */
-  recordHistory: function (question, answer) {
-    let historyRecord = {};
-    historyRecord['table'] = HISTORY_TABLE
-    historyRecord['question'] = question
-    // delete question._id
-    // Object.assign(historyRecord, question)
-    Object.assign(historyRecord, answer)
-    // debugLog('historyRecord', historyRecord)
-    wx.cloud.callFunction({
-      name: 'learnHistoryCreate',
-      data: {
-        hisRecord: historyRecord
-      },
-      success: res => {
-        // debugLog('learnHistoryCreate.success.res', res)
-      },
-      fail: err => {
-        errorLog('[云函数] 调用失败：', err)
-      }
-    })
-  },
+
 
   /**
    * 暂停判断
@@ -234,15 +178,7 @@ Page({
     }
   },
 
-  /**
-   * 组合拼写结果
-   */
-  combineSpellAnswer: function(spellAnswer){
-    if (spellAnswer && spellAnswer.length > 0){
-      let answerWord = spellAnswer.map(card=> card.blankValue).join('')
-      return answerWord;
-    }
-  },
+
   /**
    * 提交答案
    */
@@ -336,14 +272,6 @@ Page({
     curQuestionIndex = Math.floor(Math.random() * questions.length)
     question = questions[curQuestionIndex]
     that.onClickNextQuestion()
-    // that.setData({
-    //   questions: questions,
-    //   questionsDone: questionsDone,
-    //   curQuestionIndex: curQuestionIndex,
-    //   curQuestion: question,
-    // })
-
-    // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
     // 开始计时
     that.setData({
       curDeciSecond: 0,
@@ -415,7 +343,7 @@ Page({
       let isFavorited = false
       if (question._id) {
         let tags = question.tags
-        
+
         if (tags.includes(gConst.IS_FAVORITED)) {
           isFavorited = true
         }
@@ -428,50 +356,13 @@ Page({
         curQuestionIndex: curQuestionIndex,
         curQuestion: question,
         curAnswer: '',
-        selectedCard: false,
-        curSpellCards: false,
         thinkSeconds: 0,
         isFavorited: isFavorited,
-      }, res=>{
+      }, res => {
         that.processCurrentQuestion(question)
       })
     } catch (e) {
       errorLog('onClickNextQuestion error:', e)
-    }
-  },
-
-  /**
-   * 处理当前题目
-   * 7 cards in every line
-   */
-  processCurrentQuestion: function (question){
-    let that = this
-    that.setData({
-      curSpellCards: []
-    })
-    if ( typeof question.word == 'string'){
-      let letters = question.word.split('');
-      let curSpellCards = []
-      let length = letters.length
-      // debugLog('length', length)
-      for (let idx = 0; idx < length; idx++ ) {
-        // debugLog('letters', letters)
-        let i = Math.floor(Math.random() * letters.length)
-        // debugLog('i', i)
-        let cardObject = {}
-        Object.assign(cardObject,cardObjectTemplate)
-        cardObject.id = idx
-        cardObject.letter = letters[i]
-        // cardObject.x = card_x_offset + idx % 7 * card_width
-        // cardObject.y = card_y_offset + Math.floor(idx/7) * card_height
-        // debugLog('cardObject', cardObject)
-        curSpellCards.push(cardObject)
-        letters.splice(i,1)
-      }
-
-      that.setData({
-        curSpellCards: curSpellCards
-      })
     }
   },
 
@@ -487,12 +378,6 @@ Page({
       })
       this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
 
-    } else if (gameMode == gConst.GAME_MODE.WRONG) {
-      wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.WRONG]
-      })
-      this.getHistoryQuestions(gConst.GAME_MODE.WRONG);
-
     } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
       wx.setNavigationBarTitle({
         title: titles[gConst.GAME_MODE.FAVORITES]
@@ -507,7 +392,7 @@ Page({
   getNormalQuestions: function () {
     let that = this
     wx.cloud.callFunction({
-      name: 'spellEnglishWordsQuery',
+      name: 'ChineseKnowledgeQuery',
       data: {
         filters: {
           tags: that.data.tags
@@ -536,7 +421,7 @@ Page({
   /**
    * 获得收藏题目
    */
-  getFavoritesQuestions: function(mode){
+  getFavoritesQuestions: function (mode) {
     let that = this
     let userInfo = that.data.userInfo
     debugLog('that.data.lastDate', that.data.lastDate)
@@ -546,7 +431,7 @@ Page({
     let wherefilters
     if (gConst.GAME_MODE.FAVORITES == mode) {
       wherefilters = {
-        tags: _.all(that.data.tags)
+        tags: that.data.tags
       }
     }
     favoritesApi.getFavorites(TABLES.ENGLISH_WORDS
@@ -588,7 +473,7 @@ Page({
     let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
     debugLog('getWrongSlowQuestions.filterDate', filterDate)
     let wherefilters
-    if(gConst.GAME_MODE.WRONG == mode ){
+    if (gConst.GAME_MODE.WRONG == mode) {
       wherefilters = _.and(
         {
           openid: userInfo.openId,
@@ -637,8 +522,8 @@ Page({
   onClickPause: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
-    if (e.target.dataset.isContinueButton 
-      && that.data.isPause == false){
+    if (e.target.dataset.isContinueButton
+      && that.data.isPause == false) {
       return;
     }
     if (that.data.isPause) {
@@ -705,11 +590,11 @@ Page({
   },
 
   /**
-   * 
+   * 点击检索用最近日期
    */
   bindLastDateChange: function (e) {
     let that = this
-    debugLog('bindLastDateChange.e', e)
+    // debugLog('bindLastDateChange.e', e)
     let lastDate = e.detail.value;
     let lastTime = that.data.lastTime;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -721,11 +606,11 @@ Page({
   },
 
   /**
-   * 
+   * 点击检索用最近时间
    */
   bindLastTimeChange: function (e) {
     let that = this
-    debugLog('bindLastTimeChange.e', e)
+    // debugLog('bindLastTimeChange.e', e)
     let lastDate = that.data.lastDate;
     let lastTime = e.detail.value;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -742,177 +627,8 @@ Page({
    */
   onClickSearch: function (e) {
     let that = this
-    debugLog('search now...')
+    // debugLog('search now...')
     that.getQuestions(that.data.gameMode);
     that.resetAnswer();
   },
-
-  /**
-   * 点击拼写空档
-   */
-  onTapSpellBlank: function(e){
-    let dataset = e.target.dataset;
-    debugLog('onTapSpellBlank.dataset', dataset)
-    let that = this
-    
-    let blankIdx = parseInt(dataset.blankIdx)
-    debugLog('typeof blankIdx', typeof blankIdx)
-    let selectedBlank = dataset.spellBlank
-    let selectedCard = that.data.selectedCard
-    let curSpellCards = that.data.curSpellCards;
-    let curBlank = curSpellCards[blankIdx]
-
-    if (selectedCard){
-      let usedCardIdx = selectedCard.tempCardIdx;
-      curBlank.blankValue = selectedCard.letter
-      curBlank.usedCardIdx = usedCardIdx;
-      curSpellCards[curBlank.usedCardIdx].usedBlankIdx = blankIdx
-      selectedCard = false
-
-    }else{
-      if (typeof curBlank.usedCardIdx == 'number'){
-        // Mockup click spell card and call onTapAnswerCard
-        this.onTapAnswerCard({
-          target: {
-            dataset: {
-              cardIdx: curBlank.usedCardIdx,
-              spellCard: curSpellCards[curBlank.usedCardIdx]
-          }
-          }
-        })
-      }
-   
-    }
-    that.setData({
-      selectedCard: selectedCard,
-      curSpellCards: curSpellCards,
-    })
-  },
-
-  /**
-   * 点击字母卡片
-   */
-  onTapAnswerCard: function(e, callback){
-    let dataset = e.target.dataset;
-    debugLog('onTapAnswerCard.dataset', dataset)
-    let that = this
-    let curSpellCards = that.data.curSpellCards;
-    let cardIdx = parseInt(dataset.cardIdx)
-    let curCard = curSpellCards[cardIdx];
-    // 如果没有填写空档就选下一个
-
-    if (that.data.selectedCard 
-      && that.data.selectedCard.id != curCard.id) {
-      wx.showToast({
-        image: gConst.ERROR_ICON,
-        title: MSG.CLICK_BLANK_FIRST,
-        duration: 1000,
-      })
-      return;
-    }
-
-    let selectedCard = dataset.spellCard
-
-    if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED){
-      selectedCard.tempCardIdx = cardIdx
-      curCard.cardState = CARD_STATE.USED
-    } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED){
-      curCard.cardState = CARD_STATE.UNUSED
-      if (typeof curCard.usedBlankIdx == 'number'){
-        // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
-        curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
-        curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
-        curCard.usedBlankIdx = false
-      }
-      selectedCard = false
-    }
-    // debugLog('selectCard', selectedCard)
-    that.setData({
-      curSpellCards: curSpellCards,
-      selectedCard: selectedCard,
-    })
-    if(typeof callback == 'function')callback()
-  },
-
-  /**
-   * 通过拖曳卡片填写答案
-   * 自动填写到左起第一个空格上
-   */
-  onLongPressAnswerCard: function(e){
-    debugLog('onTouchMoveAnswerCard.e', e.target.dataset);
-    let that = this
-    let dataset = e.target.dataset
-    let cardIdx = dataset.cardIdx
-    let spellCard = dataset.spellCard
-    if(spellCard.cardState == CARD_STATE.USED){
-      return;
-    }
-    that.onTapAnswerCard({
-      target: {
-        dataset: {
-          cardIdx: cardIdx,
-          spellCard: spellCard,          
-        }
-      }
-    }, res=>{
-      let blankIdx = false;
-      let spellBlank = false
-      let curSpellCards = that.data.curSpellCards;
-      for (let i in curSpellCards){
-        if (curSpellCards[i].blankValue == BLANK_EMPTY){
-          spellBlank = curSpellCards[i]
-          blankIdx = i
-          that.onTapSpellBlank({
-            target: {
-              dataset: {
-                blankIdx: blankIdx,
-                spellBlank: spellBlank,
-              }
-            }
-          })
-          break;
-        }
-      }
-      
-    })
-  },
-  clickFavoriteSwitch: function(e){
-    let that = this
-    debugLog('clickFavoriteSwitch.dataset', e.target.dataset)
-    let dataset = e.target.dataset
-    let curQuesId = dataset.curQuestionIndex
-    
-    if(that.data.isFavorited == true){
-      let curQuestion = that.data.curQuestion
-      let tags = curQuestion.tags
-      // delete favorite tag
-      tags = tags.filter(ele => {
-        return ele != gConst.IS_FAVORITED
-      })
-      debugLog('curQuestion tags removed', tags)
-      favoritesApi.removeFavorite(TABLES.ENGLISH_WORDS, curQuestion, res=>{
-        that.setData({
-          isFavorited: false,
-          curQuestion: curQuestion,
-        })
-      })
-
-    } else if (that.data.isFavorited == false){
-      // set to favorited
-      let curQuestion = that.data.curQuestion
-      let tags = curQuestion.tags
-      if (!tags.includes(gConst.IS_FAVORITED)) {
-        tags.push(gConst.IS_FAVORITED)
-      }
-      debugLog('curQuestion tags', tags)
-      favoritesApi.createFavorite(TABLES.ENGLISH_WORDS, curQuestion
-      , res => {
-        that.setData({
-          isFavorited: true,
-          curQuestion: curQuestion,
-        })  
-      })
-  
-    }
-  }
 })

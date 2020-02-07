@@ -68,14 +68,22 @@ const removeFavorite = function (tableName, removeData, callback) {
 }
 
 function getFavorites(tableName, pWhere, callback) {
-  let where = _.and({
-    thing: {
-      tags: gConst.IS_FAVORITED
+  debugLog('pWhere', pWhere)
+  let where = 
+  _.and({
+      table: tableName,
+      thing: {
+        tags: gConst.IS_FAVORITED
+      }
     }
-  }, {
-      thing: pWhere
-  })
-  db.collection(TABLE).get({
+    ,{
+        thing: pWhere
+    }
+  )
+  debugLog('where', where)
+  db.collection(TABLE)
+    .where(where)
+    .get({
     success: res => {
       let result = res.data;
       // debugLog('res', result);
