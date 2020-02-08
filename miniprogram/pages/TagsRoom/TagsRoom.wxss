@@ -1,1 +1,47 @@
-/* miniprogram/pages/TagsRoom/TagsRoom.wxss */
+.tags-cloud {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;  
+
+  width: 100vw;
+  height: 90vh;
+  background-color: rgba(114, 183, 185, 0.5);
+}
+
+.tag {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;  
+
+  height: 4vh;
+  margin-left: 1vw;
+  padding: 1vw;
+  background-color: rgba(82, 136, 236, 0.9);
+  border-radius: 2vw;
+}
+
+.selected-tag {
+  background-color: rgba(228, 80, 43, 0.9);
+}
+
+.buttons {
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  margin-top: 2vw;
+}
+
+.button {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}

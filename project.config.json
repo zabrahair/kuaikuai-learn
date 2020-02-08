@@ -100,9 +100,16 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "gameMode=NORMAL",
+					"id": 7,
+					"name": "ChineseWords - gameMode=NORMAL",
 					"pathName": "pages/gamesRoom/ChineseWords/ChineseWords",
+					"query": "gameMode=NORMAL",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/TagsRoom/TagsRoom",
+					"pathName": "pages/TagsRoom/TagsRoom",
 					"query": "gameMode=NORMAL",
 					"scene": null
 				}

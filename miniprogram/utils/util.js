@@ -291,6 +291,22 @@ function getUserConfigs(ifRefresh, updateConfigs){
     return config
   }
 }
+/**
+ * join array with object
+ */
+function arrayJoin(array, joinProp, seperator){
+  if (!seperator){
+    seperator = ','
+  }
+  let result = ''
+  for(let i in array){
+    result += array[i][joinProp]
+    if(i < array.length -1){
+      result += seperator
+    }
+  }
+  return result
+}
 
 module.exports = {
   formatTime: formatTime,
@@ -307,4 +323,5 @@ module.exports = {
   getTotalScore: getTotalScore,
   getGamingStatistics: getGamingStatistics,
   getUserConfigs: getUserConfigs,
+  arrayJoin: arrayJoin,
 }

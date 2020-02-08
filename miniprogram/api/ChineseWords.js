@@ -19,15 +19,27 @@ function getTags(pWhere,callback) {
   db.collection(TABLE)
     .aggregate()
     .match(pWhere)
-    .unwind({tags: '$tags'})
+    .unwind('$tags')
     .group({
-      _id: {
-        tags: '$tags'
-      }
+      _id: '$tags',
+      count: $.sum(1)
     })
-    .end().then(res => {
-      // debugLog('getTags[' + table + ']', res)
-      callback(res)
+    .end().then
+    (res => {
+      debugLog('getTags', res)
+      if(res.list.length > 0){
+        let tags = []
+        for(let i in res.list){
+          tags.push({
+            text: res.list[i]._id
+            , count: res.list[i].count
+          })
+        }
+        callback(tags)
+        return
+      }else{
+        callback([])
+      }
     })
 }
 

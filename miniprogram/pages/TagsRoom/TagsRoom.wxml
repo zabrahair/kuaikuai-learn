@@ -1,3 +1,17 @@
 <view class='container'>
-  <button bindtap="onClickEnter" >进入</button>
+  <view class='tags-cloud'>
+    <view class='tag {{tag.css}}'
+      wx:for-items='{{tags}}' wx:for-item='tag' 
+      wx:for-index='idx' wx:key="tag" 
+      data-tag-count='{{tag.count}}' 
+      data-tag-text='{{tag.text}}' 
+      data-tag-idx='{{idx}}'
+      bindtap="tapTag"
+    >
+      {{tag.text}}
+    </view>
+  </view>
+  <view class='buttons'>
+  <button class="button" bindtap="onClickEnter" type='primary'>进入</button>
+  </view>
 </view>

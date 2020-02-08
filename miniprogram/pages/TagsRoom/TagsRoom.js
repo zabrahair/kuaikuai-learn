@@ -1,18 +1,37 @@
-// miniprogram/pages/TagsRoom/TagsRoom.js
+const app = getApp()
+const globalData = app.globalData
+
+const MSG = require('../../const/message.js')
+const debugLog = require('../../utils/log.js').debug;
+const errorLog = require('../../utils/log.js').error;
+const gConst = require('../../const/global.js');
+const storeKeys = require('../../const/global.js').storageKeys;
+const utils = require('../../utils/util.js');
+const TABLES = require('../../const/collections.js')
+
+const USER_ROLE = require('../../const/userRole.js')
+const dbApi = require('../../api/db.js')
+const ChineseApi = require('../../api/ChineseWords.js')
+
+const SELECTED_TAG_CSS = 'selected-tag'
+
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    // common
+    gConst: gConst,
+    tags: [],
+    selectedTags: [],
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    this.getTags();
   },
 
   /**
@@ -68,8 +87,67 @@ Page({
    * 
    */
   onClickEnter: function(e){
+    let that = this
+    let selectedTags = that.data.selectedTags
+    let joinedString = utils.arrayJoin(selectedTags, 'text')
     wx.navigateTo({
-      url: '/pages/gamesRoom/ChineseWords/ChineseWords?gameMode=' + gConst.GAME_MODE.NORMAL,
+      url: '/pages/gamesRoom/ChineseWords/ChineseWords?gameMode=' + gConst.GAME_MODE.NORMAL + '&filterTags=' + joinedString,
     })
-  }
+  },
+  /**
+   * 獲取所有的標籤
+   */
+  getTags: function(){
+    let that = this
+    ChineseApi.getTags({
+      score: 1
+    }
+    ,res=>{
+      debugLog('res',res)
+      let tags = res
+      that.setData({
+        tags: tags
+      })
+    })
+  },
+
+  /**
+   * tap Tag
+   * 
+   */
+  tapTag: function(e){
+    let that = this
+    debugLog('tapTag.e.target.dataset', e.target.dataset)
+    let dataset = e.target.dataset
+    let tagText = dataset.tagText
+    let tagIdx = parseInt(dataset.tagIdx)
+    let tagCount = dataset.tagCount
+    let selectedTags = that.data.selectedTags
+    let tags = that.data.tags
+
+    let isFound = false
+    for (let i in selectedTags){
+      if (selectedTags[i].text == tagText) {
+        selectedTags.splice(i, 1)
+        tags[tagIdx]['css'] = ''
+        isFound = true
+      }
+    }
+
+    if(isFound == false){
+      tags[tagIdx]['css'] = SELECTED_TAG_CSS
+      selectedTags.push(
+        { 
+          text: tagText,
+          count: tagCount,
+        }
+      )
+    }
+
+    that.setData({
+      selectedTags: selectedTags,
+      tags: tags,
+    })
+
+  },
 })
