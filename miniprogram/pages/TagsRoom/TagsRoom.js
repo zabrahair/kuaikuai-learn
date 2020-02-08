@@ -11,9 +11,10 @@ const TABLES = require('../../const/collections.js')
 
 const USER_ROLE = require('../../const/userRole.js')
 const dbApi = require('../../api/db.js')
-const ChineseApi = require('../../api/ChineseWords.js')
+const ChineseWordsApi = require('../../api/ChineseWords.js')
 
 const SELECTED_TAG_CSS = 'selected-tag'
+var dataLoadTimer;
 
 Page({
 
@@ -22,6 +23,7 @@ Page({
    */
   data: {
     // common
+    isLoadingFinished: false,
     gConst: gConst,
     tags: [],
     selectedTags: [],
@@ -99,16 +101,23 @@ Page({
    */
   getTags: function(){
     let that = this
-    ChineseApi.getTags({
-      score: 1
-    }
-    ,res=>{
-      debugLog('res',res)
-      let tags = res
-      that.setData({
-        tags: tags
+    let pageIdx = 0
+    clearInterval(dataLoadTimer)
+    dataLoadTimer = setInterval(function () {
+      ChineseWordsApi.getTags({}, pageIdx, (tags, pageIdx) => {
+        debugLog('getTags.pageIdx', pageIdx)
+        debugLog('getTags.tags', tags)
+        if (!tags.length || tags.length < 1) {
+          // stop load
+          clearInterval(dataLoadTimer)
+        }
+        // 
+        that.setData({
+          tags: that.data.tags.concat(tags)
+        })
       })
-    })
+      pageIdx++;
+    }, 500)
   },
 
   /**
@@ -117,7 +126,7 @@ Page({
    */
   tapTag: function(e){
     let that = this
-    debugLog('tapTag.e.target.dataset', e.target.dataset)
+    // debugLog('tapTag.e.target.dataset', e.target.dataset)
     let dataset = e.target.dataset
     let tagText = dataset.tagText
     let tagIdx = parseInt(dataset.tagIdx)

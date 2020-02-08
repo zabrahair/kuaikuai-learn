@@ -27,7 +27,7 @@ const titles = {
 
 // Titles
 titles[gConst.GAME_MODE.NORMAL] = '语文知识练习';
-
+var dataLoadTimer;
 
 // Page Const Value
 Page({
@@ -391,31 +391,41 @@ Page({
    */
   getNormalQuestions: function () {
     let that = this
-    wx.cloud.callFunction({
-      name: 'ChineseKnowledgeQuery',
-      data: {
-        filters: {
-          tags: that.data.tags
-        }
-      },
-      success: res => {
-        // debugLog('spellEnglishWordsQuery.success.res', res)
-        // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
-        if (res.result.data.length && res.result.data.length > 0) {
-          let questions = res.result.data
-          that.setData({
-            questions: questions,
-          }, function () {
-            // 生成下一道题目
-            that.onClickNextQuestion()
-          })
-        }
 
-      },
-      fail: err => {
-        console.error('[云函数] 调用失败：', err)
-      }
-    })
+    let pageIdx = 0
+    clearInterval(dataLoadTimer)
+    dataLoadTimer = setInterval(function () {
+      wx.cloud.callFunction({
+        name: 'ChineseKnowledgeQuery',
+        data: {
+          pageIdx: pageIdx,
+          filters: {
+            tags: that.data.tags
+          }
+        },
+        success: (res, pageIdx)  => {
+          // debugLog('spellEnglishWordsQuery.success.res', res)
+          // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
+          if (res.result.data.length && res.result.data.length > 0) {
+            let questions = res.result.data
+            that.setData({
+              questions: questions,
+            }, function () {
+              // 生成下一道题目
+              that.onClickNextQuestion()
+            })
+          }else{
+            // stop load
+            clearInterval(dataLoadTimer)
+          }
+
+        },
+        fail: err => {
+          console.error('[云函数] 调用失败：', err)
+        }
+      })
+      pageIdx++;
+    }, 5000)
   },
 
   /**

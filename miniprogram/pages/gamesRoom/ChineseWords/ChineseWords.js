@@ -14,6 +14,7 @@ const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
 const favoritesApi = require('../../../api/favorites.js')
+const ChineseWordsApi = require('../../../api/ChineseWords.js')
 const HISTORY_TABLE = TABLES.ENGLISH_WORDS
 // DB Related
 const db = wx.cloud.database()
@@ -22,6 +23,7 @@ const _ = db.command
 
 // 练习计时器
 var scoreTimer = null;
+var dataLoadTimer = null;
 const titles = {
 }
 
@@ -507,31 +509,34 @@ Page({
    */
   getNormalQuestions: function () {
     let that = this
-    wx.cloud.callFunction({
-      name: 'ChineseWordsQuery',
-      data: {
-        filters: {
-          tags: that.data.tags
-        }
-      },
-      success: res => {
-        // debugLog('spellEnglishWordsQuery.success.res', res)
-        // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
-        if (res.result.data.length && res.result.data.length > 0) {
-          let questions = res.result.data
-          that.setData({
-            questions: questions,
-          }, function () {
-            // 生成下一道题目
-            that.onClickNextQuestion()
-          })
-        }
+    let pageIdx = 0
+    clearInterval(dataLoadTimer)
+    dataLoadTimer = setInterval(function () {
+      ChineseWordsApi.getWords({
+            tags: _.all(that.data.tags)
+          },
+        pageIdx,
+        (res, pageIdx) => {
+          debugLog('ChineseWordsApi.getWords.res', res)
+          debugLog('ChineseWordsApi.getWords.pageIdx', pageIdx)
+          // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
+          if (res.length && res.length > 0) {
+            let questions = that.data.questions.concat(res)
+            that.setData({
+              questions: questions,
+            }, function () {
+              if (pageIdx == 0) {
+                // 生成下一道题目
+                that.onClickNextQuestion()
+              }
+            })
+          }else {
+            clearInterval(dataLoadTimer)
 
-      },
-      fail: err => {
-        console.error('[云函数] 调用失败：', err)
-      }
-    })
+          }
+        })
+      pageIdx++
+    }, 1000)
   },
 
   /**

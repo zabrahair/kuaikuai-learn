@@ -288,9 +288,9 @@
   justify-content: center;
   align-items: center;
 
-  left: 86.5%;
+  right: 0%;
   top: 0vh;
-  width: 10vw;
+  /* width: 10vw; */
   height: 10vw;
 
   border-top-right-radius: 3vw;
