@@ -1,3 +1,44 @@
+.tables-container {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  width: 100vw;
+  height: 20vh;
+  margin-bottom: 1vh;
+  background-color: rgba(51, 226, 51, 0.5);
+}
+.tables-cloud {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;  
+
+  width: 100%;
+
+}
+
+.table {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;  
+
+
+  height: 4vh;
+  margin: 1vw;
+  margin-left: 2vw;
+  padding: 1.5vw;
+  background-color: rgba(82, 136, 236, 0.9);
+  border-radius: 2vw;
+
+  font-size: 5vw;
+  font-weight: 100;
+}
+
+
 .tags-container {
   flex-direction: row;
   flex-wrap: wrap;
@@ -5,10 +46,11 @@
   align-items: center;
 
   width: 100vw;
-  height: 90vh;
+  height: 70vh;
 
   background-color: rgba(114, 183, 185, 0.5);
 }
+
 .tags-cloud {
   flex-direction: row;
   flex-wrap: wrap;
@@ -38,7 +80,7 @@
   font-weight: 100;
 }
 
-.selected-tag {
+.selected {
   background-color: rgba(228, 80, 43, 0.9);
 }
 

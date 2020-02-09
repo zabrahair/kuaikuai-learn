@@ -6,5 +6,15 @@ module.exports = {
   USERS: 'users',
   SCORE_STANDARD: 'score-standard',
   LEARN_HISTORY: 'learn-history',
-  FAVORITES: 'favorites'
+  FAVORITES: 'favorites',
+  LIST: [
+    {
+      name: '中文词语',
+      value: 'chinese-words',
+    },
+    {
+      name: '英文单词',
+      value: 'english-words',
+    },
+  ]
 }

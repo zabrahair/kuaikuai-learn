@@ -56,6 +56,7 @@ module.exports = {
   valueCSS: valueCSS,
   OPERATION: OPERATION,
   WEEK_DAYS: WEEK_DAYS,
+  // 验证码
   REGISTER_VERTIFY_CODE: {
     STUDENT: 'A48!KB',
     PARENT: 'A47!KB',

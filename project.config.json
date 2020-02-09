@@ -101,9 +101,9 @@
 				},
 				{
 					"id": 7,
-					"name": "ChineseWords - gameMode=NORMAL",
+					"name": "英语单词 - gameMode=NORMAL",
 					"pathName": "pages/gamesRoom/ChineseWords/ChineseWords",
-					"query": "gameMode=NORMAL",
+					"query": "gameMode=NORMAL&tableValue=english-words&tableName=英语单词&filterTags=必会",
 					"scene": null
 				},
 				{
@@ -111,6 +111,13 @@
 					"name": "pages/TagsRoom/TagsRoom",
 					"pathName": "pages/TagsRoom/TagsRoom",
 					"query": "gameMode=NORMAL",
+					"scene": null
+				},
+				{
+					"id": 9,
+					"name": "中文词语 gameMode=NORMAL&filterTags=成语",
+					"pathName": "pages/gamesRoom/ChineseWords/ChineseWords",
+					"query": "gameMode=NORMAL&tableValue=chinese-words&tableName=中文词语&filterTags=成语",
 					"scene": null
 				}
 			]

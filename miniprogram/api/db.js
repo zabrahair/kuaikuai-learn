@@ -8,7 +8,7 @@ const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
 
-const queryPages = function(tableName, pWhere, pageIdx, callback){
+function queryPages(tableName, pWhere, pageIdx, callback){
   // debugLog('pWhere', pWhere)
   let perPageCount = 20
   let where = pWhere
@@ -121,9 +121,46 @@ const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectOb
     })
 }
 
+function getTags(tableName, pWhere, pageIdx, callback) {
+  debugLog('tableName', tableName)
+  debugLog('pWhere', pWhere)
+  let perPageCount = 20
+  let where = pWhere
+  debugLog('where', where)
+  db.collection(tableName)
+    .aggregate()
+    .unwind('$tags')
+    .group({
+      _id: '$tags',
+      count: $.sum(1)
+    })
+    .skip(pageIdx * perPageCount)
+    .end()
+    .then
+    (res => {
+      debugLog('getTags', res)
+      debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        let tags = []
+        for (let i in res.list) {
+          tags.push({
+            text: res.list[i]._id
+            , count: res.list[i].count
+          })
+        }
+        callback(tags, pageIdx)
+        return
+      } else {
+        callback([], pageIdx)
+      }
+    })
+}
+
 module.exports = {
   query: query,
   create: create,
   update: update,
   groupAggregate: groupAggregate,
+  queryPages: queryPages,
+  getTags: getTags,
 }

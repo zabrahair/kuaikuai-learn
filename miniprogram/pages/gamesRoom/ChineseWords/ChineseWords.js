@@ -14,13 +14,20 @@ const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
 const favoritesApi = require('../../../api/favorites.js')
-const ChineseWordsApi = require('../../../api/ChineseWords.js')
-const HISTORY_TABLE = TABLES.ENGLISH_WORDS
 // DB Related
 const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
-
+const MANUAL_CHECK_RESULT = {
+  RIGHT: {
+    name: '对',
+    value: true,
+  },
+  WRONG: {
+    name: '错',
+    value: false,
+  }
+}
 // 练习计时器
 var scoreTimer = null;
 var dataLoadTimer = null;
@@ -28,8 +35,8 @@ const titles = {
 }
 
 // Titles
-titles[gConst.GAME_MODE.NORMAL] = '语文词语';
-titles[gConst.GAME_MODE.FAVORITES] = '语文词语收藏-收藏'
+titles[gConst.GAME_MODE.NORMAL] = '';
+titles[gConst.GAME_MODE.FAVORITES] = '收藏'
 
 // Alphabet Variables
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -100,8 +107,17 @@ Page({
     // gConst
     gConst: gConst,
 
+    // common
+    tableName: '',
+
+    // page show
+    questionViewWidth: 50,
+    cardFontSize: 13.5,
+    maxCardFontSize: 15,
+    minCardFontSize: 5,
+
     // filters
-    tags: ['小学三年级'],
+    tags: [],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
   },
@@ -113,6 +129,8 @@ Page({
     debugLog('onLoad.options', options)
     let that = this
     let gameMode = options.gameMode;
+    let tableValue = options.tableValue
+    let tableName = options.tableName
     let tags = that.data.tags
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
@@ -124,6 +142,9 @@ Page({
       userInfo: userInfo,
       gameMode: gameMode,
       tags: tags,
+      tableValue: tableValue,
+      tableName: tableName,
+      filterTags: options.filterTags,
     })
   },
 
@@ -197,8 +218,9 @@ Page({
      * 提交做题记录
      */
   recordHistory: function (question, answer) {
+    let that = this
     let historyRecord = {};
-    historyRecord['table'] = HISTORY_TABLE
+    historyRecord['table'] = that.data.tableValue
     historyRecord['question'] = question
     // delete question._id
     // Object.assign(historyRecord, question)
@@ -252,19 +274,41 @@ Page({
       return;
     }
 
+    
     // debugLog('submitAnswer.e', e)
     let that = this
+    let dataset ;
+    let answer
+    let curQuestion = that.data.curQuestion
+    let manualCheckResult
+    let isCorrect = false
+    try{
+      dataset = e.target.dataset
+      debugLog('submitAnswer.dataset', dataset)
+      manualCheckResult = dataset.manualCheckResult
+      for(let i in MANUAL_CHECK_RESULT){
+        if (manualCheckResult == MANUAL_CHECK_RESULT[i].name){
+          debugLog('MANUAL_CHECK_RESULT[i].value', MANUAL_CHECK_RESULT[i].value)
+          if (MANUAL_CHECK_RESULT[i].value == true){
+            debugLog('curQuestion.word', curQuestion.word)
+            answer = curQuestion.word
+          }
+          break;
+        }
+      }
+    }catch(e){errorLog('submitAnswer.e', e)}
+    
 
     // try{
 
     // debugLog('formValues', formValues)
-    let curQuestion = that.data.curQuestion
+    
     // debugLog('curQuestion', curQuestion)
     // 同時針對回車和Button提交
     let curSpellCards = that.data.curSpellCards
-    let answer = that.combineSpellAnswer(curSpellCards)
-    debugLog('answer', answer)
-    let isCorrect = false
+    if (!manualCheckResult){
+      answer = that.combineSpellAnswer(curSpellCards)
+    }
     if (answer == curQuestion.word) {
       isCorrect = true
       wx.showToast({
@@ -334,15 +378,14 @@ Page({
       questions.push(questionsDone[i])
     }
     questionsDone = []
-    curQuestionIndex = Math.floor(Math.random() * questions.length)
-    question = questions[curQuestionIndex]
-    that.onClickNextQuestion()
-    // that.setData({
-    //   questions: questions,
-    //   questionsDone: questionsDone,
-    //   curQuestionIndex: curQuestionIndex,
-    //   curQuestion: question,
-    // })
+    curQuestionIndex = 0
+    that.setData({
+      questions: questions,
+      questionsDone: questionsDone,
+      curQuestionIndex: curQuestionIndex,
+    })
+    that.onClickNextQuestion(null, null, 0)
+
 
     // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
     // 开始计时
@@ -374,17 +417,42 @@ Page({
   /**
    * 下一题
    */
-  onClickNextQuestion: function (e, isCorrect) {
+  onClickNextQuestion: function (e, isCorrect, idxOffset) {
     let that = this
-    if (that.checkPauseStatus()) {
+    let dataset
+    try{
+      dataset = e ? e.target.dataset : null
+      if (dataset.idxOffset) {
+        idxOffset = parseInt(dataset.idxOffset)
+      }
+    }
+    catch(e){
+      errorLog('onClickNextQuestion.e',e)
+    }
+
+    if (that.checkPauseStatus() 
+      || !that.data.questions
+      || that.data.questions.length <=0) {
       return;
     }
-    try {
-      let targetValues = e ? e.target.dataset : null
+    if (idxOffset == null){
+      idxOffset = 1
+    }
+    // try {
+      
       let questions = this.data.questions
       let questionsDone = this.data.questionsDone
       let question = this.data.curQuestion
       let curQuestionIndex = this.data.curQuestionIndex
+      let nextQuestionIndex
+      if (curQuestionIndex == 0 && idxOffset < 0){
+        nextQuestionIndex = questions.length - 1
+      }else{
+        nextQuestionIndex = Math.abs((curQuestionIndex + idxOffset)) % questions.length 
+      }
+
+      
+      let nextQuestion = questions[nextQuestionIndex]
 
       if (isCorrect) {
         questionsDone.push(question)
@@ -393,10 +461,14 @@ Page({
 
       if (questions.length > 0) {
         // If answer is correct then move to done.
-        curQuestionIndex = Math.floor(Math.random() * questions.length)
-        // debugLog('curQuestionIndex', curQuestionIndex)
-        question = questions[curQuestionIndex]
+        // if (!isCorrect){
+        //   curQuestionIndex = Math.floor(curQuestionIndex + 1 % questions.length)
+          // curQuestionIndex = Math.floor(Math.random() * questions.length)
+          // debugLog('curQuestionIndex', curQuestionIndex)
+          // question = questions[curQuestionIndex]
         // debugLog('question', question)
+        // }
+
       } else {
         for (let i in questionsDone) {
           questions.push(questionsDone[i])
@@ -414,8 +486,8 @@ Page({
       }
 
       let isFavorited = false
-      if (question._id) {
-        let tags = question.tags
+      if (nextQuestionIndex._id) {
+        let tags = nextQuestionIndex.tags
 
         if (tags.includes(gConst.IS_FAVORITED)) {
           isFavorited = true
@@ -423,22 +495,23 @@ Page({
       }
 
       // 重置变量
+      debugLog('nextQuestion', nextQuestion)
       that.setData({
         questions: questions,
         questionsDone: questionsDone,
-        curQuestionIndex: curQuestionIndex,
-        curQuestion: question,
+        curQuestionIndex: nextQuestionIndex,
+        curQuestion: nextQuestion,
         curAnswer: '',
         selectedCard: false,
         curSpellCards: false,
         thinkSeconds: 0,
         isFavorited: isFavorited,
       }, res => {
-        that.processCurrentQuestion(question)
+        that.processCurrentQuestion(nextQuestion)
       })
-    } catch (e) {
-      errorLog('onClickNextQuestion error:', e)
-    }
+    // } catch (e) {
+    //   errorLog('onClickNextQuestion error:', e)
+    // }
   },
 
   /**
@@ -472,8 +545,14 @@ Page({
         letters.splice(i, 1)
       }
 
+      // caculate font size:
+      let questionViewWidth = that.data.questionViewWidth;
+      let cardFontSize = questionViewWidth / curSpellCards.length;
+      cardFontSize = cardFontSize > that.data.maxCardFontSize ? that.data.maxCardFontSize : cardFontSize
+      cardFontSize = cardFontSize < that.data.minCardFontSize ? that.data.minCardFontSize : cardFontSize
       that.setData({
-        curSpellCards: curSpellCards
+        curSpellCards: curSpellCards,
+        cardFontSize: cardFontSize,
       })
     }
   },
@@ -486,7 +565,7 @@ Page({
 
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.NORMAL]
+        title: that.data.tableName + titles[gConst.GAME_MODE.NORMAL]
       })
       this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
 
@@ -512,13 +591,15 @@ Page({
     let pageIdx = 0
     clearInterval(dataLoadTimer)
     dataLoadTimer = setInterval(function () {
-      ChineseWordsApi.getWords({
+      dbApi.queryPages(
+        that.data.tableValue,
+        {
             tags: _.all(that.data.tags)
-          },
+        },
         pageIdx,
         (res, pageIdx) => {
-          debugLog('ChineseWordsApi.getWords.res', res)
-          debugLog('ChineseWordsApi.getWords.pageIdx', pageIdx)
+          debugLog('getNormalQuestions.getWords.res', res)
+          debugLog('getNormalQuestions.getWords.pageIdx', pageIdx)
           // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
           if (res.length && res.length > 0) {
             let questions = that.data.questions.concat(res)
@@ -527,7 +608,7 @@ Page({
             }, function () {
               if (pageIdx == 0) {
                 // 生成下一道题目
-                that.onClickNextQuestion()
+                that.onClickNextQuestion(null, null, 0)
               }
             })
           }else {
@@ -569,7 +650,7 @@ Page({
               questions: questions,
             }, function () {
               // 生成下一道题目
-              that.onClickNextQuestion()
+              that.onClickNextQuestion(null, null, 0)
             })
           }
         } catch (e) {
@@ -598,7 +679,7 @@ Page({
       wherefilters = _.and(
         {
           openid: userInfo.openId,
-          table: HISTORY_TABLE,
+          table: that.data.tableValue,
           question: _.exists(true),
           answerTime: _.gte(filterDate),
           question: {
@@ -623,7 +704,7 @@ Page({
               questions: questions,
             }, function () {
               // 生成下一道题目
-              that.onClickNextQuestion()
+              that.onClickNextQuestion(null, null, 0)
             })
           }
         } catch (e) {

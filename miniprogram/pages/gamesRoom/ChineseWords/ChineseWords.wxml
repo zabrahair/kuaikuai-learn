@@ -41,7 +41,7 @@
       </picker>
       <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
     </view>
-    <movable-area class='question' animation="{{fadeInOutQuestion}}">
+    <view class='question' animation="{{fadeInOutQuestion}}">
       <image class="favorite" data-question-id="{{curQuestion._id}}"
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
       bindtap="clickFavoriteSwitch"/>
@@ -49,6 +49,9 @@
       <view class='left_questions_count'>
         {{questions.length}}
       </view>
+      <view class='current_question_index'>
+        {{curQuestionIndex+1}}
+      </view>      
       <!-- <view class="spell_positions">
         <view class='spell_letter_position' 
       wx:for-items='{{curSpellCards}}' wx:for-item='spellBlank' 
@@ -60,6 +63,7 @@
       </view> -->
       <view class="alphabet_cards">
         <view class='alphabet_card {{spellCard.cardState}}'
+        style="width: {{cardFontSize*1.2}}vw; height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
         wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
@@ -69,15 +73,34 @@
         </view>
       </view>
 
-    </movable-area>
+    </view>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <view class='buttons' animation="{{fadeInOutQuestion}}">
         <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
-        <button class="btn_answer" formType="submit" type="primary" size='mini' >提交</button>
-        <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini'>下一题</button>
+        <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="-1">上一题</button>
+        <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1">下一题</button>
         <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
+        <view class="check-answer right" bindtap="submitAnswer"  data-manual-check-result='对'>对</view>
+        <view class="check-answer wrong" bindtap="submitAnswer" data-manual-check-result='错'>错</view>
       </view>    
     </form>
+    <scroll-view class="all_words_container" scroll-y="true">
+      <view class="all_words">
+        <view class="word_card done_card"
+          wx:for-items='{{questionsDone}}' wx:for-item='question' 
+          wx:for-index='idx' wx:key="_id" 
+        >
+          {{question.word}}
+        </view> 
+        <view class="word_card left_card"
+          wx:for-items='{{questions}}' wx:for-item='question' 
+          wx:for-index='idx' wx:key="_id" 
+        >
+          {{question.word}}
+        </view>
+       
+      </view>
+    </scroll-view>
   </view>
   <button class="btn_continue {{isPause}}" bindtap='onClickPause' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
 </view>
