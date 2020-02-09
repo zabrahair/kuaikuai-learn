@@ -8,6 +8,28 @@ const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
 
+const queryPages = function(tableName, pWhere, pageIdx, callback){
+  // debugLog('pWhere', pWhere)
+  let perPageCount = 20
+  let where = pWhere
+  // debugLog('where', where)
+  db.collection(tableName)
+    .where(pWhere)
+    .skip(pageIdx * perPageCount)
+    .get()
+    .then
+    (res => {
+      debugLog('queryPages', res)
+      debugLog('queryPages.length', res.data.length)
+      if (res.data.length > 0) {
+        callback(res.data, pageIdx)
+        return
+      } else {
+        callback([], pageIdx)
+      }
+    })
+}
+
 const query = function (table, filters, callback) {
 
   // 根据条件查询所有Records

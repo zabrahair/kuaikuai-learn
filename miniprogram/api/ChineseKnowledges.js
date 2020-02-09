@@ -13,14 +13,10 @@ const TABLE = TABLES.CHINESE_KNOWLEDGE
 
 
 
-function query(pWhere, callback) {
-  let where = _.and({
-    thing: {
-      tags: gConst.IS_FAVORITED
-    }
-  }, {
-      thing: pWhere
-    })
+function query(pWhere, pageIdx, callback) {
+  dbApi.query(TABLE, pWhere, pageIdx, res=>{
+    
+  })
   db.collection(TABLE).get({
     success: res => {
       let result = res.data;
