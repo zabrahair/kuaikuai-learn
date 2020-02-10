@@ -9,7 +9,6 @@ const storeKeys = require('../../const/global.js').storageKeys;
 const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
 
-const USER_ROLE = require('../../const/userRole.js')
 const dbApi = require('../../api/db.js')
 const userApi = require('../../api/user.js')
 
@@ -23,6 +22,7 @@ Page({
     totalScore: 0,
     scoreIcon: gConst.SCORE_ICON,
     gConst: gConst,
+    globalData: globalData,
   },
 
   /**

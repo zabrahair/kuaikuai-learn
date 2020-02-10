@@ -51,7 +51,10 @@
       </view>
       <view class='current_question_index'>
         {{curQuestionIndex+1}}
-      </view>      
+      </view>  
+      <view class='current_tags'>
+        {{filterTags}}
+      </view>            
       <!-- <view class="spell_positions">
         <view class='spell_letter_position' 
       wx:for-items='{{curSpellCards}}' wx:for-item='spellBlank' 
@@ -76,10 +79,12 @@
     </view>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <view class='buttons' animation="{{fadeInOutQuestion}}">
-        <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
-        <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="-1">上一题</button>
-        <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1">下一题</button>
-        <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
+        <image class="btn_previous_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="-1" src="{{gConst.PREVIOUS_ICON}}"/>
+        <image class="btn_reset" bindtap='resetAnswer' src="{{gConst.RESET_ICON}}" />
+        <image class="btn_pause" bindtap='onClickPause' src="{{gConst.PAUSE_ICON}}"/>
+        
+        <image class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1" src="{{gConst.NEXT_ICON}}"/>
+        
         <view class="check-answer right" bindtap="submitAnswer"  data-manual-check-result='对'>对</view>
         <view class="check-answer wrong" bindtap="submitAnswer" data-manual-check-result='错'>错</view>
       </view>    

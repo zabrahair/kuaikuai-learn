@@ -10,7 +10,7 @@ const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
-
+const favoritesApi = require('../../api/favorites.js')
 
 const SELECTED_CSS = 'selected'
 var dataLoadTimer;
@@ -39,7 +39,7 @@ Page({
 
     tables: that.initTablesArray()
 
-    
+
   },
 
   /**
@@ -94,14 +94,14 @@ Page({
   /**
    * 
    */
-  initTablesArray: function(callback){
+  initTablesArray: function (callback) {
     let that = this
     let tables = TABLES.LIST
     tables[0]['css'] = SELECTED_CSS
     that.setData({
       tables: tables,
       selectedTable: tables[0]
-    }, res=>{
+    }, res => {
       that.getTags(that.data.selectedTable.value);
     })
   },
@@ -109,23 +109,23 @@ Page({
   /**
    * 
    */
-  onClickEnter: function(e){
+  onClickEnter: function (e) {
     let that = this
     let selectedTags = that.data.selectedTags
     let joinedString = utils.arrayJoin(selectedTags, 'text')
     wx.navigateTo({
-      url: '/pages/gamesRoom/words/words?gameMode=' + gConst.GAME_MODE.NORMAL + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + joinedString,
+      url: '/pages/gamesRoom/words/words?gameMode=' + gConst.GAME_MODE.FAVORITES + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + joinedString,
     })
   },
   /**
    * 獲取所有的標籤
    */
-  getTags: function(tableName){
+  getTags: function (tableName) {
     let that = this
     let pageIdx = 0
     clearInterval(dataLoadTimer)
     dataLoadTimer = setInterval(function () {
-      dbApi.getTags(tableName, {}, pageIdx, (tags, pageIdx) => {
+      favoritesApi.getTags(tableName, {}, pageIdx, (tags, pageIdx) => {
         debugLog('getTags.pageIdx', pageIdx)
         debugLog('getTags.tags', tags)
         if (!tags.length || tags.length < 1) {
@@ -154,18 +154,18 @@ Page({
     let selectedTable = that.data.selectedTable
     let tables = that.data.tables
 
-    if (tableValue == selectedTable.value){
+    if (tableValue == selectedTable.value) {
       return;
     }
 
     clearInterval(dataLoadTimer)
 
     for (let i in tables) {
-      if (i == tableIdx){
+      if (i == tableIdx) {
         selectedTable = tables[i]
         tables[i]['css'] = SELECTED_CSS
         that.getTags(tableValue)
-      }else{
+      } else {
         tables[i]['css'] = ''
       }
     }
@@ -174,7 +174,7 @@ Page({
       selectedTable: selectedTable,
       tags: [],
       selectedTags: [],
-    }, res=>{
+    }, res => {
       that.getTags(tableValue)
     })
   },
@@ -183,7 +183,7 @@ Page({
    * tap Tag
    * 
    */
-  tapTag: function(e){
+  tapTag: function (e) {
     let that = this
     // debugLog('tapTag.e.target.dataset', e.target.dataset)
     let dataset = e.target.dataset
@@ -194,7 +194,7 @@ Page({
     let tags = that.data.tags
 
     let isFound = false
-    for (let i in selectedTags){
+    for (let i in selectedTags) {
       if (selectedTags[i].text == tagText) {
         selectedTags.splice(i, 1)
         tags[tagIdx]['css'] = ''
@@ -202,10 +202,10 @@ Page({
       }
     }
 
-    if(isFound == false){
+    if (isFound == false) {
       tags[tagIdx]['css'] = SELECTED_CSS
       selectedTags.push(
-        { 
+        {
           text: tagText,
           count: tagCount,
         }

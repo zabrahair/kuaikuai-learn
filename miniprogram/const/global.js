@@ -56,13 +56,10 @@ module.exports = {
   valueCSS: valueCSS,
   OPERATION: OPERATION,
   WEEK_DAYS: WEEK_DAYS,
-  // 验证码
-  REGISTER_VERTIFY_CODE: {
-    STUDENT: 'A48!KB',
-    PARENT: 'A47!KB',
-    TEACHER: 'A46!KB',
-    ADMIN: 'A45!KB',
-  },
+  // USER_ROLE & 验证码
+  USER_ROLES_OBJS_KEY: 'USER_ROLES_OBJS',
+  USER_ROLES_KEY: 'USER_ROLES',
+  VERTIFY_CODE_KEY: 'REGISTER_VERTIFY_CODE',
   // icons relate
   FAVORITED_ICON: '/images/favorited.png',
   NOT_FAVORITED_ICON: '/images/not-favorited.png',
@@ -78,6 +75,11 @@ module.exports = {
   SEARCH_ICON: '/images/search.png',
   GOTO_HOVER_ICON: '/images/goto-hover.png',
   GOTO_ICON: '/images/goto.png',
+  PREVIOUS_ICON: '/images/previous.png',
+  NEXT_ICON: '/images/next.png',
+  RESET_ICON: '/images/reset.png',
+  PAUSE_ICON: '/images/pause.png',
+  // 北京
   DEFAULT_BACKGROUND: 'https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/kuai_background.jpg?sign=4c4590afa901625789b285cf1285cc4b&t=1580309905',
   ANSWER_TYPE: {
     TEXT: 'text',

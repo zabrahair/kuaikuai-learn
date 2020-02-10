@@ -16,10 +16,9 @@ const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
 
-const USER_ROLE = require('../../const/userRole.js')
 const userApi = require('../../api/user');
 const vertifyCodes = gConst.REGISTER_VERTIFY_CODE;
-
+const USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
 Page({
 
   /**
@@ -27,7 +26,7 @@ Page({
    */
   data: {
     userInfo: {},
-    userRole: USER_ROLE.NORMAL,
+    userRole: USER_ROLE_OBJS[0].name,
     phoneNumber: '',
     isValueCorrect: gConst.valueCSS.CORRECT,
     contactName: '',

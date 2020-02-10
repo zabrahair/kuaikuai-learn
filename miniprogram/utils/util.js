@@ -1,6 +1,5 @@
 
 const gConst = require('../const/global.js');
-const USER_ROLE = require('../const/userRole.js')
 const storeKeys = require('../const/global.js').storageKeys;
 const debugLog = require('log.js').debug;
 const errorLog = require('log.js').error;
@@ -158,19 +157,14 @@ const extractFileInfo = function (filePath) {
 
 }
 
-const vertifyCodes = gConst.REGISTER_VERTIFY_CODE;
-const getUserRole = function(registerVertifyCode){
-  if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.STUDENT){
-    return USER_ROLE.STUDENT;
-  } else if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.PARENT){
-    return USER_ROLE.STUDENT;
-  } else if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.TEACHER) {
-    return USER_ROLE.TEACHER;
-  } else if (registerVertifyCode == gConst.REGISTER_VERTIFY_CODE.ADMIN) {
-    return USER_ROLE.ADMIN;
-  } else {
-    return '';
+const getUserRole = function(inputVertifyCode){
+  let userRoleObjs = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
+  for (let i in userRoleObjs){
+    if (userRoleObjs[i].vertifyCode == inputVertifyCode){
+      return userRoleObjs[i].name
+    }
   }
+  return ''
 }
 
 const getTotalScore = function(userInfo, callback){
@@ -308,6 +302,25 @@ function arrayJoin(array, joinProp, seperator){
   return result
 }
 
+
+function refreshConfigs(){
+  const configs = require('../api/configs.js')
+  configs.getConfigs({
+    tags: configs.USER_ROLE_TAG
+  }, 0, (configs, pageIdx)=>{
+    debugLog('refreshConfigs.configs', configs);
+    wx.setStorageSync(gConst.USER_ROLES_OBJS_KEY, configs)
+    let userRoles = {}
+    let registerVertifyCode = {}
+    for(let i in configs){
+      userRoles[configs[i].value] = configs[i].name
+      registerVertifyCode[configs[i].value] = configs[i].vertifyCode
+    }
+    wx.setStorageSync(gConst.USER_ROLES_KEY, userRoles)
+    wx.setStorageSync(gConst.VERTIFY_CODE_KEY, registerVertifyCode)
+  })
+}
+
 module.exports = {
   formatTime: formatTime,
   formatDate: formatDate,
@@ -324,4 +337,5 @@ module.exports = {
   getGamingStatistics: getGamingStatistics,
   getUserConfigs: getUserConfigs,
   arrayJoin: arrayJoin,
+  refreshConfigs: refreshConfigs,
 }

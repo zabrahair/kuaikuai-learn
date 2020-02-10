@@ -122,11 +122,11 @@ const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectOb
 }
 
 function getTags(tableName, pWhere, pageIdx, callback) {
-  debugLog('tableName', tableName)
-  debugLog('pWhere', pWhere)
+  // debugLog('tableName', tableName)
+  // debugLog('pWhere', pWhere)
   let perPageCount = 20
   let where = pWhere
-  debugLog('where', where)
+  // debugLog('where', where)
   db.collection(tableName)
     .aggregate()
     .unwind('$tags')
@@ -138,8 +138,8 @@ function getTags(tableName, pWhere, pageIdx, callback) {
     .end()
     .then
     (res => {
-      debugLog('getTags', res)
-      debugLog('getTags.length', res.list.length)
+      // debugLog('getTags', res)
+      // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {
         let tags = []
         for (let i in res.list) {

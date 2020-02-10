@@ -1,0 +1,32 @@
+<view class='container'>
+  <scroll-view class="tables-container" scroll-y='true'>
+    <view class='tables-cloud'>
+      <view class='table {{table.css}}'
+        wx:for-items='{{tables}}' wx:for-item='table' 
+        wx:for-index='idx' wx:key="table" 
+        data-table-value='{{table.value}}' 
+        data-table-idx='{{idx}}'
+        bindtap="tapTable"
+      >
+        {{table.name}}
+      </view>
+    </view>
+  </scroll-view>
+  <scroll-view class="tags-container" scroll-y='true'>
+    <view class='tags-cloud'>
+      <view class='tag {{tag.css}}'
+        wx:for-items='{{tags}}' wx:for-item='tag' 
+        wx:for-index='idx' wx:key="tag" 
+        data-tag-count='{{tag.count}}' 
+        data-tag-text='{{tag.text}}' 
+        data-tag-idx='{{idx}}'
+        bindtap="tapTag"
+      >
+        {{tag.text}}
+      </view>
+    </view>
+  </scroll-view>
+  <view class='buttons'>
+  <button class="button" bindtap="onClickEnter" type='primary'>进入</button>
+  </view>
+</view>

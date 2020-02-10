@@ -18,11 +18,12 @@
       </view>
     </view>
   </view>
-  <view class='content'>
+  <scroll-view class='content' scroll-y='true'>
+    <view class='feature' bindtap="tapProfileFeature" data-feature-name='history'>我的历史</view>
     <view class='buttons'>
       <button wx:if="{{isSignIn}}" class="" type='warn' bindtap='toSignOut'>
         登出
       </button>
     </view>
-  </view>
+  </scroll-view>
 </view>

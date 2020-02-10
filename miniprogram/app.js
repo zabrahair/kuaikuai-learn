@@ -6,9 +6,8 @@ const storeKeys = require('./const/global.js').storageKeys;
 const utils = require('./utils/util.js');
 const TABLES = require('./const/collections.js')
 
-const USER_ROLE = require('./const/userRole.js')
 // const dbApi = require('./api/db.js')
-// const userApi = require('./api/user.js')
+const userApi = require('./api/user.js')
 
 const updateManager = wx.getUpdateManager()
 /**
@@ -38,11 +37,12 @@ updateManager.onUpdateFailed(function () {
 
 App({
   onLaunch: function () {
-    
+    let that = this
     if (!wx.cloud) {
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       this.globalData = {}
+      
       wx.cloud.init({
         // env 参数说明：
         //   env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
@@ -51,8 +51,11 @@ App({
         // env: 'my-env-id',
         traceUser: true,
       })
+      // Get Configs
+      utils.refreshConfigs(that.globalData)
       this.login();
       utils.getUserConfigs(true)
+
     }
   },
   /**
@@ -63,6 +66,7 @@ App({
     let globalData = this.globalData
     let userInfo = utils.getUserInfo(this.globalData)
     const userApi = require('./api/user.js')
+
     wx.getSetting({
       success: res => {
         // debugLog('getSetting', res)
@@ -124,7 +128,7 @@ App({
  */
   checkUserExisted: function () {
     let that = this
-    let userInfo = globalData.userInfo
+    let userInfo = this.globalData.userInfo
     userApi.queryUser({
       _id: userInfo.openId
     }, result => {

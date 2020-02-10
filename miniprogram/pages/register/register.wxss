@@ -76,7 +76,7 @@
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
 
   width: 100vw;
@@ -101,12 +101,16 @@
   justify-content: flex-start;
   align-items: center;
 
-  width: 60vw;
+  /* width: 60vw; */
+  width: 80vw;
   height: 6vh;  
   border: 1px solid black;
+  border-top-left-radius: 2vw;
+  border-bottom-left-radius: 2vw;
+
   border-top-right-radius: 2vw;
   border-bottom-right-radius: 2vw;
-  padding-left: 0vw;
+  padding-left: 2vw;
 }
 
 .field .field_placeholder {

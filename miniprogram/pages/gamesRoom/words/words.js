@@ -9,7 +9,6 @@ const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
 const TABLES = require('../../../const/collections.js')
 // Api Handler
-const USER_ROLE = require('../../../const/userRole.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
@@ -453,11 +452,14 @@ Page({
 
       
       let nextQuestion = questions[nextQuestionIndex]
-
       if (isCorrect) {
         questionsDone.push(question)
         questions.splice(curQuestionIndex, 1)
+        if (curQuestionIndex < nextQuestionIndex) {
+          nextQuestionIndex -= 1
+        }
       }
+
 
       if (questions.length > 0) {
         // If answer is correct then move to done.
@@ -625,43 +627,52 @@ Page({
    */
   getFavoritesQuestions: function (mode) {
     let that = this
+    let pageIdx = 0
     let userInfo = that.data.userInfo
-    debugLog('that.data.lastDate', that.data.lastDate)
-    debugLog('that.data.lastTime', that.data.lastTime)
+    // debugLog('that.data.lastDate', that.data.lastDate)
+    // debugLog('that.data.lastTime', that.data.lastTime)
     let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
-    debugLog('getFavoritesQuestions.filterDate', filterDate)
+    // debugLog('getFavoritesQuestions.filterDate', filterDate)
     let wherefilters
     if (gConst.GAME_MODE.FAVORITES == mode) {
       wherefilters = {
         tags: _.all(that.data.tags)
       }
     }
-    favoritesApi.getFavorites(TABLES.ENGLISH_WORDS
-      , wherefilters
-      , res => {
-        debugLog('favoritesApi.getFavorites', res)
-        try {
-          if (res.length >= 0) {
-            let questions = []
-            for (let i in res) {
-              questions.push(res[i].thing)
+    clearInterval(dataLoadTimer)
+    dataLoadTimer = setInterval(function () {
+      favoritesApi.getFavorites(
+        that.data.tableValue
+        , wherefilters
+        , pageIdx
+        , (things, pageIdx) => {
+          debugLog('favoritesApi.getFavorites', things)
+          if (things.length && things.length > 0) {
+            try {
+              let questions = that.data.questions.concat(things)
+              that.setData({
+                questions: questions,
+              }, function () {
+                if (pageIdx == 0) {
+                  // 生成下一道题目
+                  that.onClickNextQuestion(null, null, 0)
+                }
+              }) 
+            } catch (e) {
+              wx.showToast({
+                image: gConst.ERROR_ICON,
+                title: MSG.SOME_EXCEPTION,
+                duration: 1000,
+              })
             }
-            that.setData({
-              questions: questions,
-            }, function () {
-              // 生成下一道题目
-              that.onClickNextQuestion(null, null, 0)
-            })
-          }
-        } catch (e) {
-          wx.showToast({
-            image: gConst.ERROR_ICON,
-            title: MSG.SOME_EXCEPTION,
-            duration: 1000,
-          })
-        }
+          } else {
+            clearInterval(dataLoadTimer)
 
-      })
+          }
+        })
+        pageIdx++
+    }, 1000)
+    
   },
 
   /**
@@ -977,7 +988,7 @@ Page({
         return ele != gConst.IS_FAVORITED
       })
       debugLog('curQuestion tags removed', tags)
-      favoritesApi.removeFavorite(TABLES.ENGLISH_WORDS, curQuestion, res => {
+      favoritesApi.removeFavorite(that.data.tableValue, curQuestion, res => {
         that.setData({
           isFavorited: false,
           curQuestion: curQuestion,
@@ -992,7 +1003,7 @@ Page({
         tags.push(gConst.IS_FAVORITED)
       }
       debugLog('curQuestion tags', tags)
-      favoritesApi.createFavorite(TABLES.ENGLISH_WORDS, curQuestion
+      favoritesApi.createFavorite(that.data.tableValue, curQuestion
         , res => {
           that.setData({
             isFavorited: true,

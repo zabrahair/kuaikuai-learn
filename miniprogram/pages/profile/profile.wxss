@@ -155,6 +155,27 @@
   justify-content: flex-start;
   align-items: center;
 
+  margin-top: 2vh;
   padding: 5vw;
+
+}
+
+.feature {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  width: 90%;
+  height: 8vh;
+  margin: 1vw;
+  padding-left: 5vw;
+  color: darkblue;
+  font-size: 5vw;
+  font-weight: 100;
+  text-shadow: 1px 1px 2px darkcyan;
+  background-color: rgba(140, 216, 252, 0.5);
+  box-shadow: 6px 6px 2px 1px rgba(0, 0, 255, .2);
 }
 

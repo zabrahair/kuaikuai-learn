@@ -67,8 +67,47 @@ const removeFavorite = function (tableName, removeData, callback) {
   })
 }
 
-function getFavorites(tableName, pWhere, callback) {
-  debugLog('pWhere', pWhere)
+function getTags(tableName, pWhere, pageIdx, callback){
+  // debugLog('tableName', tableName)
+  // debugLog('pWhere', pWhere)
+  let perPageCount = 20
+  let where = pWhere
+  // debugLog('where', where)
+  db.collection(TABLE)
+    .aggregate()
+    .match({
+      table: tableName,
+    })
+    .unwind('$thing.tags')
+    .group({
+      _id: '$thing.tags',
+      count: $.sum(1)
+    })
+    .skip(pageIdx * perPageCount)
+    .end()
+    .then
+    (res => {
+      // debugLog('getTags', res)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        let tags = []
+        for (let i in res.list) {
+          tags.push({
+            text: res.list[i]._id
+            , count: res.list[i].count
+          })
+        }
+        callback(tags, pageIdx)
+        return
+      } else {
+        callback([], pageIdx)
+      }
+    })
+}
+
+function getFavorites(tableName, pWhere, pageIdx, callback) {
+  // debugLog('pWhere', pWhere)
+  let perPageCount = 20
   let where = 
   _.and({
       table: tableName,
@@ -80,18 +119,23 @@ function getFavorites(tableName, pWhere, callback) {
         thing: pWhere
     }
   )
-  debugLog('where', where)
+  // debugLog('where', where)
   db.collection(TABLE)
     .where(where)
+    .skip(pageIdx * perPageCount)
     .get({
     success: res => {
       let result = res.data;
-      // debugLog('res', result);
-      if (result.length > 0) {
-        callback(result)
-      } else {
-        callback(undefined)
+      debugLog('getFavorites.result', result);
+      let things = []
+      if (result.length) {
+        for (let i in result) {
+          things.push(result[i].thing)
+        }     
+        debugLog('getFavorites.things', things)
+        
       }
+      callback(things, pageIdx)
 
     },
     fail: err => {
@@ -108,4 +152,5 @@ module.exports = {
   createFavorite: createFavorite,
   removeFavorite: removeFavorite,
   getFavorites: getFavorites,
+  getTags: getTags
 }

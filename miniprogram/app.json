@@ -8,8 +8,9 @@
     "pages/gamesRoom/gameTemplate/gameTemplate",
     "pages/gamesRoom/spellEnglishWords/spellEnglishWords",
     "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
-    "pages/gamesRoom/ChineseWords/ChineseWords",
-    "pages/TagsRoom/TagsRoom"
+    "pages/gamesRoom/words/words",
+    "pages/TagsRoom/TagsRoom",
+    "pages/favorites/favorites"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
@@ -29,10 +30,10 @@
         "text": "游戏"
       },
       {
-        "pagePath": "pages/history/history",
-        "selectedIconPath": "images/history.png",
-        "iconPath": "images/history_unselected.png",
-        "text": "历史"
+        "pagePath": "pages/favorites/favorites",
+        "selectedIconPath": "images/favorited.png",
+        "iconPath": "images/not-favorited.png",
+        "text": "收藏"
       },
       {
         "pagePath": "pages/TagsRoom/TagsRoom",

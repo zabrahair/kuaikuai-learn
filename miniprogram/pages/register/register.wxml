@@ -10,10 +10,10 @@
     <view class="field contact_name">
       <input name="contactName" class='input {{isValueCorrect}}' placeholder="输入联系人"  placeholder-class="field_placeholder" value='{{contactName}}'/>
     </view>
-    <view class="mobile_field">
-      <view class="btn_auth" ><button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" type='primary' size='mini'>获取手机</button></view>
+    <view class="field mobile_field">
+      <!-- <view class="btn_auth" ><button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber" type='primary' size='mini'>获取手机</button></view> -->
       
-      <input name="contactMobile" class='contact_mobile' placeholder="输入联系人电话" placeholder-class="mobile_placeholder" value="{{phoneNumber}}"/>
+      <input name="contactMobile" class='input contact_mobile' placeholder="输入联系人电话" placeholder-class="mobile_placeholder" value="{{phoneNumber}}"/>
     </view>
     <view class="field register">
       <button class="btn_register" formType="submit" type="primary">注册</button>
