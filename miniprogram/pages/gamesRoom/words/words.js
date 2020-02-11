@@ -71,7 +71,6 @@ Page({
    * 页面的初始数据
    */
   data: {
-
     // Question Related
     alphabetArray: alphabetArray,
     questions: [],
@@ -88,6 +87,7 @@ Page({
     timerInterval: 1000,
     curDeciSecond: 0,
     thinkSeconds: 0,
+    questionWaitTime: 0,
 
     // Answer Related
     curAnswer: '',
@@ -406,6 +406,7 @@ Page({
           curDeciSecond: timer,
           thinkSeconds: thinkTimer,
           curDeciTimerStr: utils.formatDeciTimer(timer, 1),
+          thinkSecondsStr: utils.formatDeciTimer(thinkTimer, 1),
           // totalScore: utils.getTotalScore(that.data.userInfo),
         })
       }
@@ -475,7 +476,9 @@ Page({
    */
   getQuestions: function (gameMode) {
     let that = this
-
+    that.setData({
+      questions: []
+    })
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
         title: that.data.tableName + titles[gConst.GAME_MODE.NORMAL]
@@ -495,43 +498,6 @@ Page({
       this.getFavoritesQuestions(gConst.GAME_MODE.FAVORITES);
     }
   },
-
-  // /**
-  //  * Get Normal Question
-  //  */
-  // getNormalQuestions: function () {
-  //   let that = this
-  //   let pageIdx = 0
-  //   clearInterval(dataLoadTimer)
-  //   dataLoadTimer = setInterval(function () {
-  //     dbApi.queryPages(
-  //       that.data.tableValue,
-  //       {
-  //           tags: _.all(that.data.tags)
-  //       },
-  //       pageIdx,
-  //       (res, pageIdx) => {
-  //         debugLog('getNormalQuestions.getWords.res', res)
-  //         debugLog('getNormalQuestions.getWords.pageIdx', pageIdx)
-  //         // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
-  //         if (res.length && res.length > 0) {
-  //           let questions = that.data.questions.concat(res)
-  //           that.setData({
-  //             questions: questions,
-  //           }, function () {
-  //             if (pageIdx == 0) {
-  //               // 生成下一道题目
-  //               common.onClickNextQuestion(that, null, null, 0)
-  //             }
-  //           })
-  //         }else {
-  //           clearInterval(dataLoadTimer)
-
-  //         }
-  //       })
-  //     pageIdx++
-  //   }, 1000)
-  // },
 
   /**
    * 获得收藏题目
