@@ -126,6 +126,13 @@
 					"pathName": "pages/favorites/favorites",
 					"query": "",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
+					"pathName": "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
+					"query": "gameMode=NORMAL&tableValue=chinese-knowledge&tableName=中文知识&filterTags=",
+					"scene": null
 				}
 			]
 		}

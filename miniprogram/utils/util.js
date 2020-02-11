@@ -302,13 +302,15 @@ function arrayJoin(array, joinProp, seperator){
   return result
 }
 
-
-function refreshConfigs(){
+/**
+ * 刷新用户角色
+ */
+function refreshUserRoleConfigs(){
   const configs = require('../api/configs.js')
   configs.getConfigs({
     tags: configs.USER_ROLE_TAG
   }, 0, (configs, pageIdx)=>{
-    debugLog('refreshConfigs.configs', configs);
+    // debugLog('refreshConfigs.configs', configs);
     wx.setStorageSync(gConst.USER_ROLES_OBJS_KEY, configs)
     let userRoles = {}
     let registerVertifyCode = {}
@@ -320,6 +322,8 @@ function refreshConfigs(){
     wx.setStorageSync(gConst.VERTIFY_CODE_KEY, registerVertifyCode)
   })
 }
+
+
 
 module.exports = {
   formatTime: formatTime,
@@ -337,5 +341,5 @@ module.exports = {
   getGamingStatistics: getGamingStatistics,
   getUserConfigs: getUserConfigs,
   arrayJoin: arrayJoin,
-  refreshConfigs: refreshConfigs,
+  refreshUserRoleConfigs: refreshUserRoleConfigs,
 }

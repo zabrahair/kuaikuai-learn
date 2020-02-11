@@ -52,7 +52,7 @@ App({
         traceUser: true,
       })
       // Get Configs
-      utils.refreshConfigs(that.globalData)
+      utils.refreshUserRoleConfigs(that.globalData)
       this.login();
       utils.getUserConfigs(true)
 

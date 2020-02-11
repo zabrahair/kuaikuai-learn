@@ -108,6 +108,7 @@ Page({
 
     // common
     tableName: '',
+    tableValue: '',
 
     // page show
     questionViewWidth: 50,

@@ -358,7 +358,7 @@ Page({
         thinkSeconds: 0,
         isFavorited: isFavorited,
       }, res => {
-        that.processCurrentQuestion(question)
+
       })
     } catch (e) {
       errorLog('onClickNextQuestion error:', e)

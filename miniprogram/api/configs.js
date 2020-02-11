@@ -41,4 +41,5 @@ function getConfigs(pWhere, pageIdx, callback) {
 module.exports = {
   getConfigs: getConfigs,
   USER_ROLE_TAG: 'USER_ROLE',
+  ANSWER_TYPE: 'ANSWER_TYPE',
 }

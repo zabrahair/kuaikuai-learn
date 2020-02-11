@@ -1,6 +1,6 @@
 {
   "usingComponents": {
-    "single-select-question": "../../../components/singleSelectQuestion"
+    "single-select-question": "../../../components/singleSelectQuestion/singleSelectQuestion"
   },
   "navigationBarTitleText": "语文知识学习",
   "enablePullDownRefresh": false

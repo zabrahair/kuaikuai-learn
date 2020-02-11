@@ -8,12 +8,14 @@ const gConst = require('../../../const/global.js');
 const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
 const TABLES = require('../../../const/collections.js')
+const common = require('../common/common.js')
+
 // Api Handler
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
 const favoritesApi = require('../../../api/favorites.js')
-const HISTORY_TABLE = TABLES.ENGLISH_WORDS
+
 // DB Related
 const db = wx.cloud.database()
 const $ = db.command.aggregate
@@ -21,8 +23,11 @@ const _ = db.command
 
 // 练习计时器
 var scoreTimer = null;
+var dataLoadTimer = null;
+
 const titles = {
 }
+const titleSubfix = '拼写'
 
 // Titles
 titles[gConst.GAME_MODE.NORMAL] = '英语拼写练习';
@@ -55,6 +60,7 @@ const cardObjectTemplate = {
   usedBlankIdx: false,
   tempCardIdx: false,
 }
+
 Page({
 
   /**
@@ -112,6 +118,8 @@ Page({
     let that = this
     let gameMode = options.gameMode;
     let tags = that.data.tags
+    let tableValue = options.tableValue
+    let tableName = options.tableName
     if (options.filterTags){
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
@@ -122,6 +130,8 @@ Page({
       userInfo: userInfo,
       gameMode: gameMode,
       tags: tags,
+      tableValue: tableValue,
+      tableName: tableName,
     })
   },
 
@@ -195,8 +205,9 @@ Page({
      * 提交做题记录
      */
   recordHistory: function (question, answer) {
+    let that = this
     let historyRecord = {};
-    historyRecord['table'] = HISTORY_TABLE
+    historyRecord['table'] = that.data.tableValue
     historyRecord['question'] = question
     // delete question._id
     // Object.assign(historyRecord, question)
@@ -335,14 +346,7 @@ Page({
     curQuestionIndex = Math.floor(Math.random() * questions.length)
     question = questions[curQuestionIndex]
     that.onClickNextQuestion()
-    // that.setData({
-    //   questions: questions,
-    //   questionsDone: questionsDone,
-    //   curQuestionIndex: curQuestionIndex,
-    //   curQuestion: question,
-    // })
 
-    // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
     // 开始计时
     that.setData({
       curDeciSecond: 0,
@@ -482,55 +486,56 @@ Page({
 
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.NORMAL]
+        title: that.data.tableValue + titleSubfix
       })
-      this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
+      common.getNormalQuestions(that, dataLoadTimer)
+      // this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
 
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.WRONG]
+        title: that.data.tableValue + titleSubfix
       })
       this.getHistoryQuestions(gConst.GAME_MODE.WRONG);
 
     } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
       wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.FAVORITES]
+        title: that.data.tableValue + titleSubfix
       })
       this.getFavoritesQuestions(gConst.GAME_MODE.FAVORITES);
     }
   },
 
-  /**
-   * Get Normal Question
-   */
-  getNormalQuestions: function () {
-    let that = this
-    wx.cloud.callFunction({
-      name: 'spellEnglishWordsQuery',
-      data: {
-        filters: {
-          tags: that.data.tags
-        }
-      },
-      success: res => {
-        // debugLog('spellEnglishWordsQuery.success.res', res)
-        // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
-        if (res.result.data.length && res.result.data.length > 0) {
-          let questions = res.result.data
-          that.setData({
-            questions: questions,
-          }, function () {
-            // 生成下一道题目
-            that.onClickNextQuestion()
-          })
-        }
+  // /**
+  //  * Get Normal Question
+  //  */
+  // getNormalQuestions: function () {
+  //   let that = this
+  //   wx.cloud.callFunction({
+  //     name: 'spellEnglishWordsQuery',
+  //     data: {
+  //       filters: {
+  //         tags: that.data.tags
+  //       }
+  //     },
+  //     success: res => {
+  //       // debugLog('spellEnglishWordsQuery.success.res', res)
+  //       // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
+  //       if (res.result.data.length && res.result.data.length > 0) {
+  //         let questions = res.result.data
+  //         that.setData({
+  //           questions: questions,
+  //         }, function () {
+  //           // 生成下一道题目
+  //           that.onClickNextQuestion()
+  //         })
+  //       }
 
-      },
-      fail: err => {
-        console.error('[云函数] 调用失败：', err)
-      }
-    })
-  },
+  //     },
+  //     fail: err => {
+  //       console.error('[云函数] 调用失败：', err)
+  //     }
+  //   })
+  // },
 
   /**
    * 获得收藏题目
@@ -548,7 +553,7 @@ Page({
         tags: _.all(that.data.tags)
       }
     }
-    favoritesApi.getFavorites(TABLES.ENGLISH_WORDS
+    favoritesApi.getFavorites(that.data.tableValue
       , wherefilters
       , res => {
         debugLog('favoritesApi.getFavorites', res)
@@ -591,7 +596,7 @@ Page({
       wherefilters = _.and(
         {
           openid: userInfo.openId,
-          table: HISTORY_TABLE,
+          table: that.data.tableValue,
           question: _.exists(true),
           answerTime: _.gte(filterDate),
           question: {
@@ -889,7 +894,7 @@ Page({
         return ele != gConst.IS_FAVORITED
       })
       debugLog('curQuestion tags removed', tags)
-      favoritesApi.removeFavorite(TABLES.ENGLISH_WORDS, curQuestion, res=>{
+      favoritesApi.removeFavorite(that.data.tableValue, curQuestion, res=>{
         that.setData({
           isFavorited: false,
           curQuestion: curQuestion,
@@ -904,7 +909,7 @@ Page({
         tags.push(gConst.IS_FAVORITED)
       }
       debugLog('curQuestion tags', tags)
-      favoritesApi.createFavorite(TABLES.ENGLISH_WORDS, curQuestion
+      favoritesApi.createFavorite(that.data.tableValue, curQuestion
       , res => {
         that.setData({
           isFavorited: true,

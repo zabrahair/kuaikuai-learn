@@ -44,6 +44,11 @@
     <single-select-question
       wx:if="{{curQuestion.type == gConst.QUESTION_TYPES.SINGLE_SELECT}}"
       question="{{curQuestion}}"
+      bindprevious=""
+      bindnext=""
+      bindreset=""
+      bindpause=""
+      bindsubmit=""
     />
   </view>
 </view>
