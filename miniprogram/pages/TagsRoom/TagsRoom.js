@@ -126,8 +126,8 @@ Page({
     clearInterval(dataLoadTimer)
     dataLoadTimer = setInterval(function () {
       dbApi.getTags(tableName, {}, pageIdx, (tags, pageIdx) => {
-        debugLog('getTags.pageIdx', pageIdx)
-        debugLog('getTags.tags', tags)
+        // debugLog('getTags.pageIdx', pageIdx)
+        // debugLog('getTags.tags', tags)
         if (!tags.length || tags.length < 1) {
           // stop load
           clearInterval(dataLoadTimer)

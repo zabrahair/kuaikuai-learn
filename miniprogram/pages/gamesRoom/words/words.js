@@ -13,6 +13,8 @@ const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
 const favoritesApi = require('../../../api/favorites.js')
+const common = require('../common/common.js')
+
 // DB Related
 const db = wx.cloud.database()
 const $ = db.command.aggregate
@@ -349,7 +351,7 @@ Page({
       })
 
     // Next Question
-    that.onClickNextQuestion(null, isCorrect)
+    common.onClickNextQuestion(that, null, isCorrect)
     that.setData({
       curAnswer: '',
       thinkSeconds: 0,
@@ -384,7 +386,7 @@ Page({
       questionsDone: questionsDone,
       curQuestionIndex: curQuestionIndex,
     })
-    that.onClickNextQuestion(null, null, 0)
+    common.onClickNextQuestion(that, null, null, 0)
 
 
     // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
@@ -419,102 +421,9 @@ Page({
    */
   onClickNextQuestion: function (e, isCorrect, idxOffset) {
     let that = this
-    let dataset
-    try{
-      dataset = e ? e.target.dataset : null
-      if (dataset.idxOffset) {
-        idxOffset = parseInt(dataset.idxOffset)
-      }
-    }
-    catch(e){
-      errorLog('onClickNextQuestion.e',e)
-    }
+    common.onClickNextQuestion(that, e, isCorrect, idxOffset, res=>{
 
-    if (that.checkPauseStatus() 
-      || !that.data.questions
-      || that.data.questions.length <=0) {
-      return;
-    }
-    if (idxOffset == null){
-      idxOffset = 1
-    }
-    // try {
-      
-      let questions = this.data.questions
-      let questionsDone = this.data.questionsDone
-      let question = this.data.curQuestion
-      let curQuestionIndex = this.data.curQuestionIndex
-      let nextQuestionIndex
-      if (curQuestionIndex == 0 && idxOffset < 0){
-        nextQuestionIndex = questions.length - 1
-      }else{
-        nextQuestionIndex = Math.abs((curQuestionIndex + idxOffset)) % questions.length 
-      }
-
-      
-      let nextQuestion = questions[nextQuestionIndex]
-      if (isCorrect) {
-        questionsDone.push(question)
-        questions.splice(curQuestionIndex, 1)
-        if (curQuestionIndex < nextQuestionIndex) {
-          nextQuestionIndex -= 1
-        }
-      }
-
-
-      if (questions.length > 0) {
-        // If answer is correct then move to done.
-        // if (!isCorrect){
-        //   curQuestionIndex = Math.floor(curQuestionIndex + 1 % questions.length)
-          // curQuestionIndex = Math.floor(Math.random() * questions.length)
-          // debugLog('curQuestionIndex', curQuestionIndex)
-          // question = questions[curQuestionIndex]
-        // debugLog('question', question)
-        // }
-
-      } else {
-        for (let i in questionsDone) {
-          questions.push(questionsDone[i])
-        }
-        questionsDone = []
-        curQuestionIndex = 0
-        question = {}
-        wx.showToast({
-          image: gConst.ANSWER_CORRECT,
-          title: MSG.FINISH_ALL_QUESTIONS,
-          duration: 1000,
-        }, function () {
-
-        })
-      }
-
-      let isFavorited = false
-      if (nextQuestionIndex._id) {
-        let tags = nextQuestionIndex.tags
-
-        if (tags.includes(gConst.IS_FAVORITED)) {
-          isFavorited = true
-        }
-      }
-
-      // 重置变量
-      debugLog('nextQuestion', nextQuestion)
-      that.setData({
-        questions: questions,
-        questionsDone: questionsDone,
-        curQuestionIndex: nextQuestionIndex,
-        curQuestion: nextQuestion,
-        curAnswer: '',
-        selectedCard: false,
-        curSpellCards: false,
-        thinkSeconds: 0,
-        isFavorited: isFavorited,
-      }, res => {
-        that.processCurrentQuestion(nextQuestion)
-      })
-    // } catch (e) {
-    //   errorLog('onClickNextQuestion error:', e)
-    // }
+    })
   },
 
   /**
@@ -611,7 +520,7 @@ Page({
             }, function () {
               if (pageIdx == 0) {
                 // 生成下一道题目
-                that.onClickNextQuestion(null, null, 0)
+                common.onClickNextQuestion(that, null, null, 0)
               }
             })
           }else {
@@ -656,7 +565,7 @@ Page({
               }, function () {
                 if (pageIdx == 0) {
                   // 生成下一道题目
-                  that.onClickNextQuestion(null, null, 0)
+                  common.onClickNextQuestion(that, null, null, 0)
                 }
               }) 
             } catch (e) {
@@ -716,7 +625,7 @@ Page({
               questions: questions,
             }, function () {
               // 生成下一道题目
-              that.onClickNextQuestion(null, null, 0)
+              common.onClickNextQuestion(that, null, null, 0)
             })
           }
         } catch (e) {

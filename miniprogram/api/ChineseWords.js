@@ -49,8 +49,8 @@ function getTags(pWhere, pageIdx, callback) {
     .end()
     .then
     (res => {
-      debugLog('getTags', res)
-      debugLog('getTags.length', res.list.length)
+      // debugLog('getTags', res)
+      // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {
         let tags = []
         for (let i in res.list) {

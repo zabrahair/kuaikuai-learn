@@ -49,14 +49,8 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": -1,
 			"list": [
-				{
-					"id": -1,
-					"name": "db guide",
-					"pathName": "pages/databaseGuide/databaseGuide",
-					"query": ""
-				},
 				{
 					"id": 1,
 					"name": "pages/index/index",
@@ -132,6 +126,12 @@
 					"name": "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
 					"pathName": "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
 					"query": "gameMode=NORMAL&tableValue=chinese-knowledge&tableName=中文知识&filterTags=",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/favorites/favorites",
+					"pathName": "pages/favorites/favorites",
 					"scene": null
 				}
 			]

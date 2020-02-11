@@ -42,19 +42,59 @@ const createFavorite = function (tableName, insertData, callback) {
   })
 }
 
+const isFavorited = function(tableName, pWhere, callback){
+  // debugLog('pWhere', pWhere)
+  let perPageCount = 20
+  let where =
+    _.and({
+      table: tableName,
+      thing: {
+        tags: gConst.IS_FAVORITED
+      }
+    }
+      , {
+        thing: pWhere
+      }
+    )
+  // debugLog('where', where)
+  db.collection(TABLE)
+    .aggregate()
+    .match(where)
+    .group({
+      _id: '$thing._id',
+      thing: $.first('$thing')
+    })
+    .limit(1)
+    .end()
+    .then(
+      res => {
+        let result = res.list;
+        debugLog('getFavorites.result', result);
+        let thing = null
+        if (result.length) {
+          thing = result[0].thing
+          if (thing.tags.includes(gConst.IS_FAVORITED)) {
+            thing['isFavorited'] = true
+          }
+        }
+
+        callback(thing)
+      })  
+}
+
 const removeFavorite = function (tableName, removeData, callback) {
   const db = wx.cloud.database()
-  let _id = removeData._id
+  // let _id = removeData._id
   // 根据条件插入所有用户
   db.collection(TABLE).where({
     table: tableName,
     thing: {
-      _id: _id
+      word: removeData.word
     }
   }).remove({
     success: res => {
       let result = res;
-      debugLog('【删除结果】 favorites', result);
+      debugLog('【删除结果】 favorites count:', result);
       callback(result)
     },
     fail: err => {
@@ -121,30 +161,27 @@ function getFavorites(tableName, pWhere, pageIdx, callback) {
   )
   // debugLog('where', where)
   db.collection(TABLE)
-    .where(where)
+    .aggregate()
+    .match(where)
+    .group({
+      _id: '$thing._id',
+      thing: $.first('$thing')
+    })
     .skip(pageIdx * perPageCount)
-    .get({
-    success: res => {
-      let result = res.data;
-      debugLog('getFavorites.result', result);
-      let things = []
-      if (result.length) {
-        for (let i in result) {
-          things.push(result[i].thing)
-        }     
-        debugLog('getFavorites.things', things)
-        
-      }
-      callback(things, pageIdx)
-
-    },
-    fail: err => {
-      wx.showToast({
-        icon: 'none',
-        title: '查询记录失败'
-      })
-      errorLog('[数据库favorites] [查询记录] 失败：', err)
-    }
+    .end()
+    .then(
+      res => {
+        let result = res.list;
+        debugLog('getFavorites.result', result);
+        let things = []
+        if (result.length) {
+          for (let i in result) {
+            things.push(result[i].thing)
+          }     
+          debugLog('getFavorites.things', things)
+          
+        }
+        callback(things, pageIdx)
   })
 }
 
@@ -152,5 +189,6 @@ module.exports = {
   createFavorite: createFavorite,
   removeFavorite: removeFavorite,
   getFavorites: getFavorites,
-  getTags: getTags
+  getTags: getTags,
+  isFavorited: isFavorited,
 }
