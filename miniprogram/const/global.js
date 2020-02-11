@@ -95,11 +95,16 @@ module.exports = {
     , { name: '年', interval: 100 }
   ],
   GAME_MODE: {
-    WRONG: 'WRONG',
-    NORMAL: 'NORMAL',
-    SLOW: 'SLOW',
-    WRONG_SLOW: 'WRONG_SLOW',
-    FAVORITES: 'FAVORITES',
+    // WRONG: 'WRONG',
+    // NORMAL: 'NORMAL',
+    // SLOW: 'SLOW',
+    // WRONG_SLOW: 'WRONG_SLOW',
+    // FAVORITES: 'FAVORITES',
+    WRONG: '错题',
+    NORMAL: '常规',
+    SLOW: '慢速',
+    WRONG_SLOW: '错而慢',
+    FAVORITES: '收藏',
   },
   DEFAULT_USER_CONFIGS: {
     divideSpeedFloor: 4000,
@@ -115,4 +120,10 @@ module.exports = {
     FILL_BLANK: '填空题',
     CONNECT_ITEMS: '连线题',
   },
+  TAGS_LOCATION: {
+    NORMAL: 'NORMAL',
+    FAVORITES: 'FAVORITES',
+    HISTORY: 'HISTORY',
+    WRONG_HISTORY: 'WRONG_HISTORY'
+  }
 }

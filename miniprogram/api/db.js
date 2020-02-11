@@ -19,8 +19,8 @@ function queryPages(tableName, pWhere, pageIdx, callback){
     .get()
     .then
     (res => {
-      debugLog('queryPages', res)
-      debugLog('queryPages.length', res.data.length)
+      // debugLog('queryPages', res)
+      // debugLog('queryPages.length', res.data.length)
       if (res.data.length > 0) {
         callback(res.data, pageIdx)
         return
@@ -117,16 +117,18 @@ const update = function (table, id, updateObj, callback) {
   })
 }
 
-const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectObj, callback) {
+const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectObj, pageIdx, callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
   const _ = db.command
+  let perPageCount = 20
   db.collection(table)
     .aggregate()
     .match(matchObj)
     .unwind(unwindObj)
     .group(groupObj)
     .project(projectObj)
+    .skip(pageIdx * perPageCount)
     .end().then(res => {
       // debugLog('groupAggregate[' + table + ']', res)
       callback(res)

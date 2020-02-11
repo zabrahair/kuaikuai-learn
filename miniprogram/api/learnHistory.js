@@ -4,6 +4,7 @@ const gConst = require('../const/global.js');
 const storeKeys = require('../const/global.js').storageKeys;
 const utils = require('../utils/util.js');
 const TABLES = require('../const/collections.js');
+const TABLE = TABLES.LEARN_HISTORY;
 const dbApi = require('db.js')
 
 const db = wx.cloud.database()
@@ -55,7 +56,7 @@ function tagsStatistic(userInfo, whereFilter, callback){
     , callback);
 }
 
-function getHistoryQuestions(userInfo, whereFilter, callback){
+function getHistoryQuestions(userInfo, whereFilter, pageIdx, callback){
   dbApi.groupAggregate(TABLES.LEARN_HISTORY
     , whereFilter
     , '$openid'
@@ -67,11 +68,51 @@ function getHistoryQuestions(userInfo, whereFilter, callback){
     , {
       _id: 1,
     }
+    , pageIdx
     , callback);
+}
+
+function getTags(tableName, pWhere, pageIdx, callback) {
+  // debugLog('tableName', tableName)
+  // debugLog('pWhere', pWhere)
+  let perPageCount = 20
+  let where = pWhere
+  // debugLog('where', where)
+  db.collection(TABLE)
+    .aggregate()
+    .match({
+      table: tableName,
+    })
+    .unwind('$question.tags')
+    .group({
+      _id: '$question.tags',
+      count: $.sum(1)
+    })
+    .skip(pageIdx * perPageCount)
+    .end()
+    .then
+    (res => {
+      // debugLog('getTags', res)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        let tags = []
+        for (let i in res.list) {
+          tags.push({
+            text: res.list[i]._id
+            , count: res.list[i].count
+          })
+        }
+        callback(tags, pageIdx)
+        return
+      } else {
+        callback([], pageIdx)
+      }
+    })
 }
 
 module.exports = {
   dailyStatistic: dailyStatistic,
   tagsStatistic: tagsStatistic,
   getHistoryQuestions: getHistoryQuestions,
+  getTags: getTags,
 }

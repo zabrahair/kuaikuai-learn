@@ -27,7 +27,7 @@
   </view>
   <view class='content'>
     <view class="filters" 
-          wx:if="{{gameMode != gConst.GAME_MODE.NORMAL}}">
+          wx:if="{{gameMode != gConst.GAME_MODE.NORMAL && gameMode != gConst.GAME_MODE.FAVORITES}}">
       <image class='filters_icon' src='{{gConst.FILTERS_ICON}}'/>
       <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{userConfigs.filterQuesLastDate}}" bindchange="bindLastDateChange">
         <view class="picker">
@@ -92,6 +92,8 @@
         <view class="word_card left_card"
           wx:for-items='{{questions}}' wx:for-item='question' 
           wx:for-index='idx' wx:key="_id" 
+          bindtap="onClickLeftCard" data-card-idx="{{idx}}"
+          data-question='{{question}}'
         >
           {{question.word}}
         </view>

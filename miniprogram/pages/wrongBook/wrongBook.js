@@ -30,8 +30,8 @@ Page({
   onLoad: function (options) {
     let that = this
     common.initDataBodyInTagRoom(that, {
-      tagsLocation: gConst.TAGS_LOCATION.FAVORITES,
-      gameMode: gConst.GAME_MODE.FAVORITES,
+      tagsLocation: gConst.TAGS_LOCATION.WRONG_HISTORY,
+      gameMode: gConst.GAME_MODE.WRONG,
     }, res => {
       if (options.tagsLocation) {
         that.setData({

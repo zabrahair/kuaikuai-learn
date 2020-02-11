@@ -32,12 +32,8 @@ const MANUAL_CHECK_RESULT = {
 // 练习计时器
 var scoreTimer = null;
 var dataLoadTimer = null;
-const titles = {
-}
 
-// Titles
-titles[gConst.GAME_MODE.NORMAL] = '';
-titles[gConst.GAME_MODE.FAVORITES] = '收藏'
+const titleSubfix = '默写卡'
 
 // Alphabet Variables
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -49,22 +45,8 @@ const card_height = 60;
 
 // Page Const Value
 const BLANK_EMPTY = '_'
-const CARD_STATE = {
-  UNUSED: 'card_unused',
-  USED: 'card_used',
-}
-const cardObjectTemplate = {
-  id: 0,
-  letter: '',
-  cardState: CARD_STATE.UNUSED,
-  x: 0,
-  y: 0,
-  isUsed: false,
-  blankValue: BLANK_EMPTY,
-  usedCardIdx: false,
-  usedBlankIdx: false,
-  tempCardIdx: false,
-}
+
+
 Page({
 
   /**
@@ -216,31 +198,31 @@ Page({
 
   },
 
-  /**
-     * 提交做题记录
-     */
-  recordHistory: function (question, answer) {
-    let that = this
-    let historyRecord = {};
-    historyRecord['table'] = that.data.tableValue
-    historyRecord['question'] = question
-    // delete question._id
-    // Object.assign(historyRecord, question)
-    Object.assign(historyRecord, answer)
-    // debugLog('historyRecord', historyRecord)
-    wx.cloud.callFunction({
-      name: 'learnHistoryCreate',
-      data: {
-        hisRecord: historyRecord
-      },
-      success: res => {
-        // debugLog('learnHistoryCreate.success.res', res)
-      },
-      fail: err => {
-        errorLog('[云函数] 调用失败：', err)
-      }
-    })
-  },
+  // /**
+  //    * 提交做题记录
+  //    */
+  // recordHistory: function (question, answer) {
+  //   let that = this
+  //   let historyRecord = {};
+  //   historyRecord['table'] = that.data.tableValue
+  //   historyRecord['question'] = question
+  //   // delete question._id
+  //   // Object.assign(historyRecord, question)
+  //   Object.assign(historyRecord, answer)
+  //   // debugLog('historyRecord', historyRecord)
+  //   wx.cloud.callFunction({
+  //     name: 'learnHistoryCreate',
+  //     data: {
+  //       hisRecord: historyRecord
+  //     },
+  //     success: res => {
+  //       // debugLog('learnHistoryCreate.success.res', res)
+  //     },
+  //     fail: err => {
+  //       errorLog('[云函数] 调用失败：', err)
+  //     }
+  //   })
+  // },
 
   /**
    * 暂停判断
@@ -337,7 +319,7 @@ Page({
     }
     // Record History
     let answerTime = new Date()
-    that.recordHistory(curQuestion
+    common.recordHistory(that, curQuestion
       , {
         openid: that.data.userInfo.openId,
         nickName: that.data.userInfo.nickName,
@@ -428,48 +410,6 @@ Page({
     })
   },
 
-  /**
-   * 处理当前题目
-   * 7 cards in every line
-   */
-  processCurrentQuestion: function (question) {
-    let that = this
-    that.setData({
-      curSpellCards: []
-    })
-    if (typeof question.word == 'string') {
-      let letters = question.word.split('');
-      let curSpellCards = []
-      let length = letters.length
-      // debugLog('length', length)
-      for (let idx = 0; idx < length; idx++) {
-        // debugLog('letters', letters)
-        // let i = Math.floor(Math.random() * letters.length)
-        // no need to random the order of word
-        let i = 0;
-        // debugLog('i', i)
-        let cardObject = {}
-        Object.assign(cardObject, cardObjectTemplate)
-        cardObject.id = idx
-        cardObject.letter = letters[i]
-        // cardObject.x = card_x_offset + idx % 7 * card_width
-        // cardObject.y = card_y_offset + Math.floor(idx/7) * card_height
-        // debugLog('cardObject', cardObject)
-        curSpellCards.push(cardObject)
-        letters.splice(i, 1)
-      }
-
-      // caculate font size:
-      let questionViewWidth = that.data.questionViewWidth;
-      let cardFontSize = questionViewWidth / curSpellCards.length;
-      cardFontSize = cardFontSize > that.data.maxCardFontSize ? that.data.maxCardFontSize : cardFontSize
-      cardFontSize = cardFontSize < that.data.minCardFontSize ? that.data.minCardFontSize : cardFontSize
-      that.setData({
-        curSpellCards: curSpellCards,
-        cardFontSize: cardFontSize,
-      })
-    }
-  },
 
   /**
    * 获取所有题目
@@ -481,130 +421,25 @@ Page({
     })
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titles[gConst.GAME_MODE.NORMAL]
+        title: that.data.tableName + titleSubfix
       })
       common.getNormalQuestions(that, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.WRONG]
+        title: that.data.tableName + gConst.GAME_MODE.WRONG + titleSubfix
       })
-      this.getHistoryQuestions(gConst.GAME_MODE.WRONG);
+      common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
       wx.setNavigationBarTitle({
-        title: titles[gConst.GAME_MODE.FAVORITES]
+        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + titleSubfix
       })
-      this.getFavoritesQuestions(gConst.GAME_MODE.FAVORITES);
+      common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
     }
   },
 
-  /**
-   * 获得收藏题目
-   */
-  getFavoritesQuestions: function (mode) {
-    let that = this
-    let pageIdx = 0
-    let userInfo = that.data.userInfo
-    // debugLog('that.data.lastDate', that.data.lastDate)
-    // debugLog('that.data.lastTime', that.data.lastTime)
-    let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
-    // debugLog('getFavoritesQuestions.filterDate', filterDate)
-    let wherefilters
-    if (gConst.GAME_MODE.FAVORITES == mode) {
-      wherefilters = {
-        tags: _.all(that.data.tags)
-      }
-    }
-    clearInterval(dataLoadTimer)
-    dataLoadTimer = setInterval(function () {
-      favoritesApi.getFavorites(
-        that.data.tableValue
-        , wherefilters
-        , pageIdx
-        , (things, pageIdx) => {
-          debugLog('favoritesApi.getFavorites', things)
-          if (things.length && things.length > 0) {
-            try {
-              let questions = that.data.questions.concat(things)
-              that.setData({
-                questions: questions,
-              }, function () {
-                if (pageIdx == 0) {
-                  // 生成下一道题目
-                  common.onClickNextQuestion(that, null, null, 0)
-                }
-              }) 
-            } catch (e) {
-              wx.showToast({
-                image: gConst.ERROR_ICON,
-                title: MSG.SOME_EXCEPTION,
-                duration: 1000,
-              })
-            }
-          } else {
-            clearInterval(dataLoadTimer)
-
-          }
-        })
-        pageIdx++
-    }, 1000)
-    
-  },
-
-  /**
-   * 获得做地错的题目
-   */
-  getHistoryQuestions: function (mode) {
-    let that = this
-    let userInfo = that.data.userInfo
-    debugLog('that.data.lastDate', that.data.lastDate)
-    debugLog('that.data.lastTime', that.data.lastTime)
-    let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
-    debugLog('getWrongSlowQuestions.filterDate', filterDate)
-    let wherefilters
-    if (gConst.GAME_MODE.WRONG == mode) {
-      wherefilters = _.and(
-        {
-          openid: userInfo.openId,
-          table: that.data.tableValue,
-          question: _.exists(true),
-          answerTime: _.gte(filterDate),
-          question: {
-            tags: _.all(that.data.tags)
-          }
-        },
-        _.or([{ isCorrect: false },
-          // { thinkSeconds: _.gt('$question.minFinishTime') }
-        ]))
-    }
-    learnHistoryApi.getHistoryQuestions(userInfo
-      , wherefilters
-      , res => {
-        debugLog('spellEnglishWords.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
-        try {
-          if (res.list.length >= 0) {
-            let questions = []
-            for (let i in res.list) {
-              questions.push(res.list[i]._id.question)
-            }
-            that.setData({
-              questions: questions,
-            }, function () {
-              // 生成下一道题目
-              common.onClickNextQuestion(that, null, null, 0)
-            })
-          }
-        } catch (e) {
-          wx.showToast({
-            image: gConst.ERROR_ICON,
-            title: MSG.SOME_EXCEPTION,
-            duration: 1000,
-          })
-        }
-
-      })
-  },
+ 
 
   /**
    * 暂停
@@ -723,48 +558,6 @@ Page({
   },
 
   /**
-   * 点击拼写空档
-   */
-  onTapSpellBlank: function (e) {
-    let dataset = e.target.dataset;
-    debugLog('onTapSpellBlank.dataset', dataset)
-    let that = this
-
-    let blankIdx = parseInt(dataset.blankIdx)
-    debugLog('typeof blankIdx', typeof blankIdx)
-    let selectedBlank = dataset.spellBlank
-    let selectedCard = that.data.selectedCard
-    let curSpellCards = that.data.curSpellCards;
-    let curBlank = curSpellCards[blankIdx]
-
-    if (selectedCard) {
-      let usedCardIdx = selectedCard.tempCardIdx;
-      curBlank.blankValue = selectedCard.letter
-      curBlank.usedCardIdx = usedCardIdx;
-      curSpellCards[curBlank.usedCardIdx].usedBlankIdx = blankIdx
-      selectedCard = false
-
-    } else {
-      if (typeof curBlank.usedCardIdx == 'number') {
-        // Mockup click spell card and call onTapAnswerCard
-        this.onTapAnswerCard({
-          target: {
-            dataset: {
-              cardIdx: curBlank.usedCardIdx,
-              spellCard: curSpellCards[curBlank.usedCardIdx]
-            }
-          }
-        })
-      }
-
-    }
-    that.setData({
-      selectedCard: selectedCard,
-      curSpellCards: curSpellCards,
-    })
-  },
-
-  /**
    * 点击字母卡片
    */
   onTapAnswerCard: function (e, callback) {
@@ -851,43 +644,25 @@ Page({
 
     })
   },
+
+  /**
+   * 当点击收藏按钮
+   */
   clickFavoriteSwitch: function (e) {
     let that = this
-    debugLog('clickFavoriteSwitch.dataset', e.target.dataset)
+    common.clickFavoriteSwitch(that, e)
+  },
+
+  /**
+   * 当点击剩下的单词卡片
+   */
+  onClickLeftCard: function(e){
+    let that = this
     let dataset = e.target.dataset
-    let curQuesId = dataset.curQuestionIndex
+    let curQuestionIndex = that.data.curQuestionIndex
+    let clickCardIdx = dataset.cardIdx
+    let idxOffSet = clickCardIdx - curQuestionIndex
+    common.onClickNextQuestion(that, null, null, idxOffSet)
 
-    if (that.data.isFavorited == true) {
-      let curQuestion = that.data.curQuestion
-      let tags = curQuestion.tags
-      // delete favorite tag
-      tags = tags.filter(ele => {
-        return ele != gConst.IS_FAVORITED
-      })
-      debugLog('curQuestion tags removed', tags)
-      favoritesApi.removeFavorite(that.data.tableValue, curQuestion, res => {
-        that.setData({
-          isFavorited: false,
-          curQuestion: curQuestion,
-        })
-      })
-
-    } else if (that.data.isFavorited == false) {
-      // set to favorited
-      let curQuestion = that.data.curQuestion
-      let tags = curQuestion.tags
-      if (!tags.includes(gConst.IS_FAVORITED)) {
-        tags.push(gConst.IS_FAVORITED)
-      }
-      debugLog('curQuestion tags', tags)
-      favoritesApi.createFavorite(that.data.tableValue, curQuestion
-        , res => {
-          that.setData({
-            isFavorited: true,
-            curQuestion: curQuestion,
-          })
-        })
-
-    }
   }
 })

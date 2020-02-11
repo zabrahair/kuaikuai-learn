@@ -10,7 +10,8 @@
     "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
     "pages/gamesRoom/words/words",
     "pages/TagsRoom/TagsRoom",
-    "pages/favorites/favorites"
+    "pages/favorites/favorites",
+    "pages/wrongBook/wrongBook"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
@@ -40,6 +41,12 @@
         "selectedIconPath": "images/tags_selected.png",
         "iconPath": "images/tags_unselected.png",
         "text": "标签"
+      },
+      {
+        "pagePath": "pages/wrongBook/wrongBook",
+        "selectedIconPath": "images/wrong_book_selected.png",
+        "iconPath": "images/wrong_book_unselected.png",
+        "text": "错题本"
       },
       {
         "pagePath": "pages/profile/profile",
