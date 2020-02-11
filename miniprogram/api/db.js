@@ -131,7 +131,7 @@ const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectOb
     .skip(pageIdx * perPageCount)
     .end().then(res => {
       // debugLog('groupAggregate[' + table + ']', res)
-      callback(res)
+      callback(res, pageIdx)
     })
 }
 

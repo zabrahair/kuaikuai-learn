@@ -61,6 +61,7 @@ Page({
     curQuestion: {},
     curSpellCards: [],
     selectedCard: null,
+    isRandomSpell: false,
 
     // User Info related
     userInfo: null,
@@ -115,7 +116,8 @@ Page({
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
-    let tags = that.data.tags
+    let lastDate = options.lastDate ? options.lastDate : that.data.lastDate
+    let tags = []
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
@@ -129,6 +131,7 @@ Page({
       tableValue: tableValue,
       tableName: tableName,
       filterTags: options.filterTags,
+      lastDate: lastDate,
     })
   },
 

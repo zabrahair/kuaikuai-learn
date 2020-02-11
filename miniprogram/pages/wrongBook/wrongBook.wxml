@@ -24,7 +24,8 @@
         wx:for-items='{{tags}}' wx:for-item='tag' 
         wx:for-index='idx' wx:key="tag" 
         data-tag-count='{{tag.count}}' 
-        data-tag-text='{{tag.text}}' 
+        data-tag-text='{{tag.text}}'
+        data-tag-last-date='{{tag.lastDate}}' 
         data-tag-idx='{{idx}}'
         bindtap="tapTag"
       >

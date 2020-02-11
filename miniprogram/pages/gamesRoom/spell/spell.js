@@ -71,6 +71,7 @@ Page({
     curQuestion: {},
     curSpellCards: [],
     selectedCard: null,
+    isRandomSpell: true,
 
     // User Info related
     userInfo: null,
@@ -109,10 +110,11 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    // debugLog('getCurrentPages()', getCurrentPages())
     debugLog('onLoad.options', options)
     let that = this
     let gameMode = options.gameMode;
-    let tags = that.data.tags
+    let tags = []
     let tableValue = options.tableValue
     let tableName = options.tableName
     if (options.filterTags){

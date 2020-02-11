@@ -277,7 +277,7 @@ function getHistoryQuestions(that, mode, dataLoadTimer) {
     learnHistoryApi.getHistoryQuestions(userInfo
       , wherefilters
       , pageIdx
-      , res => {
+      , (res, pageIdx)  => {
         // debugLog('learnHistoryApi.getHistoryQuestions count', res.list.length)
         // debugLog('learnHistoryApi.getHistoryQuestions', res.list)
         try {
@@ -292,6 +292,7 @@ function getHistoryQuestions(that, mode, dataLoadTimer) {
             }, function () {
               if (pageIdx == 0) {
                 // 生成下一道题目
+                debugLog('生成第一道题目', questions[0])
                 onClickNextQuestion(that, null, null, 0)
               }
             })
@@ -331,6 +332,9 @@ function processCurrentQuestion(that, question) {
       // let i = Math.floor(Math.random() * letters.length)
       // no need to random the order of word
       let i = 0;
+      if(that.data.isRandomSpell){
+        i = Math.floor(Math.random() * letters.length)
+      }
       // debugLog('i', i)
       let cardObject = {}
       Object.assign(cardObject, CARD_OBJECT_TEMPLATE)
@@ -437,7 +441,7 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   })
 
   // 重置变量
-  // debugLog('nextQuestion', nextQuestion)
+  debugLog('nextQuestion', nextQuestion)
   that.setData({
     questions: questions,
     questionsDone: questionsDone,
@@ -461,21 +465,25 @@ const DATA_BODY_IN_TAG_ROOM = {
   // common
   isLoadingFinished: false,
   gConst: gConst,
-  tables: [],
+
   selectedTable: '',
-  tags: [],
-  selectedTags: [],
+
 
   // Picker of answerTypes
-  answerTypesObjects: [],
-  answerTypesPickers: [],
+
   selAnswerType: '选择题型',
   // 共通函数通过这个数值判断到那种表里面获取标签列表
   tagsLocation: gConst.TAGS_LOCATION.NORMAL,
 }
 
 function initDataBodyInTagRoom(that, diffs, callback){
-  let initData = Object.assign({}, DATA_BODY_IN_TAG_ROOM)
+  let initData = Object.assign({
+    tables: [],
+    tags: [],
+    selectedTags: [],
+    answerTypesObjects: [],
+    answerTypesPickers: [],
+  }, DATA_BODY_IN_TAG_ROOM)
   for (let i in diffs) {
     initData[i] = diffs[i]
   }
@@ -583,7 +591,7 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
   dataLoadTimer = setInterval(function () {
     learnHistoryApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
       // debugLog('getTags.pageIdx', pageIdx)
-      // debugLog('getTags.tags', tags)
+      debugLog('getTags.tags', tags)
       if (!tags.length || tags.length < 1) {
         // stop load
         clearInterval(dataLoadTimer)
@@ -678,6 +686,7 @@ function tapTagInTagRoom(that, e) {
   let tagText = dataset.tagText
   let tagIdx = parseInt(dataset.tagIdx)
   let tagCount = dataset.tagCount
+  let tagLastDate = dataset.tagLastDate
   let selectedTags = that.data.selectedTags
   let tags = that.data.tags
 
@@ -696,6 +705,7 @@ function tapTagInTagRoom(that, e) {
       {
         text: tagText,
         count: tagCount,
+        lastDate: tagLastDate
       }
     )
   }
@@ -710,13 +720,31 @@ function tapTagInTagRoom(that, e) {
  * 点击进入，切换到题目展示页
  */
 function onClickEnterInTagRoom(that, e) {
+  debugLog('onClickEnterInTagRoom', that.data.selectedTags)
   let selectedTags = that.data.selectedTags
-  let joinedString = utils.arrayJoin(selectedTags, 'text')
+  let tagsStr = utils.arrayJoin(selectedTags, 'text')
   let url = ''
   if (that.data.selAnswerType == '默写卡') {
-    url = '/pages/gamesRoom/words/words?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + joinedString;
+    url = '/pages/gamesRoom/words/words?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   } else if (that.data.selAnswerType == '拼写') {
-    url = '/pages/gamesRoom/spell/spell?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + joinedString;
+    url = '/pages/gamesRoom/spell/spell?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
+  }
+
+  if(that.data.gameMode == gConst.GAME_MODE.WRONG){
+    
+    selectedTags.sort((a, b)=>{
+      if(a.lastDate < b.lastDate){
+        return -1
+      } else if (a.lastDate > b.lastDate){
+        return 1
+      } else if (a.lastDate = b.lastDate){
+        return 0
+      }
+    })
+    let lastDate = selectedTags[0].lastDate
+    lastDate = lastDate.replace(/\//g,'-')
+    debugLog('selectedTags', selectedTags)
+    url += '&lastDate=' + lastDate
   }
   wx.navigateTo({
     url: url

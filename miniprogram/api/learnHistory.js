@@ -71,6 +71,7 @@ function getHistoryQuestions(userInfo, whereFilter, pageIdx, callback){
     , {
       _id: '$question._id', 
       question: $.first('$question'),
+
     }
     , {
       _id: 1,
@@ -94,7 +95,8 @@ function getTags(tableName, pWhere, pageIdx, callback) {
     .unwind('$question.tags')
     .group({
       _id: '$question.tags',
-      count: $.sum(1)
+      lastDate: $.max('$answerTimeStr'),
+      count: $.sum(1),
     })
     .skip(pageIdx * perPageCount)
     .end()
@@ -106,8 +108,9 @@ function getTags(tableName, pWhere, pageIdx, callback) {
         let tags = []
         for (let i in res.list) {
           tags.push({
-            text: res.list[i]._id
-            , count: res.list[i].count
+            text: res.list[i]._id,
+            count: res.list[i].count,
+            lastDate: res.list[i].lastDate,
           })
         }
         callback(tags, pageIdx)

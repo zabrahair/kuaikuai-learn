@@ -546,6 +546,12 @@
   background-color: rgba(236, 119, 10, 0.9);
 }
 
+.current_card {
+  background-color: rgba(253, 51, 0, 0.9);
+  /* text-shadow: 1px 1px 1px gray; */
+  box-shadow: 2px 2px 1px 1px rgba(0, 0, 255, .2);
+}
+
 .done_card {
   background-color: rgba(43, 167, 12, 0.9);
 }
