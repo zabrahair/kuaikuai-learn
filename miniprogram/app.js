@@ -7,7 +7,7 @@ const utils = require('./utils/util.js');
 const TABLES = require('./const/collections.js')
 
 // const dbApi = require('./api/db.js')
-const userApi = require('./api/user.js')
+// const userApi = require('./api/user.js')
 
 const updateManager = wx.getUpdateManager()
 /**
@@ -53,6 +53,8 @@ App({
       })
       // Get Configs
       utils.refreshUserRoleConfigs(that.globalData)
+      const configsApi = require('./api/configs.js')
+      utils.refreshConfigs(configsApi.ANSWER_TYPE)
       this.login();
       utils.getUserConfigs(true)
 
@@ -129,6 +131,7 @@ App({
   checkUserExisted: function () {
     let that = this
     let userInfo = this.globalData.userInfo
+    const userApi = require('./api/user.js')
     userApi.queryUser({
       _id: userInfo.openId
     }, result => {

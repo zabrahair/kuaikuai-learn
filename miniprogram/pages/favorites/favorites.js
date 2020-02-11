@@ -11,6 +11,8 @@ const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
 const favoritesApi = require('../../api/favorites.js')
+const common = require('../gamesRoom/common/common.js')
+const configsApi = require('../../api/configs.js')
 
 const SELECTED_CSS = 'selected'
 var dataLoadTimer;
@@ -29,6 +31,10 @@ Page({
     tags: [],
     selectedTags: [],
 
+    // Picker of answerTypes
+    answerTypesObjects: [],
+    answerTypesPickers: [],
+    selAnswerType: '选择题型'
   },
 
   /**
@@ -36,7 +42,8 @@ Page({
    */
   onLoad: function (options) {
     let that = this
-
+    
+    that.initAnswerTypes()
     tables: that.initTablesArray()
 
 
@@ -102,9 +109,45 @@ Page({
       tables: tables,
       selectedTable: tables[0]
     }, res => {
-      that.getTags(that.data.selectedTable.value);
+      common.getFavoriteTags(that, that.data.selectedTable.value, dataLoadTimer)
+      // that.getTags(that.data.selectedTable.value);
     })
   },
+
+  /**
+   * 初始化题目类型
+   */
+  initAnswerTypes: function () {
+    let that = this
+    // Set Answer Types
+    let answerTypesObjects = wx.getStorageSync(configsApi.ANSWER_TYPE)
+    // debugLog('initAnswerTypes.answerTypesObjects', answerTypesObjects)
+    let answerTypesPickers = utils.getArrFromObjectsArr(answerTypesObjects, 'name')
+    // debugLog('initAnswerTypes.answerTypesPickers', answerTypesPickers)
+    let selAnswerType = answerTypesPickers.length > 0 ? answerTypesPickers[0] : ''
+
+    that.setData({
+      answerTypesPickers: answerTypesPickers,
+      answerTypesObjects: answerTypesObjects,
+      selAnswerType: selAnswerType,
+    })
+  },
+
+  /**
+   * 当选择题目解答类型
+   */
+  selectAnswerType: function (e) {
+    let that = this
+    let selIdx = e.detail.value
+
+    that.setData({
+      selAnswerType: that.data.answerTypesPickers[selIdx],
+      tags: [],
+    }, res => {
+      common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
+    })
+  },
+
 
   /**
    * 
@@ -113,33 +156,18 @@ Page({
     let that = this
     let selectedTags = that.data.selectedTags
     let joinedString = utils.arrayJoin(selectedTags, 'text')
+    let url = ''
+    if (that.data.selAnswerType == '默写卡') {
+      url = '/pages/gamesRoom/words/words?gameMode=' + gConst.GAME_MODE.FAVORITES + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + joinedString;
+    } else if (that.data.selAnswerType == '拼写') {
+      url = '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.FAVORITES + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + joinedString;
+    }
     wx.navigateTo({
-      url: '/pages/gamesRoom/words/words?gameMode=' + gConst.GAME_MODE.FAVORITES + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + joinedString,
+      url: url
     })
   },
-  /**
-   * 獲取所有的標籤
-   */
-  getTags: function (tableName) {
-    let that = this
-    let pageIdx = 0
-    clearInterval(dataLoadTimer)
-    dataLoadTimer = setInterval(function () {
-      favoritesApi.getTags(tableName, {}, pageIdx, (tags, pageIdx) => {
-        // debugLog('getTags.pageIdx', pageIdx)
-        // debugLog('getTags.tags', tags)
-        if (!tags.length || tags.length < 1) {
-          // stop load
-          clearInterval(dataLoadTimer)
-        }
-        // 
-        that.setData({
-          tags: that.data.tags.concat(tags)
-        })
-      })
-      pageIdx++;
-    }, 500)
-  },
+
+
 
   /**
    * tap table
@@ -164,7 +192,8 @@ Page({
       if (i == tableIdx) {
         selectedTable = tables[i]
         tables[i]['css'] = SELECTED_CSS
-        that.getTags(tableValue)
+        // common.getFavoriteTags(that, tableValue, dataLoadTimer)
+        // that.getTags(tableValue)
       } else {
         tables[i]['css'] = ''
       }
@@ -175,7 +204,8 @@ Page({
       tags: [],
       selectedTags: [],
     }, res => {
-      that.getTags(tableValue)
+      common.getFavoriteTags(that, tableValue, dataLoadTimer)
+      // that.getTags(tableValue)
     })
   },
 

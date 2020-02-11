@@ -4,11 +4,11 @@ const gConst = require('../const/global.js');
 const storeKeys = require('../const/global.js').storageKeys;
 const utils = require('../utils/util.js');
 const TABLES = require('../const/collections.js');
-const db = wx.cloud.database()
-const $ = db.command.aggregate
-const _ = db.command
 
 function queryPages(tableName, pWhere, pageIdx, callback){
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
   // debugLog('pWhere', pWhere)
   let perPageCount = 20
   let where = pWhere
@@ -31,7 +31,9 @@ function queryPages(tableName, pWhere, pageIdx, callback){
 }
 
 const query = function (table, filters, callback) {
-
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
   // 根据条件查询所有Records
   db.collection(table).where(filters).get({
     success: res => {
@@ -50,6 +52,9 @@ const query = function (table, filters, callback) {
 }
 
 const create = function (table, insertData, callback) {
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
   insertData = Object.assign(insertData, {
     _id: insertData.openId
   })
@@ -80,6 +85,10 @@ const create = function (table, insertData, callback) {
 }
 
 const update = function (table, id, updateObj, callback) {
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
+
   let now = new Date();
   let nowTimeString = utils.formatTime(now);
 
@@ -109,6 +118,9 @@ const update = function (table, id, updateObj, callback) {
 }
 
 const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectObj, callback) {
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
   db.collection(table)
     .aggregate()
     .match(matchObj)
@@ -122,6 +134,10 @@ const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectOb
 }
 
 function getTags(tableName, pWhere, pageIdx, callback) {
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
+
   // debugLog('tableName', tableName)
   // debugLog('pWhere', pWhere)
   let perPageCount = 20
@@ -129,6 +145,7 @@ function getTags(tableName, pWhere, pageIdx, callback) {
   // debugLog('where', where)
   db.collection(tableName)
     .aggregate()
+    .match(pWhere)
     .unwind('$tags')
     .group({
       _id: '$tags',

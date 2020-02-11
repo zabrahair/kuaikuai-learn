@@ -500,7 +500,7 @@ Page({
     learnHistoryApi.getHistoryQuestions(userInfo
       , wherefilters
       , res => {
-        debugLog('spellEnglishWords.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
+        debugLog('knowledge.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res)
         try {
           if (res.list.length >= 0) {
             let questions = []

@@ -29,11 +29,6 @@ const titles = {
 }
 const titleSubfix = '拼写'
 
-// Titles
-titles[gConst.GAME_MODE.NORMAL] = '英语拼写练习';
-titles[gConst.GAME_MODE.WRONG] = '英语拼写练习-错题'
-titles[gConst.GAME_MODE.FAVORITES] = '英语拼写练习-收藏'
-
 // Alphabet Variables
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
 const alphabetArray = alphabet.split('')
@@ -105,7 +100,7 @@ Page({
     gConst: gConst,
 
     // filters
-    tags: ['英语单词', '拼写', '拖曳'],
+    tags: ['拼写'],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
   },
@@ -202,32 +197,6 @@ Page({
   },
 
   /**
-     * 提交做题记录
-     */
-  recordHistory: function (question, answer) {
-    let that = this
-    let historyRecord = {};
-    historyRecord['table'] = that.data.tableValue
-    historyRecord['question'] = question
-    // delete question._id
-    // Object.assign(historyRecord, question)
-    Object.assign(historyRecord, answer)
-    // debugLog('historyRecord', historyRecord)
-    wx.cloud.callFunction({
-      name: 'learnHistoryCreate',
-      data: {
-        hisRecord: historyRecord
-      },
-      success: res => {
-        // debugLog('learnHistoryCreate.success.res', res)
-      },
-      fail: err => {
-        errorLog('[云函数] 调用失败：', err)
-      }
-    })
-  },
-
-  /**
    * 暂停判断
    */
   checkPauseStatus: function () {
@@ -300,7 +269,7 @@ Page({
     }
     // Record History
     let answerTime = new Date()
-    that.recordHistory(curQuestion
+    common.recordHistory(that, curQuestion
       , {
         openid: that.data.userInfo.openId,
         nickName: that.data.userInfo.nickName,
@@ -314,7 +283,7 @@ Page({
       })
 
     // Next Question
-    that.onClickNextQuestion(null, isCorrect)
+    common.onClickNextQuestion(that, null, isCorrect, 0)
     that.setData({
       curAnswer: '',
       thinkSeconds: 0,
@@ -345,7 +314,7 @@ Page({
     questionsDone = []
     curQuestionIndex = Math.floor(Math.random() * questions.length)
     question = questions[curQuestionIndex]
-    that.onClickNextQuestion()
+    common.onClickNextQuestion(that, null, null, 0)
 
     // 开始计时
     that.setData({
@@ -374,74 +343,84 @@ Page({
   },
 
   /**
-   * 下一题
-   */
-  onClickNextQuestion: function (e, isCorrect) {
+ * 下一题
+ */
+  onClickNextQuestion: function (e, isCorrect, idxOffset) {
     let that = this
-    if (that.checkPauseStatus()) {
-      return;
-    }
-    try {
-      let targetValues = e ? e.target.dataset : null
-      let questions = this.data.questions
-      let questionsDone = this.data.questionsDone
-      let question = this.data.curQuestion
-      let curQuestionIndex = this.data.curQuestionIndex
+    common.onClickNextQuestion(that, e, isCorrect, idxOffset, res => {
 
-      if (isCorrect) {
-        questionsDone.push(question)
-        questions.splice(curQuestionIndex, 1)
-      }
-
-      if (questions.length > 0) {
-        // If answer is correct then move to done.
-        curQuestionIndex = Math.floor(Math.random() * questions.length)
-        // debugLog('curQuestionIndex', curQuestionIndex)
-        question = questions[curQuestionIndex]
-        // debugLog('question', question)
-      } else {
-        for (let i in questionsDone) {
-          questions.push(questionsDone[i])
-        }
-        questionsDone = []
-        curQuestionIndex = 0
-        question = {}
-        wx.showToast({
-          image: gConst.ANSWER_CORRECT,
-          title: MSG.FINISH_ALL_QUESTIONS,
-          duration: 1000,
-        }, function () {
-
-        })
-      }
-
-      let isFavorited = false
-      if (question._id) {
-        let tags = question.tags
-        
-        if (tags.includes(gConst.IS_FAVORITED)) {
-          isFavorited = true
-        }
-      }
-
-      // 重置变量
-      that.setData({
-        questions: questions,
-        questionsDone: questionsDone,
-        curQuestionIndex: curQuestionIndex,
-        curQuestion: question,
-        curAnswer: '',
-        selectedCard: false,
-        curSpellCards: false,
-        thinkSeconds: 0,
-        isFavorited: isFavorited,
-      }, res=>{
-        that.processCurrentQuestion(question)
-      })
-    } catch (e) {
-      errorLog('onClickNextQuestion error:', e)
-    }
+    })
   },
+
+  // /**
+  //  * 下一题
+  //  */
+  // onClickNextQuestion: function (e, isCorrect) {
+  //   let that = this
+  //   if (that.checkPauseStatus()) {
+  //     return;
+  //   }
+  //   try {
+  //     let targetValues = e ? e.target.dataset : null
+  //     let questions = this.data.questions
+  //     let questionsDone = this.data.questionsDone
+  //     let question = this.data.curQuestion
+  //     let curQuestionIndex = this.data.curQuestionIndex
+
+  //     if (isCorrect) {
+  //       questionsDone.push(question)
+  //       questions.splice(curQuestionIndex, 1)
+  //     }
+
+  //     if (questions.length > 0) {
+  //       // If answer is correct then move to done.
+  //       curQuestionIndex = Math.floor(Math.random() * questions.length)
+  //       // debugLog('curQuestionIndex', curQuestionIndex)
+  //       question = questions[curQuestionIndex]
+  //       // debugLog('question', question)
+  //     } else {
+  //       for (let i in questionsDone) {
+  //         questions.push(questionsDone[i])
+  //       }
+  //       questionsDone = []
+  //       curQuestionIndex = 0
+  //       question = {}
+  //       wx.showToast({
+  //         image: gConst.ANSWER_CORRECT,
+  //         title: MSG.FINISH_ALL_QUESTIONS,
+  //         duration: 1000,
+  //       }, function () {
+
+  //       })
+  //     }
+
+  //     let isFavorited = false
+  //     if (question._id) {
+  //       let tags = question.tags
+        
+  //       if (tags.includes(gConst.IS_FAVORITED)) {
+  //         isFavorited = true
+  //       }
+  //     }
+
+  //     // 重置变量
+  //     that.setData({
+  //       questions: questions,
+  //       questionsDone: questionsDone,
+  //       curQuestionIndex: curQuestionIndex,
+  //       curQuestion: question,
+  //       curAnswer: '',
+  //       selectedCard: false,
+  //       curSpellCards: false,
+  //       thinkSeconds: 0,
+  //       isFavorited: isFavorited,
+  //     }, res=>{
+  //       that.processCurrentQuestion(question)
+  //     })
+  //   } catch (e) {
+  //     errorLog('onClickNextQuestion error:', e)
+  //   }
+  // },
 
   /**
    * 处理当前题目
@@ -567,7 +546,7 @@ Page({
               questions: questions,
             }, function () {
               // 生成下一道题目
-              that.onClickNextQuestion()
+              common.onClickNextQuestion(that, null, null, 0)
             })
           }
         } catch (e) {
@@ -621,7 +600,7 @@ Page({
               questions: questions,
             }, function () {
               // 生成下一道题目
-              that.onClickNextQuestion()
+              common.onClickNextQuestion(that, null, null, 0)
             })
           }
         } catch (e) {

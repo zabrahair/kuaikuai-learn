@@ -35,7 +35,6 @@ function getNormalQuestions(that, dataLoadTimer) {
       (res, pageIdx) => {
         debugLog('getNormalQuestions.getWords.res', res)
         debugLog('getNormalQuestions.getWords.pageIdx', pageIdx)
-        // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
         if (res.length && res.length > 0) {
           let questions = that.data.questions.concat(res)
           that.setData({
@@ -43,7 +42,7 @@ function getNormalQuestions(that, dataLoadTimer) {
           }, function () {
             if (pageIdx == 0) {
               // 生成下一道题目
-              that.onClickNextQuestion(null, null, 0)
+              onClickNextQuestion(that, null, null, 0)
             }
           })
         } else {
@@ -155,7 +154,89 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   // }
 }
 
+/**
+ * 獲取所有的標籤,只获取标签在记录第一层的标签。
+ */
+function getTags(that, tableName, dataLoadTimer) {
+  debugLog('getTags.tableName', tableName)
+  let pageIdx = 0
+  clearInterval(dataLoadTimer)
+  let where = {}
+  debugLog('getTags.selAnswerType', that.data.selAnswerType)
+  if (that.data.selAnswerType){
+    where = {
+      tags: that.data.selAnswerType
+    }
+  }
+  dataLoadTimer = setInterval(function () {
+    dbApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
+      // debugLog('getTags.pageIdx', pageIdx)
+      // debugLog('getTags.tags', tags)
+      if (!tags.length || tags.length < 1) {
+        // stop load
+        clearInterval(dataLoadTimer)
+      }
+      // 
+      that.setData({
+        tags: that.data.tags.concat(tags)
+      })
+    })
+    pageIdx++;
+  }, 500)
+}
+
+/**
+ * 提交做题记录
+ */
+function recordHistory(that, question, answer) {
+  let historyRecord = {};
+  historyRecord['table'] = that.data.tableValue
+  historyRecord['question'] = question
+  // delete question._id
+  // Object.assign(historyRecord, question)
+  Object.assign(historyRecord, answer)
+  // debugLog('historyRecord', historyRecord)
+  wx.cloud.callFunction({
+    name: 'learnHistoryCreate',
+    data: {
+      hisRecord: historyRecord
+    },
+    success: res => {
+      // debugLog('learnHistoryCreate.success.res', res)
+    },
+    fail: err => {
+      errorLog('[云函数] 调用失败：', err)
+    }
+  })
+}
+
+/**
+ * 獲取收藏记录的所有的標籤
+ */
+function getFavoriteTags(that, tableName, dataLoadTimer) {
+  let pageIdx = 0
+  clearInterval(dataLoadTimer)
+  dataLoadTimer = setInterval(function () {
+    favoritesApi.getTags(tableName, {}, pageIdx, (tags, pageIdx) => {
+      // debugLog('getTags.pageIdx', pageIdx)
+      // debugLog('getTags.tags', tags)
+      if (!tags.length || tags.length < 1) {
+        // stop load
+        clearInterval(dataLoadTimer)
+      }
+      // 
+      that.setData({
+        tags: that.data.tags.concat(tags)
+      })
+    })
+    pageIdx++;
+  }, 500)
+}
+
 module.exports = {
   getNormalQuestions: getNormalQuestions,
   onClickNextQuestion: onClickNextQuestion,
+  getTags: getTags,
+  recordHistory: recordHistory,
+  getFavoriteTags: getFavoriteTags,
 }

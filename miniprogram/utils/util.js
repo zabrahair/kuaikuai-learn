@@ -306,11 +306,11 @@ function arrayJoin(array, joinProp, seperator){
  * 刷新用户角色
  */
 function refreshUserRoleConfigs(){
-  const configs = require('../api/configs.js')
-  configs.getConfigs({
-    tags: configs.USER_ROLE_TAG
+  const configsApi = require('../api/configs.js')
+  configsApi.getConfigs({
+    tags: configsApi.USER_ROLE_TAG
   }, 0, (configs, pageIdx)=>{
-    // debugLog('refreshConfigs.configs', configs);
+    // debugLog('refreshUserRoleConfigs.configs', configs);
     wx.setStorageSync(gConst.USER_ROLES_OBJS_KEY, configs)
     let userRoles = {}
     let registerVertifyCode = {}
@@ -323,7 +323,48 @@ function refreshUserRoleConfigs(){
   })
 }
 
+/**
+ * 刷新用户角色
+ */
+function refreshConfigs(configGroupTag) {
+  const configsApi = require('../api/configs.js')
+  let pageIdx = 0
+  let dataLoadTimer = null
+  clearInterval(dataLoadTimer)
+  dataLoadTimer = setInterval(function () {
+    configsApi.getConfigs({
+      tags: configGroupTag
+    }, pageIdx, (configs, pageIdx) => {
+      // debugLog('refreshConfigs.configs', configs);
+      if (configs.length && configs.length > 0) {
+        let configsLoaded = wx.getStorageSync(configGroupTag)
+        if (configsLoaded){
+          configsLoaded = []
+        }
+        configsLoaded = configsLoaded.concat(configs)
+        wx.setStorageSync(configGroupTag, configsLoaded)
+      } else {
+        clearInterval(dataLoadTimer)
+      }
+    })
+    pageIdx++
+  }, 1000)
+}
 
+/**
+ * get properties Array from Objects' Array
+ */
+function getArrFromObjectsArr(objects, propName){
+  let array = []
+  if (objects && objects.length > 0){
+    for (let i in objects){
+      array.push(objects[i][propName])
+    }
+  }
+  
+  return array
+  
+}
 
 module.exports = {
   formatTime: formatTime,
@@ -342,4 +383,6 @@ module.exports = {
   getUserConfigs: getUserConfigs,
   arrayJoin: arrayJoin,
   refreshUserRoleConfigs: refreshUserRoleConfigs,
+  refreshConfigs: refreshConfigs,
+  getArrFromObjectsArr: getArrFromObjectsArr,
 }

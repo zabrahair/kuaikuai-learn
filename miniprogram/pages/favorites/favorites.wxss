@@ -9,6 +9,7 @@
   margin-bottom: 1vh;
   background-color: rgba(51, 226, 51, 0.5);
 }
+
 .tables-cloud {
   flex-direction: row;
   flex-wrap: wrap;
@@ -16,6 +17,31 @@
   align-items: center;  
 
   width: 100%;
+
+}
+
+.answer_types_picker{
+  position: fixed;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+
+  /*竖排文字*/
+  writing-mode: vertical-rl;
+
+  right: 0vw;
+  top: 0vh;
+  width: 8vw;
+  height: 19.5vh;  
+  font-size: 5vw;
+  color: rgb(248, 248, 248);
+  border: 1px solid rgba(51, 226, 51, 0.5);
+  background-color: rgba(228, 80, 43, 0.9);
+}
+
+.picker {
 
 }
 

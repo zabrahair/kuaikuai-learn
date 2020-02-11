@@ -10,6 +10,12 @@
       >
         {{table.name}}
       </view>
+      <picker class='answer_types_picker' 
+      bindchange="selectAnswerType" value="{{index}}" range="{{answerTypesPickers}}">
+        <view class="picker">
+        {{selAnswerType}} ▾
+        </view>
+      </picker> 
     </view>
   </scroll-view>
   <scroll-view class="tags-container" scroll-y='true'>
@@ -26,7 +32,7 @@
       </view>
     </view>
   </scroll-view>
-  <view class='buttons'>
-  <button class="button" bindtap="onClickEnter" type='primary'>进入</button>
+  <view class='buttons'> 
+    <button class="button" bindtap="onClickEnter" type='primary'>进入</button>
   </view>
 </view>

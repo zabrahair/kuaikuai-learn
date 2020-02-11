@@ -365,17 +365,18 @@ Page({
    * 重置答案
    */
   resetAnswer: function (e) {
-    if (this.checkPauseStatus()) {
+    let that = this
+    if (that.checkPauseStatus()) {
       return;
     }
 
-    let that = this
+    
     let formValues = e ? e.detail.value : {}
     // Reset Questions
-    let questions = this.data.questions
-    let questionsDone = this.data.questionsDone
-    let question = this.data.curQuestion
-    let curQuestionIndex = this.data.curQuestionIndex
+    let questions = that.data.questions
+    let questionsDone = that.data.questionsDone
+    let question = that.data.curQuestion
+    let curQuestionIndex = that.data.curQuestionIndex
     for (let i in questionsDone) {
       questions.push(questionsDone[i])
     }
@@ -479,7 +480,7 @@ Page({
       wx.setNavigationBarTitle({
         title: that.data.tableName + titles[gConst.GAME_MODE.NORMAL]
       })
-      this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
+      common.getNormalQuestions(that, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
@@ -495,42 +496,42 @@ Page({
     }
   },
 
-  /**
-   * Get Normal Question
-   */
-  getNormalQuestions: function () {
-    let that = this
-    let pageIdx = 0
-    clearInterval(dataLoadTimer)
-    dataLoadTimer = setInterval(function () {
-      dbApi.queryPages(
-        that.data.tableValue,
-        {
-            tags: _.all(that.data.tags)
-        },
-        pageIdx,
-        (res, pageIdx) => {
-          debugLog('getNormalQuestions.getWords.res', res)
-          debugLog('getNormalQuestions.getWords.pageIdx', pageIdx)
-          // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
-          if (res.length && res.length > 0) {
-            let questions = that.data.questions.concat(res)
-            that.setData({
-              questions: questions,
-            }, function () {
-              if (pageIdx == 0) {
-                // 生成下一道题目
-                common.onClickNextQuestion(that, null, null, 0)
-              }
-            })
-          }else {
-            clearInterval(dataLoadTimer)
+  // /**
+  //  * Get Normal Question
+  //  */
+  // getNormalQuestions: function () {
+  //   let that = this
+  //   let pageIdx = 0
+  //   clearInterval(dataLoadTimer)
+  //   dataLoadTimer = setInterval(function () {
+  //     dbApi.queryPages(
+  //       that.data.tableValue,
+  //       {
+  //           tags: _.all(that.data.tags)
+  //       },
+  //       pageIdx,
+  //       (res, pageIdx) => {
+  //         debugLog('getNormalQuestions.getWords.res', res)
+  //         debugLog('getNormalQuestions.getWords.pageIdx', pageIdx)
+  //         // debugLog('spellEnglishWordsQuery.questions.count', res.result.data.length)
+  //         if (res.length && res.length > 0) {
+  //           let questions = that.data.questions.concat(res)
+  //           that.setData({
+  //             questions: questions,
+  //           }, function () {
+  //             if (pageIdx == 0) {
+  //               // 生成下一道题目
+  //               common.onClickNextQuestion(that, null, null, 0)
+  //             }
+  //           })
+  //         }else {
+  //           clearInterval(dataLoadTimer)
 
-          }
-        })
-      pageIdx++
-    }, 1000)
-  },
+  //         }
+  //       })
+  //     pageIdx++
+  //   }, 1000)
+  // },
 
   /**
    * 获得收藏题目
