@@ -11,7 +11,10 @@ const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
 
-function dailyStatistic(userInfo, whereFilter, callback){
+function dailyStatistic(userInfo, whereFilter, pageIdx, callback){
+  if (typeof pageIdx != 'number') {
+    pageIdx = 0
+  } 
   dbApi.groupAggregate(TABLES.LEARN_HISTORY
     , whereFilter
     , '$openid'
@@ -32,10 +35,14 @@ function dailyStatistic(userInfo, whereFilter, callback){
       avgThinkTime: 1,
       answerDate: 1,
     }
+    , pageIdx
     , callback);
 }
 
-function tagsStatistic(userInfo, whereFilter, callback){
+function tagsStatistic(userInfo, whereFilter, pageIdx, callback){
+  if (typeof pageIdx != 'number'){
+    pageIdx = 0
+  } 
   dbApi.groupAggregate(TABLES.LEARN_HISTORY
     , whereFilter
     , '$tags'
@@ -53,6 +60,7 @@ function tagsStatistic(userInfo, whereFilter, callback){
       score: 1,
       avgThinkTime: 1,
     }
+    , pageIdx
     , callback);
 }
 

@@ -12,6 +12,7 @@ const TABLES = require('../../const/collections.js')
 const dbApi = require('../../api/db.js')
 const userApi = require('../../api/user.js')
 const learnHistoryApi = require('../../api/learnHistory.js')
+var dataLoadTimer = null;
 
 Page({
 
@@ -52,6 +53,7 @@ Page({
    */
   onShow: function () {
     let that = this
+    let pageIdx = 0
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
       userInfo: userInfo,
@@ -70,28 +72,37 @@ Page({
       })
     })
 
-    learnHistoryApi.dailyStatistic(userInfo
-      , {
-        openid: userInfo.openId
-      }
-      , res => {
-        debugLog('history.onShow.dailyStatistic[' + TABLES.LEARN_HISTORY + ']', res)
-        try {
-          if (res.list.length >= 0) {
-            let dailyRecords = that.formatDailyHistoryRecord(res.list)
-            that.setData({
-              dailyRecords: res.list,
+    clearInterval(dataLoadTimer)
+    dataLoadTimer = setInterval(function () {
+      learnHistoryApi.dailyStatistic(userInfo
+        , {
+          openid: userInfo.openId
+        }
+        , pageIdx
+        , res => {
+          // debugLog('history.onShow.dailyStatistic[' + TABLES.LEARN_HISTORY + ']', res)
+          try {
+            if (res.list.length && res.list.length > 0 && pageIdx < 5) {
+              let dailyRecords = that.formatDailyHistoryRecord(res.list)
+              dailyRecords = that.data.dailyRecords.concat(dailyRecords)
+
+              // debugLog('history.dailyRecords', dailyRecords)
+              that.setData({
+                dailyRecords: dailyRecords,
+              })
+            } else {
+              clearInterval(dataLoadTimer)
+            }
+          } catch (e) {
+            wx.showToast({
+              image: gConst.ERROR_ICON,
+              title: MSG.SOME_EXCEPTION,
+              duration: 1000,
             })
           }
-        } catch (e) {
-          wx.showToast({
-            image: gConst.ERROR_ICON,
-            title: MSG.SOME_EXCEPTION,
-            duration: 1000,
-          })
-        }
-
-      })  
+        })  
+      pageIdx
+    }, 1000)
   },
 
   /**

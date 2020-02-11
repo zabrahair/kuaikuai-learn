@@ -20,10 +20,7 @@ const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
 
-
 /** 题目内容展示页 内容 */
-
-
 
 /**
  * 提交做题记录
@@ -120,7 +117,6 @@ function getNormalQuestions(that, dataLoadTimer) {
           })
         } else {
           clearInterval(dataLoadTimer)
-
         }
       })
     pageIdx++
