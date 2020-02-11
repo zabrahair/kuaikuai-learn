@@ -90,14 +90,14 @@
 					"id": 5,
 					"name": "spell -  NORMAL&tableValue=english-words&tableName=英语单词&filterTags=M3U1",
 					"pathName": "pages/gamesRoom/spell/spell",
-					"query": "gameMode=NORMAL&tableValue=english-words&tableName=英语单词&filterTags=M3U1",
+					"query": "gameMode=常规&tableValue=english-words&tableName=英语单词&filterTags=M3U1",
 					"scene": null
 				},
 				{
-					"id": 7,
+					"id": 6,
 					"name": "words 英语单词&filterTags=M1U1",
 					"pathName": "pages/gamesRoom/words/words",
-					"query": "gameMode=NORMAL&tableValue=english-words&tableName=英语单词&filterTags=M1U1",
+					"query": "gameMode=常规&tableValue=english-words&tableName=英语单词&filterTags=M1U1",
 					"scene": null
 				},
 				{
@@ -108,10 +108,10 @@
 					"scene": null
 				},
 				{
-					"id": 9,
+					"id": 8,
 					"name": "中文词语 gameMode=NORMAL&filterTags=成语",
 					"pathName": "pages/gamesRoom/words/words",
-					"query": "gameMode=NORMAL&tableValue=chinese-words&tableName=中文词语&filterTags=成语",
+					"query": "gameMode=常规&tableValue=chinese-words&tableName=中文词语&filterTags=成语",
 					"scene": null
 				},
 				{
@@ -125,6 +125,7 @@
 					"id": -1,
 					"name": "pages/favorites/favorites",
 					"pathName": "pages/favorites/favorites",
+					"query": "",
 					"scene": null
 				},
 				{

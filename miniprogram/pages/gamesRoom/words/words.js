@@ -348,57 +348,25 @@ Page({
    */
   resetAnswer: function (e) {
     let that = this
+    debugLog('resetAnswer.e', e)
     if (that.checkPauseStatus()) {
       return;
     }
-
     
-    let formValues = e ? e.detail.value : {}
-    // Reset Questions
-    let questions = that.data.questions
-    let questionsDone = that.data.questionsDone
-    let question = that.data.curQuestion
-    let curQuestionIndex = that.data.curQuestionIndex
-    for (let i in questionsDone) {
-      questions.push(questionsDone[i])
+    if(e && e.timeStamp){
+      wx.showModal({
+        title: MSG.CONFIRM_TITLE,
+        content: MSG.CONFIRM_RESET_MSG,
+        success(res) {
+          common.resetQuestionStatus(that, e, scoreTimer)
+        }
+      })
+    }else{
+      common.resetQuestionStatus(that, e, scoreTimer)
     }
-    questionsDone = []
-    curQuestionIndex = 0
-    that.setData({
-      questions: questions,
-      questionsDone: questionsDone,
-      curQuestionIndex: curQuestionIndex,
-    })
-    common.onClickNextQuestion(that, null, null, 0)
-
-
-    // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
-    // 开始计时
-    that.setData({
-      curDeciSecond: 0,
-      thinkSeconds: 0,
-
-    })
-    clearInterval(scoreTimer)
-    scoreTimer = setInterval(function () {
-      if (that.data.isPause == false) {
-        let timer = that.data.curDeciSecond + that.data.timerInterval
-        let thinkTimer = that.data.thinkSeconds + that.data.timerInterval
-        that.setData({
-          curDeciSecond: timer,
-          thinkSeconds: thinkTimer,
-          curDeciTimerStr: utils.formatDeciTimer(timer, 1),
-          thinkSecondsStr: utils.formatDeciTimer(thinkTimer, 1),
-          // totalScore: utils.getTotalScore(that.data.userInfo),
-        })
-      }
-    }, that.data.timerInterval)
-    wx.showToast({
-      image: gConst.GAME_START_ICON,
-      title: '',
-      duration: 1000,
-    })
   },
+
+  
 
   /**
    * 下一题

@@ -23,6 +23,57 @@ const _ = db.command
 /** 题目内容展示页 内容 */
 
 /**
+   * Reset Current Questions Status
+   */
+function resetQuestionStatus(that, e, scoreTimer) {
+  let formValues = e ? e.detail.value : {}
+  // Reset Questions
+  let questions = that.data.questions
+  let questionsDone = that.data.questionsDone
+  let question = that.data.curQuestion
+  let curQuestionIndex = that.data.curQuestionIndex
+  for (let i in questionsDone) {
+    questions.push(questionsDone[i])
+  }
+  questionsDone = []
+  curQuestionIndex = 0
+  that.setData({
+    questions: questions,
+    questionsDone: questionsDone,
+    curQuestionIndex: curQuestionIndex,
+  })
+  onClickNextQuestion(that, null, null, 0)
+
+
+  // debugLog('timer', utils.formatDeciTimer(1000*60*60*24*30*12))
+  // 开始计时
+  that.setData({
+    curDeciSecond: 0,
+    thinkSeconds: 0,
+
+  })
+  clearInterval(scoreTimer)
+  scoreTimer = setInterval(function () {
+    if (that.data.isPause == false) {
+      let timer = that.data.curDeciSecond + that.data.timerInterval
+      let thinkTimer = that.data.thinkSeconds + that.data.timerInterval
+      that.setData({
+        curDeciSecond: timer,
+        thinkSeconds: thinkTimer,
+        curDeciTimerStr: utils.formatDeciTimer(timer, 1),
+        thinkSecondsStr: utils.formatDeciTimer(thinkTimer, 1),
+        // totalScore: utils.getTotalScore(that.data.userInfo),
+      })
+    }
+  }, that.data.timerInterval)
+  wx.showToast({
+    image: gConst.GAME_START_ICON,
+    title: '',
+    duration: 1000,
+  })
+}
+
+/**
  * 提交做题记录
  */
 function recordHistory(that, question, answer) {
@@ -227,19 +278,22 @@ function getHistoryQuestions(that, mode, dataLoadTimer) {
       , wherefilters
       , pageIdx
       , res => {
-        debugLog('learnHistoryApi.getHistoryQuestions[' + TABLES.LEARN_HISTORY + ']', res.list.length)
+        // debugLog('learnHistoryApi.getHistoryQuestions count', res.list.length)
+        // debugLog('learnHistoryApi.getHistoryQuestions', res.list)
         try {
           if (res.list.length && res.list.length > 0) {
             let questions = []
             for (let i in res.list) {
-              questions.push(res.list[i]._id.question)
+              questions.push(res.list[i].question)
             }
             questions = that.data.questions.concat(questions)
             that.setData({
               questions: questions,
             }, function () {
-              // 生成下一道题目
-              onClickNextQuestion(that, null, null, 0)
+              if (pageIdx == 0) {
+                // 生成下一道题目
+                onClickNextQuestion(that, null, null, 0)
+              }
             })
           } else {
             clearInterval(dataLoadTimer)
@@ -678,6 +732,7 @@ module.exports = {
   recordHistory: recordHistory,
   clickFavoriteSwitch: clickFavoriteSwitch,
   processCurrentQuestion: processCurrentQuestion,
+  resetQuestionStatus: resetQuestionStatus,
   BLANK_EMPTY: BLANK_EMPTY,
   CARD_STATE: CARD_STATE,
   CARD_OBJECT_TEMPLATE: CARD_OBJECT_TEMPLATE,

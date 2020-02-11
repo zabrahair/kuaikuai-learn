@@ -69,12 +69,12 @@ function getHistoryQuestions(userInfo, whereFilter, pageIdx, callback){
     , whereFilter
     , '$openid'
     , {
-      _id: {
-        question: '$question'
-      },
+      _id: '$question._id', 
+      question: $.first('$question'),
     }
     , {
       _id: 1,
+      question: 1,
     }
     , pageIdx
     , callback);

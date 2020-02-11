@@ -46,9 +46,12 @@
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
       bindtap="clickFavoriteSwitch"/>
       <text class="meaning_text">{{curQuestion.meaning}}</text>
-      <view class='left_questions_count'>
-        {{questions.length}}
-      </view>
+      <view class='ques_wait_time'>
+        {{thinkSecondsStr}}
+      </view> 
+      <view class='current_question_index'>
+        {{curQuestionIndex+1}}/{{questions.length}}
+      </view>  
       <view class="spell_positions">
         <view class='spell_letter_position' 
       wx:for-items='{{curSpellCards}}' wx:for-item='spellBlank' 
