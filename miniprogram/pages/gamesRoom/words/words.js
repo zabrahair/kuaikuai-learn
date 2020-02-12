@@ -563,4 +563,17 @@ Page({
     let that = this
     common.clickFavoriteSwitch(that, e)
   },
+
+  /**
+ * 当点击剩下的单词卡片
+ */
+  onClickLeftCard: function (e) {
+    let that = this
+    let dataset = e.target.dataset
+    let curQuestionIndex = that.data.curQuestionIndex
+    let clickCardIdx = dataset.cardIdx
+    let idxOffSet = clickCardIdx - curQuestionIndex
+    common.onClickNextQuestion(that, null, null, idxOffSet)
+
+  },
 })
