@@ -361,7 +361,12 @@ Page({
         title: MSG.CONFIRM_TITLE,
         content: MSG.CONFIRM_RESET_MSG,
         success(res) {
-          common.resetQuestionStatus(that, e, scoreTimer)
+          if (res.confirm) {
+            debugLog('用户点击确定')
+            common.resetQuestionStatus(that, e, scoreTimer)
+          } else if (res.cancel) {
+            errorLog('用户点击取消')
+          }
         }
       })
     }else{

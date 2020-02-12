@@ -539,18 +539,54 @@
   font-size: 3vw;
   padding: 1vw;
   border-radius: 2vw;
-  background-color: rgba(236, 119, 10, 0.9);
+  background-color: rgba(17, 92, 153, 0.9);
 }
 
 .left_card {
-  background-color: rgba(236, 119, 10, 0.9);
+  background-color: rgba(17, 92, 153, 0.9);
 }
 
 .current_card {
-  background-color: rgba(253, 51, 0, 0.9);
+  background-color: rgba(255, 0, 76, 0.9);
   /* text-shadow: 1px 1px 1px gray; */
   box-shadow: 2px 2px 1px 1px rgba(0, 0, 255, .2);
 }
+
+.wrong_card {
+  background-color: rgba(126, 6, 6, 0.9);
+  /* text-shadow: 1px 1px 1px gray; */
+  box-shadow: 2px 2px 1px 1px rgba(0, 0, 255, .2);
+}
+
+.count_point {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  width: 3vw;
+  height: 3vw;
+
+  color: white;
+  font-size: 1vw;
+  border-radius: 2vw;
+  background-color: rgba(0, 0, 0, 1);
+}
+
+.correct_times {
+  right: -10%;
+  top: -20%;
+  background-color: rgb(6, 138, 247);
+}
+.incorrect_times {
+  left: -8%;
+  bottom: -20%;
+  background-color: rgb(247, 6, 6);
+}
+
+
 
 .done_card {
   background-color: rgba(43, 167, 12, 0.9);

@@ -473,9 +473,12 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   // try {
 
   let questions = that.data.questions
+  let curQuestionIndex = that.data.curQuestionIndex
+  // Set isCorrect to questions responsed element
+  questions[curQuestionIndex]['isCorrect'] = isCorrect
   let questionsDone = that.data.questionsDone
   let question = that.data.curQuestion
-  let curQuestionIndex = that.data.curQuestionIndex
+
   let nextQuestionIndex
   if (curQuestionIndex == 0 && idxOffset < 0) {
     nextQuestionIndex = questions.length - 1

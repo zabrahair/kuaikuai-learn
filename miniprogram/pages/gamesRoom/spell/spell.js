@@ -315,7 +315,12 @@ Page({
         title: MSG.CONFIRM_TITLE,
         content: MSG.CONFIRM_RESET_MSG,
         success(res) {
-          common.resetQuestionStatus(that, e, scoreTimer)
+          if (res.confirm) {
+            debugLog('用户点击确定')
+            common.resetQuestionStatus(that, e, scoreTimer)
+          } else if (res.cancel) {
+            errorLog('用户点击取消')
+          }
         }
       })
     } else {
@@ -686,7 +691,7 @@ Page({
     })
   },
 
-  onTapSpellCard: function(e){
+  onLongPressAnswerCard: function(e){
     let that = this
     common.onTapSpellCard(that, e)
   },
@@ -695,13 +700,14 @@ Page({
    * 通过拖曳卡片填写答案
    * 自动填写到左起第一个空格上
    */
-  onLongPressAnswerCard: function(e){
+   onTapSpellCard: function(e){
     debugLog('onTouchMoveAnswerCard.e', e.target.dataset);
     let that = this
     let dataset = e.target.dataset
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
     if(spellCard.cardState == CARD_STATE.USED){
+      this.onLongPressAnswerCard(e)
       return;
     }
     common.onTapSpellCard(that, {

@@ -15,6 +15,8 @@ const configsApi = require('../../api/configs.js')
 
 var dataLoadTimer;
 
+utils.refreshConfigs(configsApi.ANSWER_TYPE)
+
 Page({
 
   /**

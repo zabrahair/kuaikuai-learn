@@ -66,8 +66,10 @@
         wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
-        bindtap="onTapSpellCard" bindtouchmove="onLongPressAnswerCard"
-        bindlongpress="onLongPressAnswerCard">
+        bindtap="onTapSpellCard" 
+        
+        >
+        <!-- bindlongpress="onLongPressAnswerCard" -->
         {{spellCard.letter}}
         </view>
       </view>
