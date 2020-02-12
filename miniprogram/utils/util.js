@@ -366,7 +366,32 @@ function getArrFromObjectsArr(objects, propName){
   
 }
 
+/**
+ * 根据Array对象里面的属性排序
+ * sortProp： 用来排序的字段
+ * order：降序：-1，升序：1
+ */
+const ORDER = {
+  ASC: 1,
+  DESC: -1,
+}
+
+function sortByPropLenArray(array, sortProp, order){
+  let sortedArray = array.sort((a,b)=>{
+    if (a[sortProp].length < b[sortProp].length){
+      return order
+    } else if (a[sortProp].length > b[sortProp].length ) {
+      return -order
+    } else if (a[sortProp].length == b[sortProp].length ) {
+      return 0
+    }
+    
+  })
+  return sortedArray
+}
+
 module.exports = {
+  /** 工具型方法 */
   formatTime: formatTime,
   formatDate: formatDate,
   formatDeciTimer: formatDeciTimer,
@@ -374,15 +399,20 @@ module.exports = {
   resetStatus: resetStatus,
   cloneObj: cloneObj,
   pickerMaker: pickerMaker,
-  getUserInfo: getUserInfo,
-  setUserInfo: setUserInfo,
   extractFileInfo: extractFileInfo,
-  getUserRole: getUserRole,
-  getTotalScore: getTotalScore,
-  getGamingStatistics: getGamingStatistics,
-  getUserConfigs: getUserConfigs,
   arrayJoin: arrayJoin,
+  getArrFromObjectsArr: getArrFromObjectsArr,
+  ORDER: ORDER,
+  sortByPropLenArray: sortByPropLenArray,
+
+  /** 功能型方法 */
   refreshUserRoleConfigs: refreshUserRoleConfigs,
   refreshConfigs: refreshConfigs,
-  getArrFromObjectsArr: getArrFromObjectsArr,
+  getGamingStatistics: getGamingStatistics,
+  getUserConfigs: getUserConfigs,
+  getUserRole: getUserRole,
+  getTotalScore: getTotalScore,
+  getUserInfo: getUserInfo,
+  setUserInfo: setUserInfo,
+
 }

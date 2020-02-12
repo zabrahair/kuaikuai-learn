@@ -526,11 +526,11 @@ function getTags(that, tableName, dataLoadTimer, callback) {
  * 獲取所有的標籤,只获取标签在记录第一层的标签。
  */
 function getNormalTags(that, tableName, dataLoadTimer) {
-  debugLog('getTags.tableName', tableName)
+  // debugLog('getTags.tableName', tableName)
   let pageIdx = 0
   clearInterval(dataLoadTimer)
   let where = {}
-  debugLog('getTags.selAnswerType', that.data.selAnswerType)
+  // debugLog('getTags.selAnswerType', that.data.selAnswerType)
   if (that.data.selAnswerType){
     where = {
       tags: that.data.selAnswerType
@@ -542,9 +542,16 @@ function getNormalTags(that, tableName, dataLoadTimer) {
       // debugLog('getTags.tags', tags)
       if (!tags.length || tags.length < 1) {
         // stop load
+        // debugLog('getNormalTags.sort', that.data.tags)
+        let tags = that.data.tags
+        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.ASC)
+        // debugLog('getNormalTags.sort', that.data.tags)
+        that.setData({
+          tags: sortTags
+        })
         clearInterval(dataLoadTimer)
       }
-      // 
+      // sort tags
       that.setData({
         tags: that.data.tags.concat(tags)
       })
@@ -565,6 +572,11 @@ function getFavoriteTags(that, tableName, dataLoadTimer) {
       // debugLog('getTags.tags', tags)
       if (!tags.length || tags.length < 1) {
         // stop load
+        let tags = that.data.tags
+        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.ASC)
+        that.setData({
+          tags: sortTags
+        })        
         clearInterval(dataLoadTimer)
       }
       // 
@@ -594,6 +606,11 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
       debugLog('getTags.tags', tags)
       if (!tags.length || tags.length < 1) {
         // stop load
+        let tags = that.data.tags
+        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.ASC)
+        that.setData({
+          tags: sortTags
+        }) 
         clearInterval(dataLoadTimer)
       }
       // 
