@@ -104,6 +104,7 @@ Page({
     tags: ['拼写'],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
+    filterTags: '',
   },
 
   /**
@@ -117,6 +118,8 @@ Page({
     let tags = []
     let tableValue = options.tableValue
     let tableName = options.tableName
+    let lastDate = (typeof options.lastDate == 'string' && options.lastDate != '') ? options.lastDate : that.data.lastDate
+
     if (options.filterTags){
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
@@ -129,6 +132,8 @@ Page({
       tags: tags,
       tableValue: tableValue,
       tableName: tableName,
+      lastDate: lastDate,
+      filterTags: options.filterTags,
     })
   },
 
@@ -663,8 +668,8 @@ Page({
 
     }else{
       if (typeof curBlank.usedCardIdx == 'number'){
-        // Mockup click spell card and call onTapAnswerCard
-        this.onTapAnswerCard({
+        // Mockup click spell card and call onTapSpellCard
+        common.onTapSpellCard(that, {
           target: {
             dataset: {
               cardIdx: curBlank.usedCardIdx,
@@ -681,49 +686,9 @@ Page({
     })
   },
 
-  /**
-   * 点击字母卡片
-   */
-  onTapAnswerCard: function(e, callback){
-    let dataset = e.target.dataset;
-    debugLog('onTapAnswerCard.dataset', dataset)
+  onTapSpellCard: function(e){
     let that = this
-    let curSpellCards = that.data.curSpellCards;
-    let cardIdx = parseInt(dataset.cardIdx)
-    let curCard = curSpellCards[cardIdx];
-    // 如果没有填写空档就选下一个
-
-    if (that.data.selectedCard 
-      && that.data.selectedCard.id != curCard.id) {
-      wx.showToast({
-        image: gConst.ERROR_ICON,
-        title: MSG.CLICK_BLANK_FIRST,
-        duration: 1000,
-      })
-      return;
-    }
-
-    let selectedCard = dataset.spellCard
-
-    if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED){
-      selectedCard.tempCardIdx = cardIdx
-      curCard.cardState = CARD_STATE.USED
-    } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED){
-      curCard.cardState = CARD_STATE.UNUSED
-      if (typeof curCard.usedBlankIdx == 'number'){
-        // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
-        curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
-        curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
-        curCard.usedBlankIdx = false
-      }
-      selectedCard = false
-    }
-    // debugLog('selectCard', selectedCard)
-    that.setData({
-      curSpellCards: curSpellCards,
-      selectedCard: selectedCard,
-    })
-    if(typeof callback == 'function')callback()
+    common.onTapSpellCard(that, e)
   },
 
   /**
@@ -739,7 +704,7 @@ Page({
     if(spellCard.cardState == CARD_STATE.USED){
       return;
     }
-    that.onTapAnswerCard({
+    common.onTapSpellCard(that, {
       target: {
         dataset: {
           cardIdx: cardIdx,

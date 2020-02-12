@@ -82,16 +82,17 @@ function getHistoryQuestions(userInfo, whereFilter, pageIdx, callback){
 }
 
 function getTags(tableName, pWhere, pageIdx, callback) {
-  // debugLog('tableName', tableName)
+  debugLog('tableName', tableName)
   // debugLog('pWhere', pWhere)
   let perPageCount = 20
-  let where = pWhere
+  let where = {
+    table: tableName,
+  }
+  Object.assign(where, pWhere)
   // debugLog('where', where)
   db.collection(TABLE)
     .aggregate()
-    .match({
-      table: tableName,
-    })
+    .match(where)
     .unwind('$question.tags')
     .group({
       _id: '$question.tags',

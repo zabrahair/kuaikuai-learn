@@ -116,7 +116,7 @@ Page({
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
-    let lastDate = options.lastDate ? options.lastDate : that.data.lastDate
+    let lastDate =(typeof options.lastDate == 'string' && options.lastDate != '')  ? options.lastDate : that.data.lastDate
     let tags = []
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
@@ -528,49 +528,9 @@ Page({
     that.resetAnswer();
   },
 
-  /**
-   * 点击字母卡片
-   */
-  onTapAnswerCard: function (e, callback) {
-    let dataset = e.target.dataset;
-    debugLog('onTapAnswerCard.dataset', dataset)
+  onTapReciteCard: function(e){
     let that = this
-    let curSpellCards = that.data.curSpellCards;
-    let cardIdx = parseInt(dataset.cardIdx)
-    let curCard = curSpellCards[cardIdx];
-    // 如果没有填写空档就选下一个
-
-    if (that.data.selectedCard
-      && that.data.selectedCard.id != curCard.id) {
-      wx.showToast({
-        image: gConst.ERROR_ICON,
-        title: MSG.CLICK_BLANK_FIRST,
-        duration: 1000,
-      })
-      return;
-    }
-
-    let selectedCard = dataset.spellCard
-
-    if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED) {
-      selectedCard.tempCardIdx = cardIdx
-      curCard.cardState = CARD_STATE.USED
-    } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED) {
-      curCard.cardState = CARD_STATE.UNUSED
-      if (typeof curCard.usedBlankIdx == 'number') {
-        // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
-        curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
-        curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
-        curCard.usedBlankIdx = false
-      }
-      selectedCard = false
-    }
-    // debugLog('selectCard', selectedCard)
-    that.setData({
-      curSpellCards: curSpellCards,
-      selectedCard: selectedCard,
-    })
-    if (typeof callback == 'function') callback()
+    common.onTapReciteCard(that, e)
   },
 
   /**
@@ -578,7 +538,7 @@ Page({
    * 自动填写到左起第一个空格上
    */
   onLongPressAnswerCard: function (e) {
-    debugLog('onTouchMoveAnswerCard.e', e.target.dataset);
+    debugLog('onLongPressAnswerCard.e', e.target.dataset);
     let that = this
     let dataset = e.target.dataset
     let cardIdx = dataset.cardIdx
@@ -586,34 +546,7 @@ Page({
     if (spellCard.cardState == CARD_STATE.USED) {
       return;
     }
-    that.onTapAnswerCard({
-      target: {
-        dataset: {
-          cardIdx: cardIdx,
-          spellCard: spellCard,
-        }
-      }
-    }, res => {
-      let blankIdx = false;
-      let spellBlank = false
-      let curSpellCards = that.data.curSpellCards;
-      for (let i in curSpellCards) {
-        if (curSpellCards[i].blankValue == BLANK_EMPTY) {
-          spellBlank = curSpellCards[i]
-          blankIdx = i
-          that.onTapSpellBlank({
-            target: {
-              dataset: {
-                blankIdx: blankIdx,
-                spellBlank: spellBlank,
-              }
-            }
-          })
-          break;
-        }
-      }
-
-    })
+    
   },
 
   /**

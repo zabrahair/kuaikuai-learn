@@ -372,8 +372,8 @@ function getArrFromObjectsArr(objects, propName){
  * order：降序：-1，升序：1
  */
 const ORDER = {
-  ASC: 1,
-  DESC: -1,
+  ASC: -1,
+  DESC: 1,
 }
 
 function sortByPropLenArray(array, sortProp, order){
@@ -383,7 +383,13 @@ function sortByPropLenArray(array, sortProp, order){
     } else if (a[sortProp].length > b[sortProp].length ) {
       return -order
     } else if (a[sortProp].length == b[sortProp].length ) {
-      return 0
+      if (a[sortProp] < b[sortProp]) {
+        return order
+      } else if (a[sortProp] > b[sortProp]) {
+        return -order
+      } else if (a[sortProp] == b[sortProp]) {
+        return 0
+      }
     }
     
   })

@@ -141,6 +141,94 @@ function clickFavoriteSwitch(that, e) {
 }
 
 /**
+ * 默写卡点击字卡片
+ */
+function onTapReciteCard(that, e, callback) {
+  let dataset = e.target.dataset;
+  // debugLog('onTapAnswerCard.dataset', dataset)
+  let curSpellCards = that.data.curSpellCards;
+  let cardIdx = parseInt(dataset.cardIdx)
+  let curCard = curSpellCards[cardIdx];
+  // 如果没有填写空档就选下一个
+
+  // if (that.data.selectedCard
+  //   && that.data.selectedCard.id != curCard.id) {
+  //   wx.showToast({
+  //     image: gConst.ERROR_ICON,
+  //     title: MSG.CLICK_BLANK_FIRST,
+  //     duration: 1000,
+  //   })
+  //   return;
+  // }
+
+  let selectedCard = dataset.spellCard
+
+  if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED) {
+    // selectedCard.tempCardIdx = cardIdx
+    curCard.cardState = CARD_STATE.USED
+  } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED) {
+    curCard.cardState = CARD_STATE.UNUSED
+    if (typeof curCard.usedBlankIdx == 'number') {
+      // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
+      // curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
+      // curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
+      // curCard.usedBlankIdx = false
+    }
+    selectedCard = false
+  }
+  // debugLog('selectCard', selectedCard)
+  that.setData({
+    curSpellCards: curSpellCards,
+    selectedCard: selectedCard,
+  })
+  if (typeof callback == 'function') callback()
+}
+
+/**
+   * 点击拼写字母卡片
+   */
+function onTapSpellCard(that, e, callback) {
+  let dataset = e.target.dataset;
+  debugLog('onTapSpellCard.dataset', dataset)
+  let curSpellCards = that.data.curSpellCards;
+  let cardIdx = parseInt(dataset.cardIdx)
+  let curCard = curSpellCards[cardIdx];
+  // 如果没有填写空档就选下一个
+
+  if (that.data.selectedCard
+    && that.data.selectedCard.id != curCard.id) {
+    wx.showToast({
+      image: gConst.ERROR_ICON,
+      title: MSG.CLICK_BLANK_FIRST,
+      duration: 1000,
+    })
+    return;
+  }
+
+  let selectedCard = dataset.spellCard
+
+  if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED) {
+    selectedCard.tempCardIdx = cardIdx
+    curCard.cardState = CARD_STATE.USED
+  } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED) {
+    curCard.cardState = CARD_STATE.UNUSED
+    if (typeof curCard.usedBlankIdx == 'number') {
+      // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
+      curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
+      curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
+      curCard.usedBlankIdx = false
+    }
+    selectedCard = false
+  }
+  // debugLog('selectCard', selectedCard)
+  that.setData({
+    curSpellCards: curSpellCards,
+    selectedCard: selectedCard,
+  })
+  if (typeof callback == 'function') callback()
+}
+
+/**
   * Get Normal Question
   */
 function getNormalQuestions(that, dataLoadTimer) {
@@ -544,7 +632,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
         // stop load
         // debugLog('getNormalTags.sort', that.data.tags)
         let tags = that.data.tags
-        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.ASC)
+        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
         // debugLog('getNormalTags.sort', that.data.tags)
         that.setData({
           tags: sortTags
@@ -573,7 +661,7 @@ function getFavoriteTags(that, tableName, dataLoadTimer) {
       if (!tags.length || tags.length < 1) {
         // stop load
         let tags = that.data.tags
-        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.ASC)
+        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
         that.setData({
           tags: sortTags
         })        
@@ -603,11 +691,11 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
   dataLoadTimer = setInterval(function () {
     learnHistoryApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
       // debugLog('getTags.pageIdx', pageIdx)
-      debugLog('getTags.tags', tags)
+      // debugLog('getTags.tags', tags)
       if (!tags.length || tags.length < 1) {
         // stop load
         let tags = that.data.tags
-        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.ASC)
+        let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
         that.setData({
           tags: sortTags
         }) 
@@ -776,6 +864,8 @@ module.exports = {
   onClickNextQuestion: onClickNextQuestion,
   recordHistory: recordHistory,
   clickFavoriteSwitch: clickFavoriteSwitch,
+  onTapReciteCard: onTapReciteCard,
+  onTapSpellCard: onTapSpellCard,
   processCurrentQuestion: processCurrentQuestion,
   resetQuestionStatus: resetQuestionStatus,
   BLANK_EMPTY: BLANK_EMPTY,
