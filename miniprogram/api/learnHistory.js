@@ -122,9 +122,74 @@ function getTags(tableName, pWhere, pageIdx, callback) {
     })
 }
 
+/**
+ * 统计特定Tags的题目的对错情况
+ */
+function questCorrectStat(tableName, pWhere, pageIdx, callback){
+  // debugLog('questCorrectStat.tableName', tableName)
+  // debugLog('pWhere', pWhere)
+  let perPageCount = 20
+  let where = {
+    table: tableName,
+    question: pWhere
+  }
+
+  // debugLog('questCorrectStat.where', where)
+  db.collection(TABLE)
+    .aggregate()
+    .match(where)
+    .group({
+      _id: {
+        _id: '$question._id',
+        isCorrect: '$isCorrect'
+      },
+      question: $.first('$question'),
+      isCorrect: $.first('$isCorrect'),
+      lastDate: $.max('$answerTimeStr'),
+      count: $.sum(1),
+    })
+    .project({
+      _id: 1,
+      lastDate: 1,
+      question: 1,
+      isCorrect: 1,
+      correct: $.cond({if: '$isCorrect', then: '$count', else: 0,}),
+      incorrect: $.cond({ if: '$isCorrect', then: 0, else: '$count', }),
+    })
+    .group({
+      _id: '$question._id',
+      question: $.first('$question'),
+      lastDate: $.first('$lastDate'),
+      correct: $.sum('$correct'),
+      incorrect: $.sum('$incorrect'),
+    })
+    .project({
+      _id: 1,
+      question: 1,
+      lastDate: 1,
+      correct: 1,
+      incorrect: 1,
+      leftCorrect: $.subtract(['$correct','$incorrect'])
+    })
+    .skip(pageIdx * perPageCount)
+    .end()
+    .then
+    (res => {
+      // debugLog('questCorrectStat.res', res.list)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        callback(res.list, pageIdx)
+        return
+      } else {
+        callback([], pageIdx)
+      }
+    })  
+}
+
 module.exports = {
   dailyStatistic: dailyStatistic,
   tagsStatistic: tagsStatistic,
   getHistoryQuestions: getHistoryQuestions,
+  questCorrectStat: questCorrectStat,
   getTags: getTags,
 }

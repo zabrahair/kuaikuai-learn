@@ -255,11 +255,63 @@ function getNormalQuestions(that, dataLoadTimer) {
             }
           })
         } else {
-          clearInterval(dataLoadTimer)
+          // when finish questions load
+          writeQuestionsCorrectStat(that, dataLoadTimer, res=>{
+            // debugLog('getNormalQuestions.questions', that.data.questions)
+            // debugLog('getNormalQuestions.questionsDone', that.data.questionsDone)
+            clearInterval(dataLoadTimer)
+          })
+          
         }
       })
     pageIdx++
-  }, 1000)
+  }, utils.getDataLoadInterval())
+}
+
+/**
+ * 将对错情况和当前题目合并
+ */
+function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
+  let pageIdx = 0
+  clearInterval(dataLoadTimer)
+
+  dataLoadTimer = setInterval(function () {
+    learnHistoryApi.questCorrectStat(that.data.tableValue, 
+      { tags: _.all(that.data.tags) }, pageIdx, 
+      (list, pageIdx) => {
+        // debugLog('questionStatistic.pageIdx', pageIdx)
+        // debugLog('questionStatistic.list', list)
+        if (list.length && list.length > 0) {
+          let questions = that.data.questions
+          let questionsDone = that.data.questionsDone
+          for (let i in list){
+            try{
+              let foundInQuests = questions.find(quest => quest._id == list[i]._id)  
+              Object.assign(foundInQuests, list[i])
+            }catch(e){}
+
+            try {
+              let foundInDones = questionsDone.find(quest => quest._id == list[i]._id)
+              Object.assign(foundInDones, list[i])
+            } catch (e) { }
+          }
+          that.setData({
+            questions: questions,
+            questionsDone: questionsDone,
+          }, function () {
+
+          })
+        } else {
+          // when finish questions load
+          clearInterval(dataLoadTimer)
+          callback()
+        }
+      
+    })
+    pageIdx++
+  }, utils.getDataLoadInterval())
+
+
 }
 
 /**
@@ -305,14 +357,17 @@ function getFavoritesQuestions(that, mode, dataLoadTimer, callback) {
             })
           }
         } else {
-          clearInterval(dataLoadTimer)
+          // when finish questions load
+          writeQuestionsCorrectStat(that, dataLoadTimer, res => {
+            clearInterval(dataLoadTimer)
+          })
         }
         if (typeof callback == 'function'){
           callback(things, pageIdx)
         } 
       })
     pageIdx++
-  }, 1000)
+  }, utils.getDataLoadInterval())
 }
 
 // Page Const Value
@@ -336,14 +391,14 @@ const CARD_OBJECT_TEMPLATE = {
 /**
  * 获得做地错的题目
  */
-function getHistoryQuestions(that, mode, dataLoadTimer) {
+function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
   let pageIdx = 0
   let userInfo = that.data.userInfo
-  debugLog('that.data.lastDate', that.data.lastDate)
-  debugLog('that.data.lastTime', that.data.lastTime)
+  // debugLog('getHistoryQuestions.lastDate', that.data.lastDate)
+  // debugLog('getHistoryQuestions.lastTime', that.data.lastTime)
   let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
-  debugLog('getWrongQuestions.filterDate', filterDate)
-  debugLog('getWrongQuestions.filterDateStr', utils.mergeDateTime(that.data.lastDate, that.data.lastTime))
+  debugLog('getHistoryQuestions.filterDate', filterDate)
+  // debugLog('getHistoryQuestions.filterDateStr', utils.mergeDateTime(that.data.lastDate, that.data.lastTime))
   let wherefilters
   if (gConst.GAME_MODE.WRONG == mode) {
     wherefilters = _.and(
@@ -385,11 +440,14 @@ function getHistoryQuestions(that, mode, dataLoadTimer) {
               }
             })
           } else {
-            clearInterval(dataLoadTimer)
+            // when finish questions load
+            writeQuestionsCorrectStat(that, dataLoadTimer, res => {
+              clearInterval(dataLoadTimer)
+              if (typeof callback == 'function') {
+                callback(things, pageIdx)
+              } 
+            })
           }
-          if (typeof callback == 'function') {
-            callback(things, pageIdx)
-          } 
         } catch (e) {
           wx.showToast({
             image: gConst.ERROR_ICON,
@@ -399,7 +457,7 @@ function getHistoryQuestions(that, mode, dataLoadTimer) {
         }
       })
     pageIdx++
-  }, 1000)
+  }, utils.getDataLoadInterval())
 }
 
 /**
@@ -532,7 +590,7 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   })
 
   // 重置变量
-  debugLog('nextQuestion', nextQuestion)
+  // debugLog('nextQuestion', nextQuestion)
   that.setData({
     questions: questions,
     questionsDone: questionsDone,
@@ -597,7 +655,7 @@ function initDataBodyInTagRoom(that, diffs, callback){
  * 获得Tags（根据传入的Tags来源切换
  */
 function getTags(that, tableName, dataLoadTimer, callback) {
-  debugLog('getTags.tagsLocation', that.data.tagsLocation)
+  // debugLog('getTags.tagsLocation', that.data.tagsLocation)
   if (that.data.tagsLocation == gConst.TAGS_LOCATION.NORMAL){
 
     getNormalTags(that, tableName, dataLoadTimer, callback)
@@ -648,7 +706,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
       })
     })
     pageIdx++;
-  }, 500)
+  }, utils.getDataLoadInterval())
 }
 
 /**
@@ -676,7 +734,7 @@ function getFavoriteTags(that, tableName, dataLoadTimer) {
       })
     })
     pageIdx++;
-  }, 500)
+  }, utils.getDataLoadInterval())
 }
 
 /**
@@ -710,7 +768,7 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
       })
     })
     pageIdx++;
-  }, 500)
+  }, utils.getDataLoadInterval())
 }
 
 
@@ -771,7 +829,7 @@ function initFilterTables(that, dataLoadTimer, callback){
  */
 function initFilterAnswerTypes(that) {
   // Set Answer Types
-  let answerTypesObjects = wx.getStorageSync(configsApi.ANSWER_TYPE)
+  let answerTypesObjects = wx.getStorageSync(gConst.CONFIG_TAGS.ANSWER_TYPE)
   // debugLog('initAnswerTypes.answerTypesObjects', answerTypesObjects)
   let answerTypesPickers = utils.getArrFromObjectsArr(answerTypesObjects, 'name')
   // debugLog('initAnswerTypes.answerTypesPickers', answerTypesPickers)
@@ -828,7 +886,7 @@ function tapTagInTagRoom(that, e) {
  * 点击进入，切换到题目展示页
  */
 function onClickEnterInTagRoom(that, e) {
-  debugLog('onClickEnterInTagRoom', that.data.selectedTags)
+  // debugLog('onClickEnterInTagRoom', that.data.selectedTags)
   let selectedTags = that.data.selectedTags
   let tagsStr = utils.arrayJoin(selectedTags, 'text')
   let url = ''

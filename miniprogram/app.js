@@ -54,7 +54,8 @@ App({
       // Get Configs
       utils.refreshUserRoleConfigs(that.globalData)
       const configsApi = require('./api/configs.js')
-      utils.refreshConfigs(configsApi.ANSWER_TYPE)
+      utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
+      utils.refreshConfigs(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
       this.login();
       utils.getUserConfigs(true)
 

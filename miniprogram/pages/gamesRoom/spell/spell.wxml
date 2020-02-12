@@ -1,5 +1,5 @@
 <!--miniprogram/pages/index/index.wxml-->
-<view class='container'>
+<scroll-view class='container' scroll-y='true'>
   <view class='header'>
     <view class='current_score'>
       <view class='caption'>
@@ -67,7 +67,6 @@
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
         bindtap="onTapSpellCard" 
-        
         >
         <!-- bindlongpress="onLongPressAnswerCard" -->
         {{spellCard.letter}}
@@ -77,12 +76,42 @@
     </movable-area>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <view class='buttons' animation="{{fadeInOutQuestion}}">
-        <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
-        <button class="btn_answer" formType="submit" type="primary" size='mini' >提交</button>
+        <image class="btn_previous_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="-1" src="{{gConst.PREVIOUS_ICON}}"/>
+        <image class="btn_reset" bindtap='resetAnswer' src="{{gConst.RESET_ICON}}" />
+        <image class="btn_answer" bindtap='submitAnswer' src="{{gConst.SUBMIT_ICON}}"/>
+        <!-- <button class="btn_answer" formType="submit" type="primary" size='mini' >交卷</button>         -->
+        <image class="btn_pause" bindtap='onClickPause' src="{{gConst.PAUSE_ICON}}"/>
+        <image class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1" src="{{gConst.NEXT_ICON}}"/>
+        <!-- <button class="btn_reset"  formType="reset" type="warn" size='mini'>重置</button>
+
         <button class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini'>下一题</button>
-        <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button>
+        <button class="btn_pause" bindtap='onClickPause' type="warn" size='mini'>{{pauseBtnText}}</button> -->
       </view>    
     </form>
+    <scroll-view class="all_words_container" scroll-y="true">
+      <view class="all_words">
+        <view class="word_card done_card"
+          wx:for-items='{{questionsDone}}' wx:for-item='question' 
+          wx:for-index='idx' wx:key="_id" 
+        >
+          {{question.meaning}}
+        </view> 
+        <view class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
+          wx:for-items='{{questions}}' wx:for-item='question' 
+          wx:for-index='idx' wx:key="_id" 
+          bindtap="onClickLeftCard" data-card-idx="{{idx}}"
+          data-question='{{question}}'
+        >
+          <view 
+          class="count_point {{(question.leftCorrect > 0)?'correct':'incorrect'}}" 
+          style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
+          {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
+          </view>
+          {{question.meaning}}
+        </view>
+        
+      </view>
+    </scroll-view>
   </view>
   <button class="btn_continue {{isPause}}" bindtap='onClickPause' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
-</view>
+</scroll-view>

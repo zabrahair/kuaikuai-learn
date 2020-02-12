@@ -71,14 +71,15 @@
     </view>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <view class='buttons' animation="{{fadeInOutQuestion}}">
+        <image class="check-answer right" bindtap="submitAnswer"  data-manual-check-result='对' src="{{gConst.CORRECT_ANSWER_ICON}}"/>
         <image class="btn_previous_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="-1" src="{{gConst.PREVIOUS_ICON}}"/>
         <image class="btn_reset" bindtap='resetAnswer' src="{{gConst.RESET_ICON}}" />
         <image class="btn_pause" bindtap='onClickPause' src="{{gConst.PAUSE_ICON}}"/>
         
         <image class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1" src="{{gConst.NEXT_ICON}}"/>
         
-        <view class="check-answer right" bindtap="submitAnswer"  data-manual-check-result='对'>对</view>
-        <view class="check-answer wrong" bindtap="submitAnswer" data-manual-check-result='错'>错</view>
+
+        <image class="check-answer wrong" bindtap="submitAnswer" data-manual-check-result='错' src="{{gConst.INCORRECT_ANSWER_ICON}}"/>
       </view>    
     </form>
     <scroll-view class="all_words_container" scroll-y="true">
@@ -95,8 +96,11 @@
           bindtap="onClickLeftCard" data-card-idx="{{idx}}"
           data-question='{{question}}'
         >
-          <view class='count_point correct_times'>0</view>
-          <view class='count_point incorrect_times'>0</view>
+          <view 
+          class="count_point {{(question.leftCorrect > 0)?'correct':'incorrect'}}" 
+          style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
+          {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
+          </view>
           {{question.word}}
         </view>
        

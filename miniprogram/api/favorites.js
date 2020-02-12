@@ -69,7 +69,7 @@ const isFavorited = function(tableName, pWhere, callback){
     .then(
       res => {
         let result = res.list;
-        debugLog('getFavorites.result', result);
+        // debugLog('getFavorites.result', result);
         let thing = null
         if (result.length) {
           thing = result[0].thing
@@ -172,13 +172,13 @@ function getFavorites(tableName, pWhere, pageIdx, callback) {
     .then(
       res => {
         let result = res.list;
-        debugLog('getFavorites.result', result);
+        // debugLog('getFavorites.result', result);
         let things = []
         if (result.length) {
           for (let i in result) {
             things.push(result[i].thing)
           }     
-          debugLog('getFavorites.things', things)
+          // debugLog('getFavorites.things', things)
           
         }
         callback(things, pageIdx)

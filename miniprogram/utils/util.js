@@ -329,9 +329,9 @@ function refreshUserRoleConfigs(){
 function refreshConfigs(configGroupTag) {
   const configsApi = require('../api/configs.js')
   let pageIdx = 0
-  let dataLoadTimer = null
-  clearInterval(dataLoadTimer)
-  dataLoadTimer = setInterval(function () {
+  // let dataLoadTimer = null
+  // clearInterval(dataLoadTimer)
+  // dataLoadTimer = setInterval(function () {
     configsApi.getConfigs({
       tags: configGroupTag
     }, pageIdx, (configs, pageIdx) => {
@@ -347,8 +347,8 @@ function refreshConfigs(configGroupTag) {
         clearInterval(dataLoadTimer)
       }
     })
-    pageIdx++
-  }, 1000)
+  //   pageIdx++
+  // }, 100)
 }
 
 /**
@@ -396,6 +396,18 @@ function sortByPropLenArray(array, sortProp, order){
   return sortedArray
 }
 
+const DATA_LOAD_INTERVAL = '数据加载间隔'
+const DEFAULT_DATA_LOAD_INTERVAL = 5000
+function getDataLoadInterval(){
+  try{
+    let systemConfig = wx.getStorageSync(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
+    // debugLog('getDataLoadInterval.systemConfig', systemConfig)
+    return systemConfig.find(config => config.name == DATA_LOAD_INTERVAL).value
+  }catch(e){
+    return DEFAULT_DATA_LOAD_INTERVAL
+  }
+}
+
 module.exports = {
   /** 工具型方法 */
   formatTime: formatTime,
@@ -420,5 +432,5 @@ module.exports = {
   getTotalScore: getTotalScore,
   getUserInfo: getUserInfo,
   setUserInfo: setUserInfo,
-
+  getDataLoadInterval: getDataLoadInterval,
 }

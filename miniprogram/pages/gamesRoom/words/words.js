@@ -111,7 +111,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    debugLog('onLoad.options', options)
+    // debugLog('onLoad.options', options)
     let that = this
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
@@ -121,7 +121,7 @@ Page({
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
-      debugLog('onLoad.tags', tags)
+      // debugLog('onLoad.tags', tags)
     }
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
@@ -257,13 +257,15 @@ Page({
    * 提交答案
    */
   submitAnswer: function (e) {
-    if (this.checkPauseStatus()) {
-      return;
-    }
+    let that = this
+    try {
+      if (that.data.questions.length < 1 || that.checkPauseStatus()) {
+        return;
+      }
+    } catch (e) { }
 
     
     // debugLog('submitAnswer.e', e)
-    let that = this
     let dataset ;
     let answer
     let curQuestion = that.data.curQuestion
@@ -561,17 +563,4 @@ Page({
     let that = this
     common.clickFavoriteSwitch(that, e)
   },
-
-  /**
-   * 当点击剩下的单词卡片
-   */
-  onClickLeftCard: function(e){
-    let that = this
-    let dataset = e.target.dataset
-    let curQuestionIndex = that.data.curQuestionIndex
-    let clickCardIdx = dataset.cardIdx
-    let idxOffSet = clickCardIdx - curQuestionIndex
-    common.onClickNextQuestion(that, null, null, idxOffSet)
-
-  }
 })

@@ -75,14 +75,14 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    debugLog('onLoad.options', options)
+    // debugLog('onLoad.options', options)
     let that = this
     let gameMode = options.gameMode;
     let tags = that.data.tags
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
-      debugLog('onLoad.tags', tags)
+      // debugLog('onLoad.tags', tags)
     }
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
