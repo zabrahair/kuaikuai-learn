@@ -1,14 +1,14 @@
 /**app.wxss**/
 .container {
-  /* position: fixed; */
+  position: fixed;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
 
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
 
   background-size: 100vw 100vh;
   background-image: url('https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/kuai_background.jpg?sign=4c4590afa901625789b285cf1285cc4b&t=1580309905');
@@ -169,4 +169,27 @@ page {
   font-size: 24rpx;
   line-height: 36rpx;
   word-break: break-all;
+}
+
+/** 题目界面共通式样 **/
+.question image {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  -webkit-filter: drop-shadow(2px 2px 2px #222);
+  filter: drop-shadow(3px 3px 3px #222);
+}
+
+.buttons image {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  -webkit-filter: drop-shadow(2px 2px 2px #222);
+  filter: drop-shadow(3px 3px 3px #222);
 }

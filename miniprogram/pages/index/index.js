@@ -109,7 +109,7 @@ Page({
    */
   onClickSpellEnglishWords: function(e){
     wx.navigateTo({
-      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.NORMAL + '&tableValue=' + TABLES.MAP.ENGLISH_WORDS.value + '&tableName=' + TABLES.MAP.ENGLISH_WORDS.name
+      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.NORMAL + '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name
     })    
   },
 
@@ -118,7 +118,7 @@ Page({
  */
   onClickSpellEnglishWordsWrong: function (e) {
     wx.navigateTo({
-      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.WRONG + '&tableValue=' + TABLES.MAP.ENGLISH_WORDS.value + '&tableName=' + TABLES.MAP.ENGLISH_WORDS.name + "(错)",
+      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.WRONG + '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name + "(错)",
     })
   },
   /**
@@ -126,7 +126,7 @@ Page({
    */
   onClickSpellEnglishWordsFavorites: function(e){
     wx.navigateTo({
-      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.FAVORITES + '&filterTags=收藏' + '&tableValue=' + TABLES.MAP.ENGLISH_WORDS.value + '&tableName=' + TABLES.MAP.ENGLISH_WORDS.name + '收藏',
+      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.FAVORITES + '&filterTags=收藏' + '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name + '收藏',
     })
   },
   /**

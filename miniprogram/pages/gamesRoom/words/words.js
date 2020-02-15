@@ -7,6 +7,7 @@ const errorLog = require('../../../utils/log.js').error;
 const gConst = require('../../../const/global.js');
 const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
+const animation = require('../../../utils/animation.js');
 const TABLES = require('../../../const/collections.js')
 // Api Handler
 const dbApi = require('../../../api/db.js')
@@ -46,7 +47,6 @@ const card_height = 60;
 // Page Const Value
 const BLANK_EMPTY = '_'
 
-
 Page({
 
   /**
@@ -54,6 +54,7 @@ Page({
    */
   data: {
     // Question Related
+    ANSWER_TYPES: gConst.ANSWER_TYPES.MANUAL_CHECK,
     alphabetArray: alphabetArray,
     questions: [],
     questionsDone: [],
@@ -111,12 +112,17 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    // debugLog('onLoad.options', options)
+    debugLog('words.options', options)
     let that = this
+    that.initOnLoad(that, options)
+    that.whenPageOnShow(that)
+  },
+
+  initOnLoad: function (that, options) {
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
-    let lastDate =(typeof options.lastDate == 'string' && options.lastDate != '')  ? options.lastDate : that.data.lastDate
+    let lastDate = (typeof options.lastDate == 'string' && options.lastDate != '') ? options.lastDate : that.data.lastDate
     let tags = []
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
@@ -132,9 +138,8 @@ Page({
       tableName: tableName,
       filterTags: options.filterTags,
       lastDate: lastDate,
-    })
+    })   
   },
-
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
@@ -147,6 +152,10 @@ Page({
    */
   onShow: function () {
     let that = this
+   
+  },
+
+  whenPageOnShow: function(that){
     let userInfo = that.data.userInfo
     let gameMode = that.data.gameMode
     utils.getTotalScore(userInfo, userScore => {
@@ -154,18 +163,12 @@ Page({
         totalScore: userScore.score,
       })
     })
-    this.getQuestions(gameMode)
-    this.resetAnswer()
+    that.getQuestions(gameMode)
+    that.resetAnswer()
 
     // 隐藏暂停按钮
-    that.fadeInOut('fadeInOutPauseBtn', {
-      duration: 10,
-      timingFunction: 'ease-in',
-      rotateY: 0,
-      opacity: 0,
-    });
+    animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
   },
-
   /**
    * 生命周期函数--监听页面隐藏
    */
@@ -201,31 +204,12 @@ Page({
 
   },
 
-  // /**
-  //    * 提交做题记录
-  //    */
-  // recordHistory: function (question, answer) {
-  //   let that = this
-  //   let historyRecord = {};
-  //   historyRecord['table'] = that.data.tableValue
-  //   historyRecord['question'] = question
-  //   // delete question._id
-  //   // Object.assign(historyRecord, question)
-  //   Object.assign(historyRecord, answer)
-  //   // debugLog('historyRecord', historyRecord)
-  //   wx.cloud.callFunction({
-  //     name: 'learnHistoryCreate',
-  //     data: {
-  //       hisRecord: historyRecord
-  //     },
-  //     success: res => {
-  //       // debugLog('learnHistoryCreate.success.res', res)
-  //     },
-  //     fail: err => {
-  //       errorLog('[云函数] 调用失败：', err)
-  //     }
-  //   })
-  // },
+  /**
+   * 对当前题目进行处理
+   */
+  processCurrentQuestion: function(that, nextQuestion){
+    common.processWordsIntoCards(that, nextQuestion)
+  },
 
   /**
    * 暂停判断
@@ -422,7 +406,7 @@ Page({
   /**
    * 暂停
    */
-  onClickPause: function (e) {
+  onClickPauseSwitch: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
     if (e.target.dataset.isContinueButton
@@ -435,18 +419,10 @@ Page({
         pauseBtnText: '暂停',
         inputAnswerDisabled: false,
       })
-      that.fadeInOut('fadeInOutQuestion', {
-        duration: 1000,
-        timingFunction: 'ease-out',
-        rotateY: 0,
-        opacity: 1,
-      });
-
-      that.fadeInOut('fadeInOutPauseBtn', {
-        duration: 1,
-        timingFunction: 'ease-in',
-        rotateY: 0,
-        opacity: 0,
+      animation.playFade(that,
+        animation.MAP.FADE_OUT_QUESTION_BLOCK.name, null,
+        res => {
+          animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
       })
 
     } else {
@@ -456,41 +432,35 @@ Page({
         inputAnswerDisabled: true,
       })
 
-      that.fadeInOut('fadeInOutQuestion', {
-        duration: 1000,
-        timingFunction: 'ease-in',
-        rotateY: 180,
-        opacity: 0,
-      }, that.fadeInOut('fadeInOutPauseBtn', {
-        duration: 1500,
-        timingFunction: 'ease-out',
-        rotateY: 0,
-        opacity: 1,
-      }));
+      animation.playFade(that, animation.MAP.FADE_IN_QUESTION_BLOCK.name,
+        null,
+        res => {
+          animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
+        })
     }
   },
 
-  /**
-   * Fade In Out Question
-   */
-  fadeInOut: function (animationName, fadeOptions, callback) {
-    let that = this;
-    let option = {
-      duration: fadeOptions.duration, // 动画执行时间
-      timingFunction: fadeOptions.timingFunction // 动画执行效果
-    };
-    var fadeInOut = wx.createAnimation(option)
-    fadeInOut.rotateY(fadeOptions.rotateY);
-    // moveOne.translateX('100vw');
-    fadeInOut.opacity(fadeOptions.opacity).step();
-    that.setData({
-      [animationName]: fadeInOut.export(),// 开始执行动画
-    }, function () {
-      if (callback) {
-        callback()
-      };
-    })
-  },
+  // /**
+  //  * Fade In Out Question
+  //  */
+  // fadeInOut: function (animationName, fadeOptions, callback) {
+  //   let that = this;
+  //   let option = {
+  //     duration: fadeOptions.duration, // 动画执行时间
+  //     timingFunction: fadeOptions.timingFunction // 动画执行效果
+  //   };
+  //   var fadeInOut = wx.createAnimation(option)
+  //   fadeInOut.rotateY(fadeOptions.rotateY);
+  //   // moveOne.translateX('100vw');
+  //   fadeInOut.opacity(fadeOptions.opacity).step();
+  //   that.setData({
+  //     [animationName]: fadeInOut.export(),// 开始执行动画
+  //   }, function () {
+  //     if (callback) {
+  //       callback()
+  //     };
+  //   })
+  // },
 
   /**
    * 
@@ -545,7 +515,7 @@ Page({
    * 自动填写到左起第一个空格上
    */
   onLongPressAnswerCard: function (e) {
-    debugLog('onLongPressAnswerCard.e', e.target.dataset);
+    // debugLog('onLongPressAnswerCard.e', e.target.dataset);
     let that = this
     let dataset = e.target.dataset
     let cardIdx = dataset.cardIdx
@@ -565,8 +535,8 @@ Page({
   },
 
   /**
- * 当点击剩下的单词卡片
- */
+   * 当点击剩下的单词卡片
+   */
   onClickLeftCard: function (e) {
     let that = this
     let dataset = e.target.dataset
@@ -576,4 +546,13 @@ Page({
     common.onClickNextQuestion(that, null, null, idxOffSet)
 
   },
+
+  /** 
+   * 朗读当前卡片
+   */
+  playCardText: function (e) {
+    let that = this
+    common.readCurrentWord(that, that.data.curQuestion.word)
+  }
+
 })

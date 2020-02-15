@@ -12,18 +12,18 @@ const _ = db.command
 const TABLE = TABLES.CHINESE_WORDS
 
 function getWords(pWhere, pageIdx, callback){
-  debugLog('pWhere', pWhere)
+  // debugLog('pWhere', pWhere)
   let perPageCount = 20
   let where = pWhere
-  debugLog('where', where)
+  // debugLog('where', where)
   db.collection(TABLE)
     .where(pWhere)
     .skip(pageIdx * perPageCount)
     .get()
     .then
     (res => {
-      debugLog('getChineseWords', res)
-      debugLog('getChineseWords.length', res.data.length)
+      // debugLog('getChineseWords', res)
+      // debugLog('getChineseWords.length', res.data.length)
       if (res.data.length > 0) {
         callback(res.data, pageIdx)
         return
@@ -34,10 +34,10 @@ function getWords(pWhere, pageIdx, callback){
 }
 
 function getTags(pWhere, pageIdx, callback) {
-  debugLog('pWhere', pWhere)
+  // debugLog('pWhere', pWhere)
   let perPageCount = 20
   let where = pWhere
-  debugLog('where', where)
+  // debugLog('where', where)
   db.collection(TABLE)
     .aggregate()
     .unwind('$tags')

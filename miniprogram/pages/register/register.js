@@ -26,7 +26,7 @@ Page({
    */
   data: {
     userInfo: {},
-    userRole: USER_ROLE_OBJS[0].name,
+    userRole: '学生',
     phoneNumber: '',
     isValueCorrect: gConst.valueCSS.CORRECT,
     contactName: '',
@@ -37,6 +37,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    utils.refreshUserRoleConfigs(globalData)
     let userInfo = utils.getUserInfo(globalData)
     // debugLog('globalData.userInfo', userInfo);
     this.setData({ userInfo: userInfo })
@@ -44,9 +45,11 @@ Page({
     // debugLog('this.data.userInfo', this.data.userInfo)
 
     // debugLog('options', options)
-    this.setData({
-      userRole: options.userRole
-    });
+    if (options.userRole){
+      this.setData({
+        userRole: options.userRole
+      });
+    }
     this.setData({
       contactName: this.data.userInfo.nickName
     })

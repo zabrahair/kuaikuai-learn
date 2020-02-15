@@ -42,7 +42,7 @@
       <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
     </view>
     <single-select-question
-      wx:if="{{curQuestion.type == gConst.QUESTION_TYPES.SINGLE_SELECT}}"
+      wx:if="{{curQuestion.type == gConst.ANSWER_TYPES.OPTIONS_SELECT}}"
       question="{{curQuestion}}"
       bindprevious=""
       bindnext=""

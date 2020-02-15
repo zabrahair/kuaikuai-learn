@@ -21,6 +21,7 @@ function getConfigs(pWhere, pageIdx, callback) {
   db.collection(TABLE)
     .where(where)
     .skip(pageIdx * perPageCount)
+    .orderBy('orderIdx','asc')
     .get({
       success: res => {
         let result = res.data;

@@ -5,57 +5,47 @@ const MSG = require('../../../const/message.js')
 const debugLog = require('../../../utils/log.js').debug;
 const errorLog = require('../../../utils/log.js').error;
 const gConst = require('../../../const/global.js');
+const animation = require('../../../utils/animation.js');
 const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
-const animation = require('../../../utils/animation.js');
 const TABLES = require('../../../const/collections.js')
-const common = require('../common/common.js')
-
 // Api Handler
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
 const favoritesApi = require('../../../api/favorites.js')
+const common = require('../common/common.js')
 
 // DB Related
 const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
-
+const MANUAL_CHECK_RESULT = {
+  RIGHT: {
+    name: '对',
+    value: true,
+  },
+  WRONG: {
+    name: '错',
+    value: false,
+  }
+}
 // 练习计时器
 var scoreTimer = null;
 var dataLoadTimer = null;
 
-const titles = {
-}
-const titleSubfix = '拼写'
+const titleSubfix = '自助默写'
 
-// Alphabet Variables
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
-const alphabetArray = alphabet.split('')
-const card_x_offset = 0;
-const card_y_offset = 300;
-const card_width = 50;
-const card_height = 60;
+// // Alphabet Variables
+// const alphabet = "abcdefghijklmnopqrstuvwxyz"
+// const alphabetArray = alphabet.split('')
+// const card_x_offset = 0;
+// const card_y_offset = 300;
+// const card_width = 50;
+// const card_height = 60;
 
-// Page Const Value
-const BLANK_EMPTY = '_'
-const CARD_STATE = {
-  UNUSED: 'card_unused',
-  USED: 'card_used',
-}
-const cardObjectTemplate = {
-  id: 0,
-  letter: '',
-  cardState: CARD_STATE.UNUSED,
-  x: 0,
-  y: 0,
-  isUsed: false,
-  blankValue: BLANK_EMPTY,
-  usedCardIdx: false,
-  usedBlankIdx: false,
-  tempCardIdx: false,
-}
+// // Page Const Value
+// const BLANK_EMPTY = '_'
 
 Page({
 
@@ -64,15 +54,15 @@ Page({
    */
   data: {
     // Question Related
-    ANSWER_TYPES: gConst.ANSWER_TYPES.SPELLING,
-    alphabetArray: alphabetArray,
+    ANSWER_TYPES: gConst.ANSWER_TYPES.MANUAL_CHECK,
     questions: [],
     questionsDone: [],
     curQuestionIndex: 0,
     curQuestion: {},
     curSpellCards: [],
     selectedCard: null,
-    isRandomSpell: true,
+    isRandomSpell: false,
+    isAnswerVisible: false,
 
     // User Info related
     userInfo: null,
@@ -81,6 +71,7 @@ Page({
     timerInterval: 1000,
     curDeciSecond: 0,
     thinkSeconds: 0,
+    questionWaitTime: 0,
 
     // Answer Related
     curAnswer: '',
@@ -88,9 +79,12 @@ Page({
     isPause: false,
     pauseBtnText: '暂停',
     inputAnswerDisabled: false,
-    fadeInOutQuestion: null,
-    fadeInOutPauseBtn: null,
     isFavorited: false,
+
+    // 画面效果
+    fadeInOutQuestionBlock: null,
+    fadeInOutContinueBtn: null,
+    turnOverSpellCard: null,    
 
     // score related
     curScore: 0,
@@ -101,31 +95,38 @@ Page({
     // gConst
     gConst: gConst,
 
+    // common
+    tableName: '',
+    tableValue: '',
+
+    // page show
+    questionViewWidth: 50,
+    cardFontSize: 13.5,
+    maxCardFontSize: 15,
+    minCardFontSize: 5,
+
     // filters
-    tags: ['拼写'],
+    tags: [],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
-    filterTags: '',
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    // debugLog('getCurrentPages()', getCurrentPages())
-    // debugLog('onLoad.options', options)
+    debugLog('selfRecite.options', options)
     let that = this
-    that.initOnLoad(that, options)
+    that.initOnLoad(that, options);
     that.whenPageOnShow(that)
   },
 
   initOnLoad: function(that, options){
     let gameMode = options.gameMode;
-    let tags = []
     let tableValue = options.tableValue
     let tableName = options.tableName
     let lastDate = (typeof options.lastDate == 'string' && options.lastDate != '') ? options.lastDate : that.data.lastDate
-
+    let tags = []
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
@@ -138,12 +139,10 @@ Page({
       tags: tags,
       tableValue: tableValue,
       tableName: tableName,
-      lastDate: lastDate,
       filterTags: options.filterTags,
+      lastDate: lastDate,
     })
   },
-
-  
 
   /**
    * 生命周期函数--监听页面初次渲染完成
@@ -157,7 +156,7 @@ Page({
    */
   onShow: function () {
     let that = this
-
+    
   },
 
   whenPageOnShow: function(that){
@@ -173,6 +172,11 @@ Page({
 
     // 隐藏暂停按钮
     animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
+
+    // 将单词卡反过来
+    if (that.data.isAnswerVisible){
+      // animation.playFade(that, animation.MAP.TURN_OVER_SPELL_CARD.name)
+    } 
   },
 
   /**
@@ -211,6 +215,13 @@ Page({
   },
 
   /**
+   * 对当前题目进行处理
+   */
+  processCurrentQuestion: function (that, nextQuestion) {
+    common.processWordsIntoCards(that, nextQuestion)
+  },
+
+  /**
    * 暂停判断
    */
   checkPauseStatus: function () {
@@ -230,9 +241,9 @@ Page({
   /**
    * 组合拼写结果
    */
-  combineSpellAnswer: function(spellAnswer){
-    if (spellAnswer && spellAnswer.length > 0){
-      let answerWord = spellAnswer.map(card=> card.blankValue).join('')
+  combineSpellAnswer: function (spellAnswer) {
+    if (spellAnswer && spellAnswer.length > 0) {
+      let answerWord = spellAnswer.map(card => card.blankValue).join('')
       return answerWord;
     }
   },
@@ -241,23 +252,46 @@ Page({
    */
   submitAnswer: function (e) {
     let that = this
-    try{
+    try {
       if (that.data.questions.length < 1 || that.checkPauseStatus()) {
         return;
       }
-    }catch(e){}
+    } catch (e) { }
+
+
+    // debugLog('submitAnswer.e', e)
+    let dataset;
+    let answer
+    let curQuestion = that.data.curQuestion
+    let manualCheckResult
+    let isCorrect = false
+    try {
+      dataset = e.target.dataset
+      // debugLog('submitAnswer.dataset', dataset)
+      manualCheckResult = dataset.manualCheckResult
+      for (let i in MANUAL_CHECK_RESULT) {
+        if (manualCheckResult == MANUAL_CHECK_RESULT[i].name) {
+          // debugLog('MANUAL_CHECK_RESULT[i].value', MANUAL_CHECK_RESULT[i].value)
+          if (MANUAL_CHECK_RESULT[i].value == true) {
+            // debugLog('curQuestion.word', curQuestion.word)
+            answer = curQuestion.word
+          }
+          break;
+        }
+      }
+    } catch (e) { errorLog('submitAnswer.e', e) }
 
 
     // try{
 
     // debugLog('formValues', formValues)
-    let curQuestion = that.data.curQuestion
+
     // debugLog('curQuestion', curQuestion)
     // 同時針對回車和Button提交
     let curSpellCards = that.data.curSpellCards
-    let answer = that.combineSpellAnswer(curSpellCards)
-    debugLog('answer', answer)
-    let isCorrect = false
+    if (!manualCheckResult) {
+      answer = that.combineSpellAnswer(curSpellCards)
+    }
     if (answer == curQuestion.word) {
       isCorrect = true
       wx.showToast({
@@ -298,7 +332,7 @@ Page({
       })
 
     // Next Question
-    common.onClickNextQuestion(that, null, isCorrect, 0)
+    common.onClickNextQuestion(that, null, isCorrect)
     that.setData({
       curAnswer: '',
       thinkSeconds: 0,
@@ -309,11 +343,11 @@ Page({
   },
 
   /**
-  * 重置答案
-  */
+   * 重置答案
+   */
   resetAnswer: function (e) {
     let that = this
-    debugLog('resetAnswer.e', e)
+    // debugLog('resetAnswer.e', e)
     if (that.checkPauseStatus()) {
       return;
     }
@@ -336,9 +370,11 @@ Page({
     }
   },
 
+
+
   /**
- * 下一题
- */
+   * 下一题
+   */
   onClickNextQuestion: function (e, isCorrect, idxOffset) {
     let that = this
     common.onClickNextQuestion(that, e, isCorrect, idxOffset, res => {
@@ -346,32 +382,36 @@ Page({
     })
   },
 
+
   /**
    * 获取所有题目
    */
   getQuestions: function (gameMode) {
     let that = this
-
+    that.setData({
+      questions: []
+    })
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
         title: that.data.tableName + titleSubfix
       })
-      common.getNormalQuestions(that, dataLoadTimer)
-      // this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
+      common.getNormalQuestions(that, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titleSubfix
+        title: that.data.tableName + gConst.GAME_MODE.WRONG + titleSubfix
       })
-      common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer );
+      common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titleSubfix
+        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + titleSubfix
       })
       common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
     }
   },
+
+
 
   /**
    * 暂停
@@ -379,8 +419,8 @@ Page({
   onClickPauseSwitch: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
-    if (e.target.dataset.isContinueButton 
-      && that.data.isPause == false){
+    if (e.target.dataset.isContinueButton
+      && that.data.isPause == false) {
       return;
     }
     if (that.data.isPause) {
@@ -389,14 +429,21 @@ Page({
         pauseBtnText: '暂停',
         inputAnswerDisabled: false,
       })
-      animation.playFade(that, 
-        animation.MAP.FADE_OUT_QUESTION_BLOCK.name, 
-        null, 
-        res=>{
-          animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
-      })
-      
+      animation.playFade(that, animation.MAP.FADE_OUT_QUESTION_BLOCK.name)
+      // that.fadeInOut('fadeInOutQuestion', {
+      //   duration: 1000,
+      //   timingFunction: 'ease-out',
+      //   rotateY: 0,
+      //   opacity: 1,
+      // });
 
+      animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
+      // that.fadeInOut('fadeInOutPauseBtn', {
+      //   duration: 1,
+      //   timingFunction: 'ease-in',
+      //   rotateY: 0,
+      //   opacity: 0,
+      // })
     } else {
       that.setData({
         isPause: true,
@@ -404,11 +451,22 @@ Page({
         inputAnswerDisabled: true,
       })
 
-      animation.playFade(that, animation.MAP.FADE_IN_QUESTION_BLOCK.name,
-        null,
-        res => {
-          animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
-        })
+      animation.playFade(that, animation.MAP.FADE_IN_QUESTION_BLOCK.name, 
+      null, 
+      res=>{
+        animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
+      })
+      // that.fadeInOut('fadeInOutQuestion', {
+      //   duration: 1000,
+      //   timingFunction: 'ease-in',
+      //   rotateY: 180,
+      //   opacity: 0,
+      // }, that.fadeInOut('fadeInOutPauseBtn', {
+      //   duration: 1500,
+      //   timingFunction: 'ease-out',
+      //   rotateY: 0,
+      //   opacity: 1,
+      // }));
     }
   },
 
@@ -433,6 +491,8 @@ Page({
   //     };
   //   })
   // },
+
+ 
 
   /**
    * 
@@ -477,101 +537,40 @@ Page({
     that.resetAnswer();
   },
 
-  /**
-   * 点击拼写空档
-   */
-  onTapSpellBlank: function(e){
-    let dataset = e.target.dataset;
-    debugLog('onTapSpellBlank.dataset', dataset)
+  onTapReciteCard: function (e) {
     let that = this
-    
-    let blankIdx = parseInt(dataset.blankIdx)
-    debugLog('typeof blankIdx', typeof blankIdx)
-    let selectedBlank = dataset.spellBlank
-    let selectedCard = that.data.selectedCard
-    let curSpellCards = that.data.curSpellCards;
-    let curBlank = curSpellCards[blankIdx]
-
-    if (selectedCard){
-      let usedCardIdx = selectedCard.tempCardIdx;
-      curBlank.blankValue = selectedCard.letter
-      curBlank.usedCardIdx = usedCardIdx;
-      curSpellCards[curBlank.usedCardIdx].usedBlankIdx = blankIdx
-      selectedCard = false
-
-    }else{
-      if (typeof curBlank.usedCardIdx == 'number'){
-        // Mockup click spell card and call onTapSpellCard
-        common.onTapSpellCard(that, {
-          target: {
-            dataset: {
-              cardIdx: curBlank.usedCardIdx,
-              spellCard: curSpellCards[curBlank.usedCardIdx]
-          }
-          }
-        })
-      }
-   
-    }
-    that.setData({
-      selectedCard: selectedCard,
-      curSpellCards: curSpellCards,
+    debugLog('onTapReciteCard.e', e)
+    common.onTapReciteCard(that, e, 
+    (thats, curSpellCards, cardIdx)=>{
+      // 当卡反过来的时候
+      // animation.playFade(that, animation.MAP.TURN_OVER_SPELL_CARD.name)
+    }, 
+    (thats, curSpellCards, cardIdx) => {
+      // 当卡没反过来的时候
+      // animation.playFade(that, animation.MAP.TURN_BACK_SPELL_CARD.name)
     })
-  },
-
-  onLongPressAnswerCard: function(e){
-    let that = this
-    common.onTapSpellCard(that, e)
   },
 
   /**
    * 通过拖曳卡片填写答案
    * 自动填写到左起第一个空格上
    */
-   onTapSpellCard: function(e){
-    debugLog('onTouchMoveAnswerCard.e', e.target.dataset);
+  onLongPressAnswerCard: function (e) {
+    // debugLog('onLongPressAnswerCard.e', e.target.dataset);
     let that = this
     let dataset = e.target.dataset
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
-    if(spellCard.cardState == CARD_STATE.USED){
-      this.onLongPressAnswerCard(e)
+    if (spellCard.cardState == CARD_STATE.USED) {
       return;
     }
-    common.onTapSpellCard(that, {
-      target: {
-        dataset: {
-          cardIdx: cardIdx,
-          spellCard: spellCard,          
-        }
-      }
-    }, res=>{
-      let blankIdx = false;
-      let spellBlank = false
-      let curSpellCards = that.data.curSpellCards;
-      for (let i in curSpellCards){
-        if (curSpellCards[i].blankValue == BLANK_EMPTY){
-          spellBlank = curSpellCards[i]
-          blankIdx = i
-          that.onTapSpellBlank({
-            target: {
-              dataset: {
-                blankIdx: blankIdx,
-                spellBlank: spellBlank,
-              }
-            }
-          })
-          break;
-        }
-      }
-      
-    })
+
   },
-  
+
   /**
    * 当点击收藏按钮
    */
-  clickFavoriteSwitch: function(e){
+  clickFavoriteSwitch: function (e) {
     let that = this
     common.clickFavoriteSwitch(that, e)
   },
@@ -589,18 +588,48 @@ Page({
 
   },
 
-  /**
-   * 对当前题目进行处理
-   */
-  processCurrentQuestion: function (that, nextQuestion) {
-    common.processWordsIntoCards(that, nextQuestion)
-  },
-
   /** 
    * 朗读当前卡片
    */
-  playCardText: function(e){
+  playCardText: function (e) {
     let that = this
     common.readCurrentWord(that, that.data.curQuestion.word)
+  },
+
+  switchAnswerVisibility: function(e){
+    let that = this
+    // try{
+      that.setData({
+        isAnswerVisible: (that.data.isAnswerVisible == false) ? true : false,
+      }, res=>{
+        that.setAnswerShownState(that)
+      })
+    // } catch (e) { errorLog('switchAnswerVisibility', switchAnswerVisibility)}
+  },
+
+  setAnswerShownState: function(that){
+    let curSpellCards = that.data.curSpellCards
+    for (let i in curSpellCards) {
+      if (that.data.isAnswerVisible){
+        curSpellCards[i].cardState = common.CARD_STATE.UNUSED
+      }else{
+        curSpellCards[i].cardState = common.CARD_STATE.USED
+      }
+    }
+    that.setData({
+      curSpellCards: curSpellCards
+    })
+  },
+
+  /**
+   * 当前页面在切换题目的时候做的个性事情
+   */
+  myNextQuestionActions: function (that, nextQuestion){
+    that.setData({
+      isAnswerVisible: false,
+    }, res=>{
+      that.setAnswerShownState(that)
+    })
   }
+
 })

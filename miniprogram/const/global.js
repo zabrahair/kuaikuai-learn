@@ -1,3 +1,4 @@
+
 const DEFAULT_DATE_FORMAT_OPTIONS = { year: 'numeric', month: '2-digit', day: '2-digit' };
 const UNSELECT = 'unselected';
 const SELECTED = 'selected';
@@ -82,7 +83,11 @@ module.exports = {
   SUBMIT_ICON: '/images/submit.png',
   CORRECT_ANSWER_ICON: '/images/correct_answer.png',
   INCORRECT_ANSWER_ICON: '/images/incorrect_answer.png',
-  // 北京
+  SOUND_ICON: '/images/sound.png',
+  THINKING_ICON: '/images/thinking.png',
+  INVISIBILITY_ICON: '/images/invisibility.png',
+  VISIBILITY_ICON: '/images/visibility.png',
+  // 背景
   DEFAULT_BACKGROUND: 'https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/kuai_background.jpg?sign=4c4590afa901625789b285cf1285cc4b&t=1580309905',
   ANSWER_TYPE: {
     TEXT: 'text',
@@ -117,9 +122,10 @@ module.exports = {
   },
   DEFAULT_DATE_FORMAT_OPTIONS: DEFAULT_DATE_FORMAT_OPTIONS,
   IS_FAVORITED: '收藏',
-  QUESTION_TYPES: {
-    SINGLE_SELECT: '单选题',
-    MULTI_SELECT: '多选题',
+  ANSWER_TYPES: {
+    MANUAL_CHECK: '默写卡',
+    SPELLING: '拼写',
+    OPTIONS_SELECT: '选择题',
     FILL_BLANK: '填空题',
     CONNECT_ITEMS: '连线题',
   },
@@ -133,5 +139,5 @@ module.exports = {
     USER_ROLE_TAG: 'USER_ROLE',
     ANSWER_TYPE: 'ANSWER_TYPE',
     SYSTEM_CONFIG: 'SYSTEM_CONFIG',
-  }
+  },
 }

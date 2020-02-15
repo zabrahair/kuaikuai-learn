@@ -17,19 +17,26 @@ module.exports = {
       name: '英文单词',
       value: 'english-words',
     },
-  ],
-  MAP: {
-    ENGLISH_WORDS: {
-      name: '英文单词',
-      value: 'english-words',     
-    },
-    CHINESE_WORDS: {
-      name: '中文词语',
-      value: 'chinese-words',
-    },
-    CHINESE_KNOWLEDGE: {
+    {
       name: '中文知识',
       value: 'chinese-knowledge',
+    },    
+  ],
+  MAP: {
+    'english-words': {
+      name: '英文单词',
+      value: 'english-words', 
+      lang: 'en_US',  
+    },
+    'chinese-words': {
+      name: '中文词语',
+      value: 'chinese-words',
+      lang: 'zh_CN',
+    },
+    'chinese-knowledge': {
+      name: '中文知识',
+      value: 'chinese-knowledge',
+      lang: 'zh_CN', 
     },
   }
 }

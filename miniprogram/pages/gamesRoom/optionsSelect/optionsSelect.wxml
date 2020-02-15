@@ -1,5 +1,5 @@
 <!--miniprogram/pages/index/index.wxml-->
-<view class='container'>
+<view class='container' >
   <view class='header'>
     <view class='current_score'>
       <view class='caption'>
@@ -25,7 +25,7 @@
       </view>   
     </view>
   </view>
-  <view class='content'>
+  <view class='content' >
     <view class="filters" 
           wx:if="{{gameMode != gConst.GAME_MODE.NORMAL && gameMode != gConst.GAME_MODE.FAVORITES}}">
       <image class='filters_icon' src='{{gConst.FILTERS_ICON}}'/>
@@ -41,15 +41,15 @@
       </picker>
       <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
     </view>
-    <movable-area class='question' animation="{{fadeInOutQuestionBlock}}">
+    <movable-area class='question' animation="{{fadeInOutQuestion}}">
       <image class="favorite" data-question-id="{{curQuestion._id}}"
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
       bindtap="clickFavoriteSwitch"/>
-      <text class="meaning_text">{{curQuestion.meaning}}</text>
+      <!-- <text class="meaning_text">{{curQuestion.meaning}}</text> -->
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
-      <movable-view direction='all' x='8' y='180'>
+      <movable-view direction='all' x='10' y='170'>
         <image class="play-sound" src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
       </movable-view>
       <view class='current_question_index'>
@@ -58,57 +58,59 @@
       <view class='current_tags'>
         {{filterTags}}
       </view>   
-        
-      <view class="alphabet_cards">
-        <view class='alphabet_card {{spellCard.cardState}}'
-        style="width: {{cardFontSize*1.2}}vw; height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
-        wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
-        wx:for-index='idx' wx:key="id" 
-        data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
-        bindtap="onTapReciteCard" bindtouchmove="onLongPressAnswerCard"
-        bindlongpress="onLongPressAnswerCard">
-        {{spellCard.letter}}
-        </view>
+      <view class="question_text">
+        {{curQuestion.questionText}}
       </view>
-
     </movable-area>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
-      <view class='buttons' animation="{{fadeInOutQuestionBlock}}">
-        <image class="check-answer right" bindtap="submitAnswer"  data-manual-check-result='对' src="{{gConst.CORRECT_ANSWER_ICON}}"/>
+      <view class='buttons' animation="{{fadeInOutQuestion}}">
         <image class="btn_previous_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="-1" src="{{gConst.PREVIOUS_ICON}}"/>
         <image class="btn_reset" bindtap='resetAnswer' src="{{gConst.RESET_ICON}}" />
-        <image class="btn_pause" bindtap='onClickPauseSwitch' src="{{gConst.PAUSE_ICON}}"/>
+        <image class="btn_answer" bindtap='submitAnswer' src="{{gConst.SUBMIT_ICON}}"/>
+        <image class="btn_pause" bindtap='onClickPause' src="{{gConst.PAUSE_ICON}}"/>
         
         <image class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1" src="{{gConst.NEXT_ICON}}"/>
-        
-
-        <image class="check-answer wrong" bindtap="submitAnswer" data-manual-check-result='错' src="{{gConst.INCORRECT_ANSWER_ICON}}"/>
       </view>    
-    </form>
-    <scroll-view class="all_words_container" scroll-y="true">
-      <view class="all_words">
-        <view class="word_card done_card"
-          wx:for-items='{{questionsDone}}' wx:for-item='question' 
-          wx:for-index='idx' wx:key="_id" 
-        >
-          {{question.word}}
-        </view> 
-        <view class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
-          wx:for-items='{{questions}}' wx:for-item='question' 
-          wx:for-index='idx' wx:key="_id" 
-          bindtap="onClickLeftCard" data-card-idx="{{idx}}"
-          data-question='{{question}}'
-        >
-          <view 
-          class="count_point {{(question.leftCorrect > 0)?'correct':'incorrect'}}" 
-          style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
-          {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
-          </view>
-          {{question.word}}
+    </form>    
+    <scroll-view class='bottom_content' scroll-y='true'>
+      <view wx:if="{{curOptions.length>0}}" class='sperator_title'>选项 ‣</view>
+      <view class="option_tags" scroll-y='true'>
+        <view class='option_tag {{option.state}}'
+        wx:for-items='{{curOptions}}' wx:for-item='option' 
+        wx:for-index='idx' wx:key="id" 
+        data-option-text='{{option.text}}' data-option-idx='{{idx}}'
+        bindtap="tapSelectOption">
+        <image class="option_select_icon {{option.state}}" 
+        src="{{gConst.ANSWER_CORRECT}}"/>
+        <text>{{option.text}}</text>
         </view>
-       
-      </view>
+      </view>   
+      <view class='sperator_title'>其他练习 ‣</view> 
+      <scroll-view class="all_words_container" scroll-y="true">
+        <view class="all_words">
+          <view class="word_card done_card"
+            wx:for-items='{{questionsDone}}' wx:for-item='question' 
+            wx:for-index='idx' wx:key="_id" 
+          >
+            {{question.title}}
+          </view> 
+          <view class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
+            wx:for-items='{{questions}}' wx:for-item='question' 
+            wx:for-index='idx' wx:key="_id" 
+            bindtap="onClickLeftCard" data-card-idx="{{idx}}"
+            data-question='{{question}}'
+          >
+            <view 
+            class="count_point {{(question.leftCorrect > 0)?'correct':'incorrect'}}" 
+            style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
+            {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
+            </view>
+            {{question.title}}
+          </view>
+        
+        </view>
+      </scroll-view>
     </scroll-view>
   </view>
-  <button class="btn_continue {{isPause}}" bindtap='onClickPauseSwitch' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutContinueBtn}}">{{pauseBtnText}}</button>
+  <button class="btn_continue {{isPause}}" bindtap='onClickPause' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
 </view>

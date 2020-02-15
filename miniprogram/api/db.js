@@ -12,6 +12,7 @@ function queryPages(tableName, pWhere, pageIdx, callback){
   // debugLog('pWhere', pWhere)
   let perPageCount = 20
   let where = pWhere
+  // debugLog('tableName', tableName)
   // debugLog('where', where)
   db.collection(tableName)
     .where(pWhere)

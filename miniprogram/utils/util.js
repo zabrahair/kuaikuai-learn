@@ -185,8 +185,12 @@ const getTotalScore = function(userInfo, callback){
         },
         success: res => {
           // debugLog('learnHistoryAggregate.success.res', res)
-          wx.setStorageSync(storeKeys.totalScore, res.result.score)
-          callback(res.result)
+          if (res && res.result && res.result.score){
+            wx.setStorageSync(storeKeys.totalScore, res.result.score)
+            callback(res.result)
+          }else{
+            wx.setStorageSync(storeKeys.totalScore, 0)
+          }
         },
         fail: err => {
           errorLog('[云函数] 调用失败：', err)
@@ -308,7 +312,7 @@ function arrayJoin(array, joinProp, seperator){
 function refreshUserRoleConfigs(){
   const configsApi = require('../api/configs.js')
   configsApi.getConfigs({
-    tags: configsApi.USER_ROLE_TAG
+    tags: gConst.CONFIG_TAGS.USER_ROLE_TAG
   }, 0, (configs, pageIdx)=>{
     // debugLog('refreshUserRoleConfigs.configs', configs);
     wx.setStorageSync(gConst.USER_ROLES_OBJS_KEY, configs)
@@ -408,8 +412,37 @@ function getDataLoadInterval(){
   }
 }
 
+function initStorage(){
+  let totalScore = wx.getStorageSync('totalScore')
+  if (!totalScore && totalScore != 0){
+    wx.setStorageSync('totalScore', 0)
+  }
+
+  let userConfigs = wx.getStorageSync('userConfigs')
+  if (!userConfigs && userConfigs != 0) {
+    wx.setStorageSync('userConfigs', false)
+  }
+}
+
+function getDataset(e){
+  let dataset1
+  let dataset2
+  try{
+    dataset1 = e.target.dataset}catch(e){}
+  try {
+    dataset2 = e.currentTarget.dataset
+  } catch (e) { }
+  if (Object.keys(dataset1).length < 1){
+    return dataset2
+  }else{
+    return dataset1
+  }
+  
+}
+
 module.exports = {
   /** 工具型方法 */
+  getDataset: getDataset,
   formatTime: formatTime,
   formatDate: formatDate,
   formatDeciTimer: formatDeciTimer,
@@ -433,4 +466,5 @@ module.exports = {
   getUserInfo: getUserInfo,
   setUserInfo: setUserInfo,
   getDataLoadInterval: getDataLoadInterval,
+  initStorage: initStorage,
 }

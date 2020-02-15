@@ -11,7 +11,9 @@
     "pages/gamesRoom/words/words",
     "pages/TagsRoom/TagsRoom",
     "pages/favorites/favorites",
-    "pages/wrongBook/wrongBook"
+    "pages/wrongBook/wrongBook",
+    "pages/gamesRoom/optionsSelect/optionsSelect",
+    "pages/gamesRoom/selfRecite/selfRecite"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
@@ -55,5 +57,11 @@
         "text": "我的"
       }
     ]
+  },
+  "plugins": {
+    "WechatSI": {
+      "version": "0.3.1",
+      "provider": "wx069ba97219f66d99"
+    }
   }
 }

@@ -46,7 +46,7 @@ Page({
       authLogin: '请授权',
       totalScore: 0,
     })
-    debugLog('onShow', true)
+    // debugLog('onShow', true)
     this.login();
   },
 

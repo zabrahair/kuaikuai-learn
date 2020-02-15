@@ -143,9 +143,9 @@ function clickFavoriteSwitch(that, e) {
 /**
  * 默写卡点击字卡片
  */
-function onTapReciteCard(that, e, callback) {
-  let dataset = e.target.dataset;
-  // debugLog('onTapAnswerCard.dataset', dataset)
+function onTapReciteCard(that, e, unusedCallback, usedCallbck) {
+  let dataset = (e.target.dataset.curSpellCards)?e.target.dataset:e.currentTarget.dataset;
+  debugLog('onTapAnswerCard.dataset', dataset)
   let curSpellCards = that.data.curSpellCards;
   let cardIdx = parseInt(dataset.cardIdx)
   let curCard = curSpellCards[cardIdx];
@@ -166,8 +166,10 @@ function onTapReciteCard(that, e, callback) {
   if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED) {
     // selectedCard.tempCardIdx = cardIdx
     curCard.cardState = CARD_STATE.USED
+    try { unusedCallback(that, curSpellCards[cardIdx])}catch(e){}
   } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED) {
     curCard.cardState = CARD_STATE.UNUSED
+    try { usedCallback(that, curSpellCards[cardIdx])}catch (e) { }
     if (typeof curCard.usedBlankIdx == 'number') {
       // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
       // curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
@@ -234,6 +236,7 @@ function onTapSpellCard(that, e, callback) {
 function getNormalQuestions(that, dataLoadTimer) {
   let pageIdx = 0
   clearInterval(dataLoadTimer)
+  debugLog('getNormalQuestions.tags', that.data.tags)
   dataLoadTimer = setInterval(function () {
     dbApi.queryPages(
       that.data.tableValue,
@@ -310,8 +313,44 @@ function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
     })
     pageIdx++
   }, utils.getDataLoadInterval())
+}
 
+/**
+ * tap Select Option
+ * 
+ */
+function tapSelectOption(that, e) {
+  // debugLog('tapTag.e.target.dataset', e.target.dataset)
+  let dataset = utils.getDataset(e)
+  let optionText = dataset.optionText
+  let optionIdx = parseInt(dataset.optionIdx)
+  let selectedOptions = that.data.selectedOptions
+  let curOptions = that.data.curOptions
 
+  let isFound = false
+  for (let i in selectedOptions) {
+    // debugLog('tapSelectOption.curOptions[optionIdx]', curOptions[optionIdx])
+    if (selectedOptions[i].text == optionText) {
+      selectedOptions.splice(i, 1)
+      curOptions[optionIdx].state = OPTION_STATE.UNSELECTED
+      isFound = true
+      break;
+    }
+  }
+
+  if (isFound == false) {
+    curOptions[optionIdx].state = OPTION_STATE.SELECTED
+    selectedOptions.push(
+      {
+        text: optionText,
+      }
+    )
+  }
+  // debugLog('tapSelectOption', e.target.dataset)
+  that.setData({
+    selectedOptions: selectedOptions,
+    curOptions: curOptions,
+  })
 }
 
 /**
@@ -376,18 +415,17 @@ const CARD_STATE = {
   UNUSED: 'card_unused',
   USED: 'card_used',
 }
-const CARD_OBJECT_TEMPLATE = {
+const SPELL_CARD_TEMPLATE = {
   id: 0,
   letter: '',
   cardState: CARD_STATE.UNUSED,
-  x: 0,
-  y: 0,
   isUsed: false,
   blankValue: BLANK_EMPTY,
   usedCardIdx: false,
   usedBlankIdx: false,
   tempCardIdx: false,
 }
+
 /**
  * 获得做地错的题目
  */
@@ -460,11 +498,54 @@ function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
   }, utils.getDataLoadInterval())
 }
 
+/** 选择题状态保存模版和选择状态 */
+const OPTION_STATE = {
+  SELECTED: 'selected',
+  UNSELECTED: '',
+}
+const OPTION_CARD_TEMPLATE = {
+  id: 0,
+  text: '',
+  state: '',
+  isUsed: false,
+}
 /**
-   * 处理当前题目
+ * 处理当前选择题的答案和选项
+ */
+function processSelectOptions(that, question) {
+  that.setData({
+    curOptions: []
+  })
+  if (question.options && question.options.length > 0) {
+    let curOptions = []
+    let length = question.options.length
+    // debugLog('length', length)
+    for (let idx = 0; idx < length; idx++) {
+      let cardObject = {}
+      Object.assign(cardObject, OPTION_CARD_TEMPLATE)
+      // debugLog('processSelectOptions.question.options[i]', question.options[i])
+      cardObject.id = idx
+      cardObject.text = question.options[idx]
+      cardObject.state = OPTION_STATE.UNSELECTED
+      curOptions.push(cardObject)
+    }
+
+    curOptions.sort((a,b)=>{
+      return 0.5 - Math.random()
+    })
+    // debugLog('processSelectOptions.curOptions', curOptions)
+    that.setData({
+      curOptions: curOptions,
+      // cardFontSize: cardFontSize,
+    })
+  }
+}
+
+/**
+   * 处理当前题目的word字段，变成一张一张卡片
    * 7 cards in every line
    */
-function processCurrentQuestion(that, question) {
+function processWordsIntoCards(that, question) {
   that.setData({
     curSpellCards: []
   })
@@ -483,7 +564,7 @@ function processCurrentQuestion(that, question) {
       }
       // debugLog('i', i)
       let cardObject = {}
-      Object.assign(cardObject, CARD_OBJECT_TEMPLATE)
+      Object.assign(cardObject, SPELL_CARD_TEMPLATE)
       cardObject.id = idx
       cardObject.letter = letters[i]
       // cardObject.x = card_x_offset + idx % 7 * card_width
@@ -510,15 +591,15 @@ function processCurrentQuestion(that, question) {
  */
 function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   let dataset
-  try {
+  // try {
     dataset = e ? e.target.dataset : null
-    if (dataset.idxOffset) {
+  if (dataset && dataset.idxOffset) {
       idxOffset = parseInt(dataset.idxOffset)
     }
-  }
-  catch (e) {
-    errorLog('onClickNextQuestion.e', e)
-  }
+  // }
+  // catch (e) {
+  //   errorLog('onClickNextQuestion.e', e)
+  // }
 
   if (that.checkPauseStatus()
     || !that.data.questions
@@ -531,6 +612,7 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   // try {
 
   let questions = that.data.questions
+  // debugLog('onClickNextQuestion.questions', that.data.questions)
   let curQuestionIndex = that.data.curQuestionIndex
   // Set isCorrect to questions responsed element
   questions[curQuestionIndex]['isCorrect'] = isCorrect
@@ -558,19 +640,32 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   if (questions.length > 0) {
 
   } else {
-    for (let i in questionsDone) {
-      questions.push(questionsDone[i])
-    }
-    questionsDone = []
-    curQuestionIndex = 0
-    question = {}
-    wx.showToast({
-      image: gConst.ANSWER_CORRECT,
-      title: MSG.FINISH_ALL_QUESTIONS,
-      duration: 1000,
-    }, function () {
+    // 当所有题目做完
+    wx.showModal({
+      title: MSG.CONFIRM_TITLE,
+      content: MSG.CONFIRM_FINISHED_MSG,
+      success: function (res) {
+        if (res.confirm) {
+          that.resetAnswer();
+          // for (let i in questionsDone) {
+          //   questions.push(questionsDone[i])
+          // }
+          // questionsDone = []
+          // curQuestionIndex = 0
+          // question = {}
+          // wx.showToast({
+          //   image: gConst.ANSWER_CORRECT,
+          //   title: MSG.FINISH_ALL_QUESTIONS,
+          //   duration: 1000,
+          // }, function () {
 
+          // })
+        }else{
+          return;
+        }
+      }
     })
+
   }
 
   let isFavorited = false
@@ -591,17 +686,38 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
 
   // 重置变量
   // debugLog('nextQuestion', nextQuestion)
+  let timer = setTimeout(function () { 
+    let speechText='';
+    if (nextQuestion.word){
+      speechText = nextQuestion.word
+      readCurrentWord(that, speechText)
+    }
+    else if(nextQuestion.questionText){
+      speechText = nextQuestion.questionText
+    }
+    
+    clearTimeout(timer)
+  }, 200);
+  
   that.setData({
+    // 共通是用的字段
     questions: questions,
     questionsDone: questionsDone,
     curQuestionIndex: nextQuestionIndex,
     curQuestion: nextQuestion,
+    thinkSeconds: 0,
+    // 填空题是用的字段
     curAnswer: '',
+    // 默写卡和拼写是用的字段
     selectedCard: false,
     curSpellCards: false,
-    thinkSeconds: 0,
+
+    // 选择题是用的字段
+    curOptions: [],
+    selectedOptions: [],
   }, res => {
-    processCurrentQuestion(that, nextQuestion)
+    that.processCurrentQuestion(that, nextQuestion)
+    if (that.myNextQuestionActions)that.myNextQuestionActions(that, nextQuestion)
   })
   // } catch (e) {
   //   errorLog('onClickNextQuestion error:', e)
@@ -862,6 +978,7 @@ function tapTagInTagRoom(that, e) {
       selectedTags.splice(i, 1)
       tags[tagIdx]['css'] = ''
       isFound = true
+      break;
     }
   }
 
@@ -894,6 +1011,10 @@ function onClickEnterInTagRoom(that, e) {
     url = '/pages/gamesRoom/words/words?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   } else if (that.data.selAnswerType == '拼写') {
     url = '/pages/gamesRoom/spell/spell?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
+  } else if (that.data.selAnswerType == '选择题') {
+    url = '/pages/gamesRoom/optionsSelect/optionsSelect?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
+  } else if (that.data.selAnswerType == '自助默写') {
+    url = '/pages/gamesRoom/selfRecite/selfRecite?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   }
 
   if(that.data.gameMode == gConst.GAME_MODE.WRONG){
@@ -917,23 +1038,58 @@ function onClickEnterInTagRoom(that, e) {
   })
 }
 
+/**
+ * 朗读当前卡片
+ */
+const plugin = requirePlugin("WechatSI")
+const audioCtx = wx.createInnerAudioContext()
+function readCurrentWord(that, word) {
+  let lang = '';
+  try {
+    lang = TABLES.MAP[that.data.tableValue].lang
+  } catch (e) { }
+  // debugLog("lang", lang)
+  plugin.textToSpeech({
+    lang: lang,
+    tts: true,
+    content: word,
+    success: function (res) {
+      // debugLog("textToSpeech.res.filename", res.filename)
+      let ac = wx.createInnerAudioContext()
+      ac.src = res.filename
+      ac.play(res => {
+        // debugLog('play source')
+      })
+    },
+    fail: function (res) {
+      errorLog("fail tts", res)
+    }
+  })
+}
+
 module.exports = {
-  // 题目内容展示页
+  /* 题目内容展示页 */
+  /* -- 数据处理 -- */
   getNormalQuestions: getNormalQuestions,
   getFavoritesQuestions: getFavoritesQuestions,
   getHistoryQuestions: getHistoryQuestions,
   onClickNextQuestion: onClickNextQuestion,
   recordHistory: recordHistory,
+  processWordsIntoCards: processWordsIntoCards,
+  processSelectOptions: processSelectOptions,
+
+  /* -- 页面事件 -- */
   clickFavoriteSwitch: clickFavoriteSwitch,
   onTapReciteCard: onTapReciteCard,
   onTapSpellCard: onTapSpellCard,
-  processCurrentQuestion: processCurrentQuestion,
   resetQuestionStatus: resetQuestionStatus,
+  tapSelectOption: tapSelectOption,
+  readCurrentWord: readCurrentWord,
   BLANK_EMPTY: BLANK_EMPTY,
   CARD_STATE: CARD_STATE,
-  CARD_OBJECT_TEMPLATE: CARD_OBJECT_TEMPLATE,
+  SPELL_CARD_TEMPLATE: SPELL_CARD_TEMPLATE,
 
-  // 标签过滤页
+  /* 标签过滤页 */
   getTags: getTags,
   getNormalTags: getNormalTags,
   getFavoriteTags: getFavoriteTags,
