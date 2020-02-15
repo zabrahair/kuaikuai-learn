@@ -101,6 +101,12 @@ Page({
     // gConst
     gConst: gConst,
 
+    // page show
+    questionViewWidth: 50,
+    cardFontSize: 13.5,
+    maxCardFontSize: 15,
+    minCardFontSize: 5,
+
     // filters
     tags: ['拼写'],
     lastDate: utils.getUserConfigs().filterQuesLastDate,

@@ -49,8 +49,11 @@
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
-      <movable-view class="play-sound" direction='all' x='130' y='45'>
+      <movable-view class="play-sound" direction='all' x='130' y='25'>
         <image src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
+      </movable-view>
+      <movable-view class="btn_answer_switch" direction='all' x='135' y='200'>
+        <image class="btn_answer_switch" bindtap='switchAnswerVisibility' src="{{isAnswerVisible?gConst.VISIBILITY_ICON:gConst.INVISIBILITY_ICON}}"/>
       </movable-view>
       <view class='current_question_index'>
         {{curQuestionIndex+1}}/{{questions.length}}
@@ -78,7 +81,6 @@
         <image class="check-answer right" bindtap="submitAnswer"  data-manual-check-result='对' src="{{gConst.CORRECT_ANSWER_ICON}}"/>
         <image class="btn_previous_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="-1" src="{{gConst.PREVIOUS_ICON}}"/>
         <image class="btn_reset" bindtap='resetAnswer' src="{{gConst.RESET_ICON}}" />
-        <image class="btn_answer_switch" bindtap='switchAnswerVisibility' src="{{isAnswerVisible?gConst.VISIBILITY_ICON:gConst.INVISIBILITY_ICON}}"/>
         <image class="btn_pause" bindtap='onClickPauseSwitch' src="{{gConst.PAUSE_ICON}}"/>
         
         <image class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1" src="{{gConst.NEXT_ICON}}"/>
@@ -95,7 +97,7 @@
         >
           {{question.word}}
         </view> 
-        <view wx:if="{{isAnswerVisible}}" class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
+        <view class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
           wx:for-items='{{questions}}' wx:for-item='question' 
           wx:for-index='idx' wx:key="_id" 
           bindtap="onClickLeftCard" data-card-idx="{{idx}}"
@@ -106,7 +108,8 @@
           style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
           {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
           </view>
-          {{question.word}}
+          <text wx:if='{{isAnswerVisible}}'>{{question.word}}</text>
+          <text wx:if='{{!isAnswerVisible}}'>. . . . </text>
         </view>
        
       </view>

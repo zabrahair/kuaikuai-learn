@@ -1,16 +1,6 @@
 .container {
   position: fixed;
-  /* display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
-  align-items: center;
-
-  width: 100vw; */
   height: 120vh;
-/* 
-  background-size: 100vw 100vh;
-  background-image: url('https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/kuai_background.jpg?sign=4c4590afa901625789b285cf1285cc4b&t=1580309905'); */
 }
 
 .header {
@@ -173,7 +163,7 @@
   height: 70vh;
   margin-top: 1vh;
   border-radius: 3vw;
-  /* padding: 3vw; */
+
   font-size: 14vw;
   color: green;
   font-weight: 800;
@@ -196,8 +186,8 @@
 
   left: 3%;
   top: 2%;
-  width: 10vw;
-  height: 10vw;
+  width: 7vw;
+  height: 7vw;
 }
 
 .meaning_text {
@@ -306,7 +296,7 @@
   justify-content: center;
   align-items: center;
 
-  margin: 2vw;
+  margin: 1px;
   font-size: 12vw;
   color: crimson;
   font-weight: 200;
