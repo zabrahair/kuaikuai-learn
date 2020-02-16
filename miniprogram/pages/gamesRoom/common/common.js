@@ -38,6 +38,13 @@ function resetQuestionStatus(that, e, scoreTimer) {
   questionsDone = []
   curQuestionIndex = 0
   that.setData({
+    // 答题连击的恢复初始化
+    hitsCount: 0,
+    isShowPointLayer: false,
+    hitsAccuScore: 0,
+    curIsCorrect: false,
+    curAnswer: false,
+
     questions: questions,
     questionsDone: questionsDone,
     curQuestionIndex: curQuestionIndex,
@@ -103,7 +110,7 @@ function recordHistory(that, question, answer) {
    */
 function clickFavoriteSwitch(that, e) {
   // debugLog('clickFavoriteSwitch.dataset', e.target.dataset)
-  let dataset = e.target.dataset
+  let dataset = utils.getDataset(e)
   let curQuesId = dataset.curQuestionIndex
 
   if (that.data.isFavorited == true) {
@@ -143,9 +150,9 @@ function clickFavoriteSwitch(that, e) {
 /**
  * 默写卡点击字卡片
  */
-function onTapReciteCard(that, e, unusedCallback, usedCallbck) {
-  let dataset = (e.target.dataset.curSpellCards)?e.target.dataset:e.currentTarget.dataset;
-  debugLog('onTapAnswerCard.dataset', dataset)
+function onTapReciteCard(that, e, unusedCallback, usedCallback) {
+  let dataset = utils.getDataset(e)
+  // debugLog('onTapAnswerCard.dataset', dataset)
   let curSpellCards = that.data.curSpellCards;
   let cardIdx = parseInt(dataset.cardIdx)
   let curCard = curSpellCards[cardIdx];
@@ -169,6 +176,7 @@ function onTapReciteCard(that, e, unusedCallback, usedCallbck) {
     try { unusedCallback(that, curSpellCards[cardIdx])}catch(e){}
   } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED) {
     curCard.cardState = CARD_STATE.UNUSED
+    // debugLog('onTapReciteCard', that.data.curQuestion)
     try { usedCallback(that, curSpellCards[cardIdx])}catch (e) { }
     if (typeof curCard.usedBlankIdx == 'number') {
       // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
@@ -190,8 +198,8 @@ function onTapReciteCard(that, e, unusedCallback, usedCallbck) {
    * 点击拼写字母卡片
    */
 function onTapSpellCard(that, e, callback) {
-  let dataset = e.target.dataset;
-  debugLog('onTapSpellCard.dataset', dataset)
+  let dataset = utils.getDataset(e);
+  // debugLog('onTapSpellCard.dataset', dataset)
   let curSpellCards = that.data.curSpellCards;
   let cardIdx = parseInt(dataset.cardIdx)
   let curCard = curSpellCards[cardIdx];
@@ -217,8 +225,8 @@ function onTapSpellCard(that, e, callback) {
     if (typeof curCard.usedBlankIdx == 'number') {
       // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
       curSpellCards[curCard.usedBlankIdx].blankValue = BLANK_EMPTY
-      curSpellCards[curCard.usedBlankIdx].usedCardIdx = false
-      curCard.usedBlankIdx = false
+      curSpellCards[curCard.usedBlankIdx].usedCardIdx = null
+      curCard.usedBlankIdx = null
     }
     selectedCard = false
   }
@@ -236,7 +244,7 @@ function onTapSpellCard(that, e, callback) {
 function getNormalQuestions(that, dataLoadTimer) {
   let pageIdx = 0
   clearInterval(dataLoadTimer)
-  debugLog('getNormalQuestions.tags', that.data.tags)
+  // debugLog('getNormalQuestions.tags', that.data.tags)
   dataLoadTimer = setInterval(function () {
     dbApi.queryPages(
       that.data.tableValue,
@@ -277,19 +285,21 @@ function getNormalQuestions(that, dataLoadTimer) {
 function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
   let pageIdx = 0
   clearInterval(dataLoadTimer)
-
+  // debugLog('writeQuestionsCorrectStat.questions', that.data.questions)
   dataLoadTimer = setInterval(function () {
     learnHistoryApi.questCorrectStat(that.data.tableValue, 
       { tags: _.all(that.data.tags) }, pageIdx, 
       (list, pageIdx) => {
         // debugLog('questionStatistic.pageIdx', pageIdx)
-        // debugLog('questionStatistic.list', list)
+        // debugLog('questi/onStatistic.list', list)
         if (list.length && list.length > 0) {
           let questions = that.data.questions
           let questionsDone = that.data.questionsDone
           for (let i in list){
+            delete list[i].question
             try{
               let foundInQuests = questions.find(quest => quest._id == list[i]._id)  
+
               Object.assign(foundInQuests, list[i])
             }catch(e){}
 
@@ -313,6 +323,92 @@ function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
     })
     pageIdx++
   }, utils.getDataLoadInterval())
+}
+
+/**
+ * 显示加分数动画
+ */
+function scoreApprove(that, curQuestion, isCorrect, callback) {
+  // debugLog('showAddScoreEffect.hitsCount', that.data.hitsCount)
+  // debugLog('showAddScoreEffect.isShowPointLayer', that.data.isShowPointLayer)
+  let score = curQuestion.score
+  let hitsCount = that.data.hitsCount
+  let hitsAccuScore = that.data.hitsAccuScore
+  let isShowPointLayer = true
+  let curIsCorrect = false
+  if (isCorrect) {
+    curQuestion['isCorrect'] = isCorrect
+    hitsAccuScore += curQuestion.score
+    hitsCount++
+    curIsCorrect = true
+  } else {
+    hitsAccuScore = 0
+    hitsCount = 0
+    curIsCorrect = false
+  }
+  // debugLog('showAddScoreEffect.hitsCount', hitsCount)
+  // debugLog('showAddScoreEffect.isShowPointLayer', isShowPointLayer)
+  that.setData({
+    isShowPointLayer: isShowPointLayer,
+    hitsCount: hitsCount,
+    hitsAccuScore: hitsAccuScore,
+    curIsCorrect: curIsCorrect
+  }, callback(that, curQuestion))
+}
+
+/**
+ * 关闭显示得分层
+ */
+function finishScoreApprove(that, params) {
+  // debugLog('closePointLayer.params', params)
+  // 将返回的积分数据合并到历史记录中然后加入
+  let recQuest = Object.assign({}, that.data.curQuestion)
+  try {
+    if (params.detail.isCorrect) {
+      recQuest.score = recQuest.score + params.detail.hitsScore
+      recQuest.tags.push(params.detail.hitsClass)
+    } else {
+    }
+
+  } catch (e) { }
+  // debugLog('finishScoreApprove.that.data.curQuestion', that.data.curQuestion)
+  // debugLog('finishScoreApprove.recQuest', recQuest)
+  // Record History
+  let answerTime = new Date()
+  recordHistory(that, recQuest
+    , {
+      openid: that.data.userInfo.openId,
+      nickName: that.data.userInfo.nickName,
+      userRole: that.data.userInfo.userRole,
+      answer: that.data.curAnswer,
+      isCorrect: params.detail.isCorrect,
+      answerTime: answerTime.getTime(),
+      answerTimeStr: utils.formatDate(answerTime),
+      // 减去一个计时间隔，作为操作时间
+      thinkSeconds: that.data.thinkSeconds - that.data.timerInterval,
+    })
+  
+  let curScore = parseFloat(that.data.curScore) + parseFloat(recQuest.score)
+  let totalScore = parseFloat(that.data.totalScore) + recQuest.score
+  try{
+    curScore = curScore.toFixed(1)
+    totalScore = totalScore.toFixed(1)
+  }catch(e){}
+  debugLog('closePrecQuestointLayer.curScore', curScore)
+  debugLog('closePrecQuestointLayer.totalScore', totalScore)
+  that.setData({
+    curScore: curScore,
+    totalScore: totalScore,
+  }, function (res) {
+    wx.setStorageSync(storeKeys.totalScore, parseFloat(that.data.totalScore))
+  })    
+  that.setData({
+    isShowPointLayer: false,
+  }, res => {
+    // Next Question
+    // debugLog('closePrecQuestointLayer.isCorrect', params.detail.isCorrect)
+    onClickNextQuestion(that, null, params.detail.isCorrect)
+  })
 }
 
 /**
@@ -421,9 +517,9 @@ const SPELL_CARD_TEMPLATE = {
   cardState: CARD_STATE.UNUSED,
   isUsed: false,
   blankValue: BLANK_EMPTY,
-  usedCardIdx: false,
-  usedBlankIdx: false,
-  tempCardIdx: false,
+  usedCardIdx: null,
+  usedBlankIdx: null,
+  tempCardIdx: null,
 }
 
 /**
@@ -579,7 +675,9 @@ function processWordsIntoCards(that, question) {
     let cardFontSize = questionViewWidth / curSpellCards.length;
     cardFontSize = cardFontSize > that.data.maxCardFontSize ? that.data.maxCardFontSize : cardFontSize
     cardFontSize = cardFontSize < that.data.minCardFontSize ? that.data.minCardFontSize : cardFontSize
+    question.discount = question.score / length
     that.setData({
+      curQuestion: question,
       curSpellCards: curSpellCards,
       cardFontSize: cardFontSize,
     })
@@ -592,7 +690,7 @@ function processWordsIntoCards(that, question) {
 function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   let dataset
   // try {
-    dataset = e ? e.target.dataset : null
+  dataset = e ? utils.getDataset(e) : null
   if (dataset && dataset.idxOffset) {
       idxOffset = parseInt(dataset.idxOffset)
     }
@@ -895,7 +993,7 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
 const SELECTED_CSS = 'selected'
 function tapFilterTable(that, e, dataLoadTimer, callback) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
-  let dataset = e.target.dataset
+  let dataset = utils.getDataset(e)
   let tableValue = dataset.tableValue
   let tableIdx = parseInt(dataset.tableIdx)
   let selectedTable = that.data.selectedTable
@@ -915,14 +1013,16 @@ function tapFilterTable(that, e, dataLoadTimer, callback) {
       tables[i]['css'] = ''
     }
   }
-  that.setData({
-    tables: tables,
-    selectedTable: selectedTable,
-    tags: [],
-    selectedTags: [],
-  }, res => {
-    getTags(that, selectedTable.value, dataLoadTimer)
+
+  resetTagsPageSelected(that, ()=>{
+    that.setData({
+      tables: tables,
+      selectedTable: selectedTable,
+    }, res => {
+      getTags(that, selectedTable.value, dataLoadTimer)
+    })
   })
+
 }
 
 /**
@@ -964,7 +1064,7 @@ function initFilterAnswerTypes(that) {
  */
 function tapTagInTagRoom(that, e) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
-  let dataset = e.target.dataset
+  let dataset = utils.getDataset(e)
   let tagText = dataset.tagText
   let tagIdx = parseInt(dataset.tagIdx)
   let tagCount = dataset.tagCount
@@ -1067,6 +1167,16 @@ function readCurrentWord(that, word) {
   })
 }
 
+/**
+ * 重置页面选择设定数据
+ */
+function resetTagsPageSelected(that, callback) {
+  that.setData({
+    tags: [],
+    selectedTags: [],
+  }, callback)
+}
+
 module.exports = {
   /* 题目内容展示页 */
   /* -- 数据处理 -- */
@@ -1077,6 +1187,7 @@ module.exports = {
   recordHistory: recordHistory,
   processWordsIntoCards: processWordsIntoCards,
   processSelectOptions: processSelectOptions,
+  
 
   /* -- 页面事件 -- */
   clickFavoriteSwitch: clickFavoriteSwitch,
@@ -1085,6 +1196,8 @@ module.exports = {
   resetQuestionStatus: resetQuestionStatus,
   tapSelectOption: tapSelectOption,
   readCurrentWord: readCurrentWord,
+  scoreApprove: scoreApprove,
+  finishScoreApprove: finishScoreApprove,
   BLANK_EMPTY: BLANK_EMPTY,
   CARD_STATE: CARD_STATE,
   SPELL_CARD_TEMPLATE: SPELL_CARD_TEMPLATE,
@@ -1100,5 +1213,6 @@ module.exports = {
   tapTagInTagRoom: tapTagInTagRoom,
   onClickEnterInTagRoom: onClickEnterInTagRoom,
   DATA_BODY_IN_TAG_ROOM: DATA_BODY_IN_TAG_ROOM,
-  initDataBodyInTagRoom: initDataBodyInTagRoom
+  initDataBodyInTagRoom: initDataBodyInTagRoom,
+  resetTagsPageSelected: resetTagsPageSelected,
 }

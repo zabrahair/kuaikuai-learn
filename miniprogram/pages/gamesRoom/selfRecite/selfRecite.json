@@ -1,5 +1,8 @@
 {
-  "usingComponents": {},
   "navigationBarTitleText": "自助默写",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "point-layer": "../../../components/getPoint/getPoint",
+    "score-title": "../../../components/scoreTitle/scoreTitle"
+  }
 }

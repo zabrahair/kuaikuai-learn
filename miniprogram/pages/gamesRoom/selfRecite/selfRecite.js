@@ -36,17 +36,6 @@ var dataLoadTimer = null;
 
 const titleSubfix = '自助默写'
 
-// // Alphabet Variables
-// const alphabet = "abcdefghijklmnopqrstuvwxyz"
-// const alphabetArray = alphabet.split('')
-// const card_x_offset = 0;
-// const card_y_offset = 300;
-// const card_width = 50;
-// const card_height = 60;
-
-// // Page Const Value
-// const BLANK_EMPTY = '_'
-
 Page({
 
   /**
@@ -91,6 +80,12 @@ Page({
     totalScore: 0,
     historyRecord: {},
     userConfigs: utils.getUserConfigs(),
+    // 得分效果和历史记录用的
+    hitsCount: 0,
+    isShowPointLayer: false,
+    hitsAccuScore: 0,
+    curIsCorrect: false,
+    curAnswer: false,
 
     // gConst
     gConst: gConst,
@@ -164,7 +159,7 @@ Page({
     let gameMode = that.data.gameMode
     utils.getTotalScore(userInfo, userScore => {
       that.setData({
-        totalScore: userScore.score,
+        totalScore: userScore.score.toFixed(1),
       })
     })
     that.getQuestions(gameMode)
@@ -263,10 +258,11 @@ Page({
     let dataset;
     let answer
     let curQuestion = that.data.curQuestion
+    debugLog('submitAnswer.curQuestion', curQuestion)
     let manualCheckResult
     let isCorrect = false
     try {
-      dataset = e.target.dataset
+      dataset = utils.getDataset(e)
       // debugLog('submitAnswer.dataset', dataset)
       manualCheckResult = dataset.manualCheckResult
       for (let i in MANUAL_CHECK_RESULT) {
@@ -283,10 +279,6 @@ Page({
 
 
     // try{
-
-    // debugLog('formValues', formValues)
-
-    // debugLog('curQuestion', curQuestion)
     // 同時針對回車和Button提交
     let curSpellCards = that.data.curSpellCards
     if (!manualCheckResult) {
@@ -294,52 +286,31 @@ Page({
     }
     if (answer == curQuestion.word) {
       isCorrect = true
-      wx.showToast({
-        image: gConst.ANSWER_CORRECT,
-        title: MSG.CORRECT_ALERT,
-        duration: 500,
-      }, function () {
-
-      })
-      let score = that.data.curQuestion.score ? that.data.curQuestion.score : 1
-      that.setData({
-        curScore: that.data.curScore + score,
-        totalScore: that.data.totalScore + score,
-      }, function (res) {
-        wx.setStorageSync(storeKeys.totalScore, that.data.totalScore)
-      })
-
-    } else {
-      wx.showToast({
-        image: gConst.ANSWER_INCORRECT,
-        title: MSG.INCORRECT_ALERT,
-        duration: 500,
-      })
     }
-    // Record History
-    let answerTime = new Date()
-    common.recordHistory(that, curQuestion
-      , {
-        openid: that.data.userInfo.openId,
-        nickName: that.data.userInfo.nickName,
-        userRole: that.data.userInfo.userRole,
-        answer: answer,
-        isCorrect: isCorrect,
-        answerTime: answerTime.getTime(),
-        answerTimeStr: utils.formatDate(answerTime),
-        // 减去一个计时间隔，作为操作时间
-        thinkSeconds: that.data.thinkSeconds - that.data.timerInterval,
-      })
-
-    // Next Question
-    common.onClickNextQuestion(that, null, isCorrect)
+    
     that.setData({
-      curAnswer: '',
-      thinkSeconds: 0,
+      curAnswer: answer?answer:null,
+      curIsCorrect: isCorrect,
+    })
+
+    common.scoreApprove(that, curQuestion, isCorrect, ()=>{
+      that.setData({
+        curAnswer: '',
+        thinkSeconds: 0,
+      },res=>{
+      })
     })
     // }catch(e){
     //   errorLog('submitAnswer Error: ', e)
     // }
+  },
+
+  /**
+   * 关闭显示得分层
+   */
+  finishScoreApprove: function(e){
+    let that = this
+    common.finishScoreApprove(that, e)
   },
 
   /**
@@ -370,8 +341,6 @@ Page({
     }
   },
 
-
-
   /**
    * 下一题
    */
@@ -381,7 +350,6 @@ Page({
 
     })
   },
-
 
   /**
    * 获取所有题目
@@ -419,7 +387,7 @@ Page({
   onClickPauseSwitch: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
-    if (e.target.dataset.isContinueButton
+    if (utils.getDataset(e).isContinueButton
       && that.data.isPause == false) {
       return;
     }
@@ -430,20 +398,9 @@ Page({
         inputAnswerDisabled: false,
       })
       animation.playFade(that, animation.MAP.FADE_OUT_QUESTION_BLOCK.name)
-      // that.fadeInOut('fadeInOutQuestion', {
-      //   duration: 1000,
-      //   timingFunction: 'ease-out',
-      //   rotateY: 0,
-      //   opacity: 1,
-      // });
 
       animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
-      // that.fadeInOut('fadeInOutPauseBtn', {
-      //   duration: 1,
-      //   timingFunction: 'ease-in',
-      //   rotateY: 0,
-      //   opacity: 0,
-      // })
+
     } else {
       that.setData({
         isPause: true,
@@ -456,43 +413,9 @@ Page({
       res=>{
         animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
       })
-      // that.fadeInOut('fadeInOutQuestion', {
-      //   duration: 1000,
-      //   timingFunction: 'ease-in',
-      //   rotateY: 180,
-      //   opacity: 0,
-      // }, that.fadeInOut('fadeInOutPauseBtn', {
-      //   duration: 1500,
-      //   timingFunction: 'ease-out',
-      //   rotateY: 0,
-      //   opacity: 1,
-      // }));
     }
   },
 
-  // /**
-  //  * Fade In Out Question
-  //  */
-  // fadeInOut: function (animationName, fadeOptions, callback) {
-  //   let that = this;
-  //   let option = {
-  //     duration: fadeOptions.duration, // 动画执行时间
-  //     timingFunction: fadeOptions.timingFunction // 动画执行效果
-  //   };
-  //   var fadeInOut = wx.createAnimation(option)
-  //   fadeInOut.rotateY(fadeOptions.rotateY);
-  //   // moveOne.translateX('100vw');
-  //   fadeInOut.opacity(fadeOptions.opacity).step();
-  //   that.setData({
-  //     [animationName]: fadeInOut.export(),// 开始执行动画
-  //   }, function () {
-  //     if (callback) {
-  //       callback()
-  //     };
-  //   })
-  // },
-
- 
 
   /**
    * 
@@ -539,16 +462,23 @@ Page({
 
   onTapReciteCard: function (e) {
     let that = this
-    debugLog('onTapReciteCard.e', e)
+    // debugLog('onTapReciteCard.e', e)
+    
     common.onTapReciteCard(that, e, 
     (thats, curSpellCards, cardIdx)=>{
       // 当卡反过来的时候
-      // animation.playFade(that, animation.MAP.TURN_OVER_SPELL_CARD.name)
+
     }, 
     (thats, curSpellCards, cardIdx) => {
+      // 反一次卡，扣分1/n
+      // let curQuestion = that.data.curQuestion
+      // curQuestion.score = parseFloat((curQuestion.score - curQuestion.discount).toFixed(1))
+      // // debugLog('onTapReciteCard', curQuestion)
+      // that.setData({
+      //   curQuestion: curQuestion
+      // })
       // 当卡没反过来的时候
-      // animation.playFade(that, animation.MAP.TURN_BACK_SPELL_CARD.name)
-    })
+          })
   },
 
   /**
@@ -558,7 +488,7 @@ Page({
   onLongPressAnswerCard: function (e) {
     // debugLog('onLongPressAnswerCard.e', e.target.dataset);
     let that = this
-    let dataset = e.target.dataset
+    let dataset = utils.getDataset(e)
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
     if (spellCard.cardState == CARD_STATE.USED) {
@@ -573,19 +503,6 @@ Page({
   clickFavoriteSwitch: function (e) {
     let that = this
     common.clickFavoriteSwitch(that, e)
-  },
-
-  /**
-   * 当点击剩下的单词卡片
-   */
-  onClickLeftCard: function (e) {
-    let that = this
-    let dataset = e.target.dataset
-    let curQuestionIndex = that.data.curQuestionIndex
-    let clickCardIdx = dataset.cardIdx
-    let idxOffSet = clickCardIdx - curQuestionIndex
-    common.onClickNextQuestion(that, null, null, idxOffSet)
-
   },
 
   /** 
@@ -610,6 +527,14 @@ Page({
   setAnswerShownState: function(that){
     let curSpellCards = that.data.curSpellCards
     for (let i in curSpellCards) {
+      // that.onTapReciteCard({
+      //   target: {
+      //     dataset:{
+      //       spellCard: curSpellCards,
+      //       cardIdx: i,
+      //     }
+      //   }
+      // })
       if (that.data.isAnswerVisible){
         curSpellCards[i].cardState = common.CARD_STATE.UNUSED
       }else{

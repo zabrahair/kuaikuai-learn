@@ -4,9 +4,10 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-
+  top: 0rpx;
+  left: 0rpx;
   width: 100vw;
   min-height: 100vh;
 

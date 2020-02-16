@@ -95,7 +95,7 @@ Page({
     let gameMode = that.data.gameMode
     utils.getTotalScore(userInfo, userScore => {
       that.setData({
-        totalScore: userScore.score,
+        totalScore: (userScore.score).toFixed(1),
       })
     })
     this.getQuestions(gameMode)
@@ -219,10 +219,10 @@ Page({
         })
         let score = that.data.curQuestion.score ? that.data.curQuestion.score : 1
         that.setData({
-          curScore: that.data.curScore + score,
-          totalScore: that.data.totalScore + score,
+          curScore: (parseFloat(that.data.curScore) + score).toFixed(1),
+          totalScore: (parseFloat(that.data.totalScore) + score).toFixed(1),
         }, function(res){
-          wx.setStorageSync(storeKeys.totalScore, that.data.totalScore)
+          wx.setStorageSync(storeKeys.totalScore, parseFloat(that.data.totalScore))
         })
         
       }else{
@@ -321,7 +321,7 @@ Page({
     }
     try{
       let that = this
-      let targetValues = e?e.target.dataset:null
+      let targetValues = e ? utils.getDataset(e):null
       let questions = this.data.questions
       let questionsDone = this.data.questionsDone
       let question = this.data.curQuestion

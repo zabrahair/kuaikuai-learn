@@ -1,7 +1,7 @@
 <!--components/getPoint/getPoint.wxml-->
 <view wx:if="{{isShown}}" class='component-container'>
   <view class='component-content {{isShown?"playHits":""}}'>
-    <text class="point-text">+{{comboTypes[0].name}}</text>
+    <text class="{{curTextCss}}">{{scoreText}}</text>
   </view>
-  <image src='../../images/close.png' class='close_button' bindtap="onClose"/>  
+  <!-- <image src='../../images/close.png' class='close_button' bindtap="onClose"/>   -->
 </view>

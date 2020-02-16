@@ -68,7 +68,7 @@ Page({
     }
     utils.getTotalScore(userInfo, userScore => {
       that.setData({
-        totalScore: userScore.score,
+        totalScore: userScore.score.toFixed(1),
       })
     })
 

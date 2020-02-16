@@ -105,13 +105,17 @@ Page({
     let that = this
     let selIdx = e.detail.value
     debugLog('selectAnswerType.e', e)
-    that.setData({
-      selAnswerType: that.data.answerTypesPickers[selIdx],
-      tags: [],
-    }, res=> {
-      common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
+    common.resetTagsPageSelected(that, ()=>{
+      that.setData({
+        selAnswerType: that.data.answerTypesPickers[selIdx],
+
+      }, res => {
+        common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
+      })
     })
+
   },
+
 
   /**
    * 点击进入，切换到题目展示页

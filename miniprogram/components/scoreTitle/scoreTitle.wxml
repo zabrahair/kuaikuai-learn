@@ -1,0 +1,21 @@
+<view class="component-container">
+  <view class='current_score'>
+    <image class='caption' src="{{gConst.SCORE_ICON}}"/>
+    <view class='value'>
+      {{curScore}}
+    </view>
+  </view>
+  <view class='current_timer'>
+    <!-- <view class='caption'>
+    </view> -->
+    <view class='value'>
+      {{curDeciTimerStr}}
+    </view>
+  </view>
+  <view class='total_score'>
+    <view class='value'>
+      {{totalScore}}
+    </view> 
+     <image class='caption' src="{{gConst.TOTAL_EXP_ICON}}"/>   
+  </view>
+</view>

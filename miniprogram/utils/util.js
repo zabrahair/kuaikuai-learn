@@ -186,7 +186,7 @@ const getTotalScore = function(userInfo, callback){
         success: res => {
           // debugLog('learnHistoryAggregate.success.res', res)
           if (res && res.result && res.result.score){
-            wx.setStorageSync(storeKeys.totalScore, res.result.score)
+            wx.setStorageSync(storeKeys.totalScore, parseFloat(res.result.score))
             callback(res.result)
           }else{
             wx.setStorageSync(storeKeys.totalScore, 0)
@@ -425,6 +425,7 @@ function initStorage(){
 }
 
 function getDataset(e){
+  // debugLog('getDataset.e',e)
   let dataset1
   let dataset2
   try{
@@ -432,10 +433,13 @@ function getDataset(e){
   try {
     dataset2 = e.currentTarget.dataset
   } catch (e) { }
+  // debugLog('Object.keys(dataset1).length', Object.keys(dataset1).length)
   if (Object.keys(dataset1).length < 1){
-    return dataset2
+    // debugLog('Object.keys(dataset2)', e.currentTarget.dataset)
+    return e.currentTarget.dataset
   }else{
-    return dataset1
+    // debugLog('Object.keys(dataset1)', Object.keys(dataset1))
+    return e.target.dataset
   } 
 }
 

@@ -1,30 +1,10 @@
 <!--miniprogram/pages/index/index.wxml-->
 <scroll-view class='container' scroll-y='true'>
-  <view class='header'>
-    <view class='current_score'>
-      <view class='caption'>
-        本次: 
-      </view>
-      <view class='value'>
-        {{curScore}}
-      </view>
-    </view>
-    <view class='current_timer'>
-      <!-- <view class='caption'>
-      </view> -->
-      <view class='value'>
-        {{curDeciTimerStr}}
-      </view>
-    </view>
-    <view class='total_score'>
-      <view class='value'>
-        {{totalScore}}
-      </view> 
-      <view class='caption'>
-        :总分
-      </view>   
-    </view>
-  </view>
+  <score-title
+    curScore="{{curScore}}"
+    curDeciTimerStr="{{curDeciTimerStr}}"
+    totalScore="{{totalScore}}"
+  />  
   <view class='content'>
     <view class="filters" 
           wx:if="{{gameMode != gConst.GAME_MODE.NORMAL}}">
@@ -45,8 +25,11 @@
       <image class="favorite" data-question-id="{{curQuestion._id}}"
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
       bindtap="clickFavoriteSwitch"/>
-      <movable-view direction='all' x='5' y='250'>
+      <movable-view direction='all' x='3' y='170'>
         <image class="play-sound" src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
+      </movable-view>
+      <movable-view class="btn_answer_switch" direction='all' x='285' y='30'>
+        <image class="btn_answer_switch" bindtap='showOneMoreAnswer' src="{{isAnswerVisible?gConst.VISIBILITY_ICON:gConst.INVISIBILITY_ICON}}"/>
       </movable-view>
       <text class="meaning_text">{{curQuestion.meaning}}</text>
       <view class='ques_wait_time'>
@@ -76,6 +59,7 @@
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
         bindtap="onTapSpellCard" 
         >
+        <image wx:if="{{(spellCard.cardState=='card_used')?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>        
         <!-- bindlongpress="onLongPressAnswerCard" -->
         {{spellCard.letter}}
         </view>
@@ -122,4 +106,12 @@
     </scroll-view>
   </view>
   <button class="btn_continue {{isPause}}" bindtap='onClickPauseSwitch' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutContinueBtn}}">{{pauseBtnText}}</button>
+  <point-layer
+    bindclose='finishScoreApprove'
+    isShown="{{isShowPointLayer}}"
+    score="{{curQuestion.score}}"
+    isCorrect="{{curIsCorrect}}"
+    hitsAccuScore="{{hitsAccuScore}}"
+    hitsCount="{{hitsCount}}"
+   />
 </scroll-view>

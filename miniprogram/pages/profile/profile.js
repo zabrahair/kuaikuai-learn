@@ -108,7 +108,7 @@ Page({
     })
     utils.getTotalScore(userInfo, userScore => {
       that.setData({
-        totalScore: userScore.score,
+        totalScore: userScore.score.toFixed(1),
       })
     })
     wx.getSetting({
@@ -171,7 +171,7 @@ Page({
                   })
                   utils.getTotalScore(userInfo, userScore => {
                     that.setData({
-                      totalScore: userScore.score,
+                      totalScore: userScore.score.toFixed(1),
                     })
                   })
                 },
@@ -262,7 +262,7 @@ Page({
    */
   tapProfileFeature: function(e){
     let that = this
-    let dataset = e.target.dataset
+    let dataset = utils.getDataset(e)
     let featureName = dataset.featureName
 
     if (featureName == 'history'){

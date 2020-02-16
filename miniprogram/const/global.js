@@ -72,6 +72,7 @@ module.exports = {
   THINK_ICON: '/images/think.png',
   ALERT_ICON: '/images/alert.png',
   SCORE_ICON: '/images/score.png',
+  TOTAL_EXP_ICON: '/images/totalExp.png',
   FILTERS_ICON: '/images/filters.png',
   SEARCH_ICON: '/images/search.png',
   GOTO_HOVER_ICON: '/images/goto-hover.png',

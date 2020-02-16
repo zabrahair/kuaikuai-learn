@@ -174,7 +174,8 @@ function questCorrectStat(tableName, pWhere, pageIdx, callback){
     .skip(pageIdx * perPageCount)
     .end()
     .then
-    (res => {
+    ((res, e) => {
+      // debugLog('questCorrectStat.res', e)
       // debugLog('questCorrectStat.res', res.list)
       // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {
@@ -183,7 +184,8 @@ function questCorrectStat(tableName, pWhere, pageIdx, callback){
       } else {
         callback([], pageIdx)
       }
-    })  
+    })
+    .catch(err => console.error(err)) 
 }
 
 module.exports = {

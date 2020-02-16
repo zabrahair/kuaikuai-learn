@@ -2,7 +2,7 @@
   "navigationBarTitleText": "中文词语",
   "enablePullDownRefresh": false,
   "usingComponents": {
-    "point-layer":
-      "../../../components/getPoint/getPoint"
+    "point-layer": "../../../components/getPoint/getPoint",
+    "score-title": "../../../components/scoreTitle/scoreTitle"
   }
 }

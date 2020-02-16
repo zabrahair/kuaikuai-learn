@@ -130,10 +130,12 @@ const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectOb
     .group(groupObj)
     .project(projectObj)
     .skip(pageIdx * perPageCount)
-    .end().then(res => {
+    .end()
+    .then(res => {
       // debugLog('groupAggregate[' + table + ']', res)
       callback(res, pageIdx)
     })
+    .catch(err => console.error(err))
 }
 
 function getTags(tableName, pWhere, pageIdx, callback) {

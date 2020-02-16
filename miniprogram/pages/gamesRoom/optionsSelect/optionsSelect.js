@@ -66,8 +66,12 @@ Page({
     totalScore: 0,
     historyRecord: {},
     userConfigs: utils.getUserConfigs(),
-    combos: [],
-    isShowPointLayer: true,
+    // 得分效果和历史记录用的
+    hitsCount: 0,
+    isShowPointLayer: false,
+    hitsAccuScore: 0,
+    curIsCorrect: false,
+    curAnswer: false,
 
     // gConst
     gConst: gConst,
@@ -133,7 +137,7 @@ Page({
     let gameMode = that.data.gameMode
     utils.getTotalScore(userInfo, userScore => {
       that.setData({
-        totalScore: userScore.score,
+        totalScore: userScore.score.toFixed(1),
       })
     })
     this.getQuestions(gameMode)
@@ -253,54 +257,31 @@ Page({
     let answerOptions = that.data.curQuestion.answer
     let selectedOptions = that.data.selectedOptions
     isCorrect = that.checkAnswer(selectedOptions, answerOptions)
-    debugLog('isCorrect', isCorrect)
-    if (isCorrect) {
-      wx.showToast({
-        image: gConst.ANSWER_CORRECT,
-        title: MSG.CORRECT_ALERT,
-        duration: 500,
-      }, function () {
+    // debugLog('isCorrect', isCorrect)
 
-      })
-      let score = that.data.curQuestion.score ? that.data.curQuestion.score : 1
-      that.setData({
-        curScore: that.data.curScore + score,
-        totalScore: that.data.totalScore + score,
-      }, function (res) {
-        wx.setStorageSync(storeKeys.totalScore, that.data.totalScore)
-      })
-
-    } else {
-      wx.showToast({
-        image: gConst.ANSWER_INCORRECT,
-        title: MSG.INCORRECT_ALERT,
-        duration: 500,
-      })
-    }
-    // Record History
-    let answerTime = new Date()
-    common.recordHistory(that, curQuestion
-      , {
-        openid: that.data.userInfo.openId,
-        nickName: that.data.userInfo.nickName,
-        userRole: that.data.userInfo.userRole,
-        answer: answer,
-        isCorrect: isCorrect,
-        answerTime: answerTime.getTime(),
-        answerTimeStr: utils.formatDate(answerTime),
-        // 减去一个计时间隔，作为操作时间
-        thinkSeconds: that.data.thinkSeconds - that.data.timerInterval,
-      })
-
-    // Next Question
-    common.onClickNextQuestion(that, null, isCorrect)
     that.setData({
       curAnswer: '',
       thinkSeconds: 0,
     })
+
+    common.scoreApprove(that, curQuestion, isCorrect, () => {
+      that.setData({
+        curAnswer: '',
+        thinkSeconds: 0,
+      }, res => {
+      })
+    })
     // }catch(e){
     //   errorLog('submitAnswer Error: ', e)
     // }
+  },
+
+  /**
+   * 关闭显示得分层
+   */
+  finishScoreApprove: function (e) {
+    let that = this
+    common.finishScoreApprove(that, e)
   },
 
   /**
@@ -381,7 +362,7 @@ Page({
   onClickPause: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
-    if (e.target.dataset.isContinueButton
+    if (utils.getDataset(e).isContinueButton
       && that.data.isPause == false) {
       return;
     }
@@ -501,9 +482,9 @@ Page({
    * 自动填写到左起第一个空格上
    */
   onLongPressAnswerCard: function (e) {
-    debugLog('onLongPressAnswerCard.e', e.target.dataset);
+    // debugLog('onLongPressAnswerCard.e', e.target.dataset);
     let that = this
-    let dataset = e.target.dataset
+    let dataset = utils.getDataset(e)
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
     if (spellCard.cardState == CARD_STATE.USED) {
@@ -525,7 +506,7 @@ Page({
  */
   onClickLeftCard: function (e) {
     let that = this
-    let dataset = e.target.dataset
+    let dataset = utils.getDataset(e)
     let curQuestionIndex = that.data.curQuestionIndex
     let clickCardIdx = dataset.cardIdx
     let idxOffSet = clickCardIdx - curQuestionIndex

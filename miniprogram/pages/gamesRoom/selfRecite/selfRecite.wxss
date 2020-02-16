@@ -1,110 +1,8 @@
-.header {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  align-items: center;
-
-  width: 100vw;
-  height: 7vh;
-  background-color: rgba(100, 100, 100, 0.5);
-  padding-left: 5vw;
-  padding-right: 5vw;
-}
-
-.current_score{
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center; 
-
-  width: 25vw;
-  height: 7vh;
-
-}
-
-.current_score .caption{
-  font-size: 3vw;
-  color: white;
-}
-
-.current_score .value{
-  font-size: 3vw;
-  color: white;
-}
-
-.total_score {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center; 
-
-  width: 25vw;
-  height: 7vh;
-
-}
-
-.total_score .caption{
-  font-size: 3vw;
-  color: white;
-}
-
-.total_score .value{
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: flex-end;
-  align-items: center; 
-
-  font-size: 3vw;
-  color: white;
-}
-
-.current_timer {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center; 
-
-  width: 50vw;
-  height: 7vh;
-}
-
-.current_timer .caption{
-  font-size: 3vw;
-  color: white;
-}
-
-.current_timer .value{
-  font-size: 4vw;
-  color: greenyellow;
-  width: 100%;
-}
-
-.caption {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;  
-
-  width: 15vw;
-  height: 7vh;
-
-}
-
-.value {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;  
-
-  width: 20vw;
-  height: 7vh;
+.container {
+  position: relative;
+  /* justify-items: flex-start; */
+  /* align-items: center;
+  width: 100vw; */
 }
 
 .content {
@@ -313,6 +211,20 @@
   box-shadow: 2px 2px 1px 1px rgba(0, 0, 255, .2);
 }
 
+.card-back-icon {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  justify-self: center;
+
+  width: 50%;
+  height: 35%;
+}
+
 @keyframes toFront {
 
   /** 第二种写法**//*开始转的角度*/
@@ -358,20 +270,6 @@
   color: rgba(255, 255, 255, 0);
   transform: rotateY(180deg);
 
-}
-
-.card-back-icon {
-  position: absolute;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  align-self: center;
-  justify-self: center;
-
-  width: 50%;
-  height: 35%;
 }
 
 .current_question_index {
