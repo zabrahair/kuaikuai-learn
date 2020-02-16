@@ -436,8 +436,15 @@ function getDataset(e){
     return dataset2
   }else{
     return dataset1
+  } 
+}
+
+function getStorage(key){
+  let storageVar = wx.getStorageSync(key)
+  if (!storageVar && storageVar != 0){
+    storageVar = false
   }
-  
+  return storageVar;
 }
 
 module.exports = {
@@ -467,4 +474,5 @@ module.exports = {
   setUserInfo: setUserInfo,
   getDataLoadInterval: getDataLoadInterval,
   initStorage: initStorage,
+  getStorage: getStorage,
 }

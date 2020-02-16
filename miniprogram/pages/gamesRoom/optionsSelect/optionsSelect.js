@@ -66,6 +66,8 @@ Page({
     totalScore: 0,
     historyRecord: {},
     userConfigs: utils.getUserConfigs(),
+    combos: [],
+    isShowPointLayer: true,
 
     // gConst
     gConst: gConst,

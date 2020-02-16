@@ -139,5 +139,6 @@ module.exports = {
     USER_ROLE_TAG: 'USER_ROLE',
     ANSWER_TYPE: 'ANSWER_TYPE',
     SYSTEM_CONFIG: 'SYSTEM_CONFIG',
+    COMBO_TYPE: 'COMBO_TYPE',
   },
 }

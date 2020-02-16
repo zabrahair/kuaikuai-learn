@@ -112,5 +112,10 @@
       </scroll-view>
     </scroll-view>
   </view>
+  <point-layer
+    bindclosePointLayer=''
+    isShown="{{isShowPointLayer}}"
+    combos="{{combos}}"
+   />
   <button class="btn_continue {{isPause}}" bindtap='onClickPause' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
 </view>

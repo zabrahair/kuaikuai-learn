@@ -104,7 +104,7 @@ Page({
   selectAnswerType: function(e){
     let that = this
     let selIdx = e.detail.value
-
+    debugLog('selectAnswerType.e', e)
     that.setData({
       selAnswerType: that.data.answerTypesPickers[selIdx],
       tags: [],
