@@ -1,0 +1,53 @@
+.container{
+  height: 100vh;
+}
+
+text {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-left: 3vw;
+}
+
+input {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  width: 95vw;
+  min-height: 6vh;
+  margin: 3vw;
+  background-color: rgba(100,100,100,0.5)
+}
+
+textarea {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  width: 95vw;
+  min-height: 30vh;
+  margin: 3vw;
+  background-color: rgba(100,100,100,0.5)
+}  
+
+button {
+  margin: 5vw;
+}
+
+.result {
+    display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  width: 95vw;
+  height: 50vh;
+}

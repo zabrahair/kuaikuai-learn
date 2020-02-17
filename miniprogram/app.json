@@ -12,7 +12,8 @@
     "pages/wrongBook/wrongBook",
     "pages/gamesRoom/optionsSelect/optionsSelect",
     "pages/gamesRoom/selfRecite/selfRecite",
-    "components/scoreTitle/scoreTitle"
+    "components/scoreTitle/scoreTitle",
+    "pages/aRunQuery/aRunQuery"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",

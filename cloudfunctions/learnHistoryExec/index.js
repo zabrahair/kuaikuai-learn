@@ -12,14 +12,18 @@ const TABLE = 'learn-history'
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  let hisRecord = event.hisRecord
-  console.log('event', JSON.stringify(event, null, 4))
   try {
-    let result = await db.collection(TABLE).add({
-      // data 传入需要局部更新的数据
-      data: hisRecord
-    })
-    console.log('create learn history record:', JSON.stringify(result, null, 4))
+    let result = await db.collection('learn-history')
+      // .doc('74b140b45e31696b0772664452d72dd8')
+      .where({
+        _openid: _.exists(false),
+      })
+      .update({
+        data: {
+          openid: _.rename('_openid')
+        }
+      })
+    console.log(' learn history exec:', JSON.stringify(result, null, 4))
     return result;
   } catch (e) {
     console.error(e)

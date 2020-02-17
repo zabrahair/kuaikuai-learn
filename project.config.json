@@ -162,6 +162,13 @@
 					"pathName": "pages/gamesRoom/selfRecite/selfRecite",
 					"query": "gameMode=常规&tableValue=english-words&tableName=英文单词&filterTags=M3U3",
 					"scene": null
+				},
+				{
+					"id": 16,
+					"name": "pages/aRunQuery/aRunQuery",
+					"pathName": "pages/aRunQuery/aRunQuery",
+					"query": "",
+					"scene": null
 				}
 			]
 		}

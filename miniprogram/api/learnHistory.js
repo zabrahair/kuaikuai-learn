@@ -11,6 +11,35 @@ const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
 
+const create = function (pHistory, callback) {
+  const db = wx.cloud.database()
+  let history = {}
+  let now = new Date();
+  let nowTimeString = now.toString();
+  Object.assign(history, pHistory)
+  Object.assign(history, {
+    createTimestamp: now.getTime(),
+    createLocalTime: nowTimeString
+  })
+  // debugLog('favorite', favorite)
+  // 根据条件插入所有用户
+  db.collection(TABLE).add({
+    data: history,
+    success: res => {
+      let result = res;
+      debugLog('【插入结果】 history', result);
+      callback(result)
+    },
+    fail: err => {
+      wx.showToast({
+        icon: 'none',
+        title: '插入记录失败'
+      })
+      debugLog('[数据库history] [插入记录] 失败：', err)
+    }
+  })
+}
+
 function dailyStatistic(userInfo, whereFilter, pageIdx, callback){
   if (typeof pageIdx != 'number') {
     pageIdx = 0
@@ -88,11 +117,11 @@ function getTags(tableName, pWhere, pageIdx, callback) {
   let where = {
     table: tableName,
   }
-  Object.assign(where, pWhere)
-  // debugLog('where', where)
+  // Object.assign(where, {question: pWhere})
+  debugLog('where', where)
   db.collection(TABLE)
     .aggregate()
-    .match(where)
+    // .match(where)
     .unwind('$question.tags')
     .group({
       _id: '$question.tags',
@@ -194,4 +223,5 @@ module.exports = {
   getHistoryQuestions: getHistoryQuestions,
   questCorrectStat: questCorrectStat,
   getTags: getTags,
+  create: create,
 }

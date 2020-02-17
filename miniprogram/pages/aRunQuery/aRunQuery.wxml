@@ -1,0 +1,18 @@
+<scroll-view class="container" scroll-Y='true'>
+<text>处理数据库</text>
+<form class="query_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
+  <text>方法名</text>
+  <input class="" name='funcitonName' value="{{funcName}}"></input>
+  <text>数据库名</text>
+  <input class="" name='tablerName' value="{{table}}"></input>
+  <text>Where Body</text>
+  <textarea class="" name='where' maxlength='-1'auto-height='true' value="{{where}}"></textarea>
+  <text>Update Body</text>
+  <textarea class="" name='update'maxlength='-1' auto-height='true'value="{{update}}"></textarea>
+  <button class="btn_answer" formType="submit" type="primary" >运行Query</button>
+  <button class="btn_reset"  formType="reset" type="warn">重置</button>
+  <scroll-view class='result'>
+    {{result}}
+  </scroll-view>
+</form>
+</scroll-view>

@@ -111,13 +111,15 @@ function getTags(tableName, pWhere, pageIdx, callback){
   // debugLog('tableName', tableName)
   // debugLog('pWhere', pWhere)
   let perPageCount = 20
-  let where = pWhere
-  // debugLog('where', where)
+  let where = {
+    table: tableName,
+  }
+  Object.assign(where, {thing: pWhere})
+  debugLog('where', where)
+
   db.collection(TABLE)
     .aggregate()
-    .match({
-      table: tableName,
-    })
+    .match(where)
     .unwind('$thing.tags')
     .group({
       _id: '$thing.tags',

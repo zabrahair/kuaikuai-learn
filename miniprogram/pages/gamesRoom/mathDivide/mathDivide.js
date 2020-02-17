@@ -156,18 +156,21 @@ Page({
     // Object.assign(historyRecord, question)
     Object.assign(historyRecord, answer)
     // debugLog('historyRecord', historyRecord)
-    wx.cloud.callFunction({
-      name: 'learnHistoryCreate',
-      data: {
-        hisRecord: historyRecord
-      },
-      success: res => {
-        // debugLog('learnHistoryCreate.success.res', res)
-      },
-      fail: err => {
-        errorLog('[云函数] 调用失败：', err)
-      }
+    learnHistoryApi.create(historyRecord, (res) => {
+      debugLog('learnHistoryCreate.success.res', res)
     })
+    // wx.cloud.callFunction({
+    //   name: 'learnHistoryCreate',
+    //   data: {
+    //     hisRecord: historyRecord
+    //   },
+    //   success: res => {
+    //     // debugLog('learnHistoryCreate.success.res', res)
+    //   },
+    //   fail: err => {
+    //     errorLog('[云函数] 调用失败：', err)
+    //   }
+    // })
 
   },
 

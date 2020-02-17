@@ -143,4 +143,10 @@ Page({
     let that = this
     common.tapTagInTagRoom(that, e)
   },
+  
+  onKeywordSearch: function (e) {
+    let that = this
+    // debugLog('onKeywordSearch.e', e)
+    common.onKeywordSearch(that, e, dataLoadTimer)
+  }
 })

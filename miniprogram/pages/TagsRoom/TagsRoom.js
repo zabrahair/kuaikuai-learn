@@ -104,7 +104,7 @@ Page({
   selectAnswerType: function(e){
     let that = this
     let selIdx = e.detail.value
-    debugLog('selectAnswerType.e', e)
+    // debugLog('selectAnswerType.e', e)
     common.resetTagsPageSelected(that, ()=>{
       that.setData({
         selAnswerType: that.data.answerTypesPickers[selIdx],
@@ -113,7 +113,6 @@ Page({
         common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
       })
     })
-
   },
 
 
@@ -145,4 +144,10 @@ Page({
     let that = this
     common.tapTagInTagRoom(that, e)
   },
+
+  onKeywordSearch: function(e){
+    let that = this
+    // debugLog('onKeywordSearch.e', e)
+    common.onKeywordSearch(that, e, dataLoadTimer)
+  }
 })

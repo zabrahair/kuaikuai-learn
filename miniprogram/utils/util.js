@@ -424,6 +424,21 @@ function initStorage(){
   }
 }
 
+/**
+ * 获取Event事件的Detail.Value
+ */
+function getEventDetailValue(e){
+  let value = ''
+  try{
+    value = e.detail.value
+  }catch(e){
+    // value = ''
+  }
+  return value
+}
+/**
+ * 获得Event事件的Dataset
+ */
 function getDataset(e){
   // debugLog('getDataset.e',e)
   let dataset1
@@ -453,7 +468,10 @@ function getStorage(key){
 
 module.exports = {
   /** 工具型方法 */
+  /* -- Event 方法 -- */
   getDataset: getDataset,
+  getEventDetailValue: getEventDetailValue,
+
   formatTime: formatTime,
   formatDate: formatDate,
   formatDeciTimer: formatDeciTimer,

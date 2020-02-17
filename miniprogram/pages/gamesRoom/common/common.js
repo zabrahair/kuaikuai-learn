@@ -91,18 +91,23 @@ function recordHistory(that, question, answer) {
   // Object.assign(historyRecord, question)
   Object.assign(historyRecord, answer)
   // debugLog('historyRecord', historyRecord)
-  wx.cloud.callFunction({
-    name: 'learnHistoryCreate',
-    data: {
-      hisRecord: historyRecord
-    },
-    success: res => {
-      // debugLog('learnHistoryCreate.success.res', res)
-    },
-    fail: err => {
-      errorLog('[云函数] 调用失败：', err)
-    }
+
+  learnHistoryApi.create(historyRecord, (res)=>{
+    debugLog('learnHistoryCreate.success.res', res)
   })
+
+  // wx.cloud.callFunction({
+  //   name: 'learnHistoryCreate',
+  //   data: {
+  //     hisRecord: historyRecord
+  //   },
+  //   success: res => {
+  //     // debugLog('learnHistoryCreate.success.res', res)
+  //   },
+  //   fail: err => {
+  //     errorLog('[云函数] 调用失败：', err)
+  //   }
+  // })
 }
 
 /**
@@ -830,7 +835,7 @@ const DATA_BODY_IN_TAG_ROOM = {
   gConst: gConst,
 
   selectedTable: '',
-
+  userKeyword: null,
 
   // Picker of answerTypes
 
@@ -843,6 +848,7 @@ function initDataBodyInTagRoom(that, diffs, callback){
   let initData = Object.assign({
     tables: [],
     tags: [],
+    userKeyword: null,
     selectedTags: [],
     answerTypesObjects: [],
     answerTypesPickers: [],
@@ -889,16 +895,29 @@ function getTags(that, tableName, dataLoadTimer, callback) {
  * 獲取所有的標籤,只获取标签在记录第一层的标签。
  */
 function getNormalTags(that, tableName, dataLoadTimer) {
-  // debugLog('getTags.tableName', tableName)
+  debugLog('getNormalTags.tableName', tableName)
   let pageIdx = 0
   clearInterval(dataLoadTimer)
   let where = {}
+
+  let tagsConds = _
   // debugLog('getTags.selAnswerType', that.data.selAnswerType)
-  if (that.data.selAnswerType){
-    where = {
-      tags: that.data.selAnswerType
-    }
+  if (that.data.selAnswerType) {
+    tagsConds = tagsConds.and(that.data.selAnswerType)
   }
+  // debugLog('getNormalTags.userKeyword', that.data.userKeyword)
+  if (that.data.userKeyword) {
+    // debugLog('getNormalTags.userKeyword2', that.data.userKeyword)
+    tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
+    // tagsConds.and(/第一课/gi)
+  }
+  if (tagsConds){
+    // where['tags'] = /第一课/gim
+    // where['tags'] = _.and(that.data.selAnswerType, new RegExp("第一课", "gim"))
+    where['tags'] = tagsConds
+    // where['tags'] = _.and(that.data.selAnswerType).and(new RegExp(that.data.userKeyword, "gim"))
+  }
+  // debugLog('getNormalTags.where', where)
   dataLoadTimer = setInterval(function () {
     dbApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
       // debugLog('getTags.pageIdx', pageIdx)
@@ -929,8 +948,24 @@ function getNormalTags(that, tableName, dataLoadTimer) {
 function getFavoriteTags(that, tableName, dataLoadTimer) {
   let pageIdx = 0
   clearInterval(dataLoadTimer)
+  let where = {}
+  // let tagsConds = _
+  // // debugLog('getFavoriteTags.selAnswerType', that.data.selAnswerType)
+  // if (that.data.selAnswerType) {
+  //   tagsConds = tagsConds.and(that.data.selAnswerType)
+  // }
+  // // debugLog('getFavoriteTags.userKeyword', that.data.userKeyword)
+  // if (that.data.userKeyword) {
+  //   tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
+  //   // tagsConds.and(new RegExp("第一课", "gim"))
+  // }
+  // if (tagsConds) {
+  //   where['tags'] = tagsConds
+  //   // where['tags'] = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
+  // }
+
   dataLoadTimer = setInterval(function () {
-    favoritesApi.getTags(tableName, {}, pageIdx, (tags, pageIdx) => {
+    favoritesApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
       // debugLog('getTags.pageIdx', pageIdx)
       // debugLog('getTags.tags', tags)
       if (!tags.length || tags.length < 1) {
@@ -963,6 +998,20 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
       isCorrect: that.data.historyCorrectFlag,
     }
   }
+
+  let tagsConds = _
+  debugLog('getFavoriteTags.selAnswerType', that.data.selAnswerType)
+  if (that.data.selAnswerType) {
+    tagsConds = tagsConds.and(that.data.selAnswerType)
+  }
+  debugLog('getFavoriteTags.userKeyword', that.data.userKeyword)
+  if (that.data.userKeyword) {
+    tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
+  }
+  if (tagsConds) {
+    where['tags'] = tagsConds
+  }
+
   dataLoadTimer = setInterval(function () {
     learnHistoryApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
       // debugLog('getTags.pageIdx', pageIdx)
@@ -1177,6 +1226,20 @@ function resetTagsPageSelected(that, callback) {
   }, callback)
 }
 
+/**
+ * 通过关键字过滤标签
+ */
+function onKeywordSearch(that, e, dataLoadTimer){
+  let inputValue = utils.getEventDetailValue(e)
+  resetTagsPageSelected(that, () => {
+    that.setData({
+      userKeyword: inputValue
+    }, res => {
+      getTags(that, that.data.selectedTable.value, dataLoadTimer)
+    })
+  }) 
+}
+
 module.exports = {
   /* 题目内容展示页 */
   /* -- 数据处理 -- */
@@ -1203,16 +1266,22 @@ module.exports = {
   SPELL_CARD_TEMPLATE: SPELL_CARD_TEMPLATE,
 
   /* 标签过滤页 */
+  /* -- 各种初始化 -- */
+  initFilterTables: initFilterTables,
+  initFilterAnswerTypes: initFilterAnswerTypes,
+  initDataBodyInTagRoom: initDataBodyInTagRoom,
+  resetTagsPageSelected: resetTagsPageSelected,
+
   getTags: getTags,
   getNormalTags: getNormalTags,
   getFavoriteTags: getFavoriteTags,
   getHistoryTags: getHistoryTags,
+
   tapFilterTable: tapFilterTable,
-  initFilterTables: initFilterTables,
-  initFilterAnswerTypes: initFilterAnswerTypes,
   tapTagInTagRoom: tapTagInTagRoom,
   onClickEnterInTagRoom: onClickEnterInTagRoom,
+  onKeywordSearch: onKeywordSearch,
+
+  /** 标签页的常量 */
   DATA_BODY_IN_TAG_ROOM: DATA_BODY_IN_TAG_ROOM,
-  initDataBodyInTagRoom: initDataBodyInTagRoom,
-  resetTagsPageSelected: resetTagsPageSelected,
 }
