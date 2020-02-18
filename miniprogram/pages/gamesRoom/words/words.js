@@ -524,6 +524,19 @@ Page({
   playCardText: function (e) {
     let that = this
     common.readCurrentWord(that, that.data.curQuestion.word)
-  }
+  },
+
+  /**
+ * 当点击剩下的单词卡片
+ */
+  onClickLeftCard: function (e) {
+    let that = this
+    let dataset = utils.getDataset(e)
+    let curQuestionIndex = that.data.curQuestionIndex
+    let clickCardIdx = dataset.cardIdx
+    let idxOffSet = clickCardIdx - curQuestionIndex
+    common.onClickNextQuestion(that, null, null, idxOffSet)
+
+  },
 
 })

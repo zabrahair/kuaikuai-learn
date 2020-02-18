@@ -149,5 +149,5 @@ Page({
     let that = this
     // debugLog('onKeywordSearch.e', e)
     common.onKeywordSearch(that, e, dataLoadTimer)
-  }
+  },
 })

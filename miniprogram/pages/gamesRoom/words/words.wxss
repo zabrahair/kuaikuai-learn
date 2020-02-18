@@ -204,15 +204,66 @@
   box-shadow: 2px 2px 1px 1px rgba(0, 0, 255, .2);
 }
 
+@keyframes toFront {
+
+  /** 第二种写法**//*开始转的角度*/
+  from {
+    /* background-color: orange; */
+    transform: rotateY(180deg);
+    color: rgba(255, 255, 255, 0);
+  }/*结束的角度*/
+
+  to {
+    /* background-color: red; */
+    color: rgba(255, 255, 255, 1);
+    transform: rotateY(0deg);
+  }
+}
+
 .card_unused {
-  /* background-color: rgba(25, 25, 133, 0.9); */
+  animation-name: toFront;
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
+  transform: rotateY(0deg);
+
+  color: rgba(255, 255, 255, 1);
 }
 
+@keyframes toBack {
+
+  /** 第二种写法**//*开始转的角度*/
+  from {
+    transform: rotateY(0deg);
+  }/*结束的角度*/
+
+  to {
+    transform: rotateY(180deg);
+  }
+}
 .card_used {
+  animation-name: toBack;
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
   color: rgba(255, 255, 255, 0);
-  /* background-color: rgba(135, 135, 139); */
+  transform: rotateY(180deg);
+
 }
 
+.card-back-icon {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  justify-self: center;
+
+  width: 50%;
+  height: 35%;
+}
 
 .current_question_index {
   position: absolute;

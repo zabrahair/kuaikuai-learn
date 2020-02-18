@@ -47,6 +47,7 @@
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
         bindtap="onTapReciteCard" bindtouchmove="onLongPressAnswerCard"
         bindlongpress="onLongPressAnswerCard">
+        <image wx:if="{{(spellCard.cardState=='card_used')?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>  
         {{spellCard.letter}}
         </view>
       </view>

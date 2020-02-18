@@ -43,7 +43,20 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    wx.request({
+      method: 'GET',
+      timeout: 10000,
+      url: 'https://www.zdic.net/hans/共',
+      success: (res, res2)=>{
+        debugLog('request.success.res', res)
+      },
+      fail: (res, res2)=>{
+        debugLog('request.fail.res', res)
+      },
+      complete: (res)=>{
+        debugLog('request.complete.res', res)
+      }
+    })
   },
 
   /**

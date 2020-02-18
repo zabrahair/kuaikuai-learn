@@ -333,6 +333,7 @@ function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
 /**
  * 显示加分数动画
  */
+const MAX_HITS = 30
 function scoreApprove(that, curQuestion, isCorrect, callback) {
   // debugLog('showAddScoreEffect.hitsCount', that.data.hitsCount)
   // debugLog('showAddScoreEffect.isShowPointLayer', that.data.isShowPointLayer)
@@ -343,6 +344,10 @@ function scoreApprove(that, curQuestion, isCorrect, callback) {
   let curIsCorrect = false
   if (isCorrect) {
     curQuestion['isCorrect'] = isCorrect
+    if (hitsCount == MAX_HITS){
+      hitsAccuScore = 0
+      hitsCount=0
+    }
     hitsAccuScore += curQuestion.score
     hitsCount++
     curIsCorrect = true
@@ -374,7 +379,6 @@ function finishScoreApprove(that, params) {
       recQuest.tags.push(params.detail.hitsClass)
     } else {
     }
-
   } catch (e) { }
   // debugLog('finishScoreApprove.that.data.curQuestion', that.data.curQuestion)
   // debugLog('finishScoreApprove.recQuest', recQuest)
@@ -399,8 +403,8 @@ function finishScoreApprove(that, params) {
     curScore = curScore.toFixed(1)
     totalScore = totalScore.toFixed(1)
   }catch(e){}
-  debugLog('closePrecQuestointLayer.curScore', curScore)
-  debugLog('closePrecQuestointLayer.totalScore', totalScore)
+  // debugLog('closePrecQuestointLayer.curScore', curScore)
+  // debugLog('closePrecQuestointLayer.totalScore', totalScore)
   that.setData({
     curScore: curScore,
     totalScore: totalScore,
@@ -1261,6 +1265,8 @@ module.exports = {
   readCurrentWord: readCurrentWord,
   scoreApprove: scoreApprove,
   finishScoreApprove: finishScoreApprove,
+
+  /* -- 常量 -- */
   BLANK_EMPTY: BLANK_EMPTY,
   CARD_STATE: CARD_STATE,
   SPELL_CARD_TEMPLATE: SPELL_CARD_TEMPLATE,

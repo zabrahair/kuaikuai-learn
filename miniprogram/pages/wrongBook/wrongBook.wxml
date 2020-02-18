@@ -13,8 +13,8 @@
       <view class="keyword_search">
         <input class="input_keyword" 
         type="text" confirm-type="search" 
-        bindconfirm="onKeywordSearch" placeholder="关键字过滤" 
-        placeholder-class="input_keyword_ph"/>
+        bindconfirm="onKeywordSearch" bindblur="onKeywordSearch" 
+        placeholder="关键字过滤" placeholder-class="input_keyword_ph"/>
       </view>
       <picker class='answer_types_picker' 
       bindchange="selectAnswerType" value="{{index}}" range="{{answerTypesPickers}}">
