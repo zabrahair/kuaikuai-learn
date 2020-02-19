@@ -12,6 +12,7 @@ const TABLES = require('../../../const/collections.js')
 const dbApi = require('../../../api/db.js')
 const userApi = require('../../../api/user.js')
 const learnHistoryApi = require('../../../api/learnHistory.js')
+const common = require('../common/common.js')
 const HISTORY_TABLE = TABLES.MATH_DIVIDE
 
 // db related
@@ -31,6 +32,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    titleSubfix: '填空题',
     questions: [],
     questionsDone: [],
     curQuestionIndex: 0,
@@ -145,34 +147,34 @@ Page({
 
   },
 
-  /**
-     * 提交做题记录
-     */
-  recordHistory: function (question, answer) {
-    let historyRecord = {};
-    historyRecord['table'] = TABLES.HISTORY_TABLE
-    historyRecord['question'] = question
-    // delete question._id
-    // Object.assign(historyRecord, question)
-    Object.assign(historyRecord, answer)
-    // debugLog('historyRecord', historyRecord)
-    learnHistoryApi.create(historyRecord, (res) => {
-      debugLog('learnHistoryCreate.success.res', res)
-    })
-    // wx.cloud.callFunction({
-    //   name: 'learnHistoryCreate',
-    //   data: {
-    //     hisRecord: historyRecord
-    //   },
-    //   success: res => {
-    //     // debugLog('learnHistoryCreate.success.res', res)
-    //   },
-    //   fail: err => {
-    //     errorLog('[云函数] 调用失败：', err)
-    //   }
-    // })
+  // /**
+  //    * 提交做题记录
+  //    */
+  // recordHistory: function (question, answer) {
+  //   let historyRecord = {};
+  //   historyRecord['table'] = TABLES.HISTORY_TABLE
+  //   historyRecord['question'] = question
+  //   // delete question._id
+  //   // Object.assign(historyRecord, question)
+  //   Object.assign(historyRecord, answer)
+  //   // debugLog('historyRecord', historyRecord)
+  //   learnHistoryApi.create(historyRecord, (res) => {
+  //     debugLog('learnHistoryCreate.success.res', res)
+  //   })
+  //   // wx.cloud.callFunction({
+  //   //   name: 'learnHistoryCreate',
+  //   //   data: {
+  //   //     hisRecord: historyRecord
+  //   //   },
+  //   //   success: res => {
+  //   //     // debugLog('learnHistoryCreate.success.res', res)
+  //   //   },
+  //   //   fail: err => {
+  //   //     errorLog('[云函数] 调用失败：', err)
+  //   //   }
+  //   // })
 
-  },
+  // },
 
   /**
    * 暂停判断
@@ -237,7 +239,7 @@ Page({
       }
       // Record History
     let answerTime = new Date()
-      that.recordHistory(curQuestion
+      common.recordHistory(that, curQuestion
       , {
         openid: that.data.userInfo.openId,
         nickName: that.data.userInfo.nickName,

@@ -18,7 +18,8 @@
 </form>
 <dict-dialog
   isShown="{{isShownChineseMeaning}}"
-  word="尼加拉瓜"
+  table="chinese-words"
+  word="同舟共济"
   dictMode="CHAR"
   char="尼"
 />

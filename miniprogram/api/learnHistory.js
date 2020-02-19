@@ -233,9 +233,7 @@ function answerTypeStatsitic(pWhere, pageIdx, callback){
     debugLog('answerTypeStatsitic.answerTypes', answerTypes)
   }catch(e){}
   let where = {
-    question: {
-      tags: _.or(answerTypes)
-    }
+    answerType:  _.or(answerTypes)
   }
   Object.assign(where, pWhere)
   if (typeof pageIdx != 'number') {
@@ -244,11 +242,11 @@ function answerTypeStatsitic(pWhere, pageIdx, callback){
   debugLog('questCorrectStat.where', where)
   db.collection(TABLE)
     .aggregate()
-    .unwind('$question.tags')
+    // .unwind('$question.tags')
     .match(where)
     .group({
       _id: {
-        tags: '$question.tags',
+        answerType: '$answerType',
         isCorrect: '$isCorrect'
       },
       isCorrect: $.first('$isCorrect'),
@@ -261,7 +259,7 @@ function answerTypeStatsitic(pWhere, pageIdx, callback){
       incorrect: $.cond({ if: '$isCorrect', then: 0, else: '$count', }),
     })
     .group({
-      _id: '$_id.tags',
+      _id: '$_id.answerType',
       correct: $.sum('$correct'),
       incorrect: $.sum('$incorrect'),
     })

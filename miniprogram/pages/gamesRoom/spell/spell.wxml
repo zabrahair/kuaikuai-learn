@@ -123,6 +123,6 @@
   word="{{curQuestion.word}}"
   dictMode="{{dictMode}}"
   char="{{dictSearchChar}}"
-  bindclose="closeChineseMeaning"
+  bindclose="closeMeanDialog"
 />
 </scroll-view>

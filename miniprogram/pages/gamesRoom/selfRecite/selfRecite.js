@@ -34,7 +34,7 @@ const MANUAL_CHECK_RESULT = {
 var scoreTimer = null;
 var dataLoadTimer = null;
 
-const titleSubfix = '自助默写'
+
 
 Page({
 
@@ -42,6 +42,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    titleSubfix: '自助默写',
     // Question Related
     ANSWER_TYPES: gConst.ANSWER_TYPES.MANUAL_CHECK,
     questions: [],
@@ -364,19 +365,19 @@ Page({
     })
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titleSubfix
+        title: that.data.tableName + that.data.titleSubfix
       })
       common.getNormalQuestions(that, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.WRONG + titleSubfix
+        title: that.data.tableName + gConst.GAME_MODE.WRONG + that.data.titleSubfix
       })
       common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + titleSubfix
+        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
       })
       common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
     }
@@ -605,7 +606,7 @@ Page({
   /**
    * 关闭显示得分层
    */
-  closeChineseMeaning: function (params) {
+  closeMeanDialog: function (params) {
     let that = this
     that.setData({
       isShownMeanDialog: false,

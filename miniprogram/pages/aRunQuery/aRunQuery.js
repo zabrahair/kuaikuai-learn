@@ -25,15 +25,15 @@ Page({
     }, null, 4),
     result: '',
     // Chinese Meaning
-    isShownChineseMeaning: false,
-    // word: '同舟共济',
-    word: '商量',
+    isShownChineseMeaning: true,
+    word: '同舟共济',
+    // word: '商量',
 
     // myQcodeDialog
     isShownMyQcode: false,
 
     // statisticDialog
-    isShownStatisticDialog: true,
+    isShownStatisticDialog: false,
   },
 
   /**
@@ -101,7 +101,8 @@ Page({
     debugLog('submitAnswer.where', where)
     debugLog('submitAnswer.update', update)
     wx.cloud.callFunction({
-      name: form.functionName,
+      // name: form.functionName,
+      name: 'Query',
       data: {
         // table: form.tableName,
         // where: where,

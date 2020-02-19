@@ -28,7 +28,6 @@ var dataLoadTimer = null;
 
 const titles = {
 }
-const titleSubfix = '拼写'
 
 // Alphabet Variables
 const alphabet = "abcdefghijklmnopqrstuvwxyz"
@@ -63,6 +62,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    titleSubfix: '拼写',
     // Question Related
     ANSWER_TYPES: gConst.ANSWER_TYPES.SPELLING,
     alphabetArray: alphabetArray,
@@ -347,20 +347,20 @@ Page({
 
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titleSubfix
+        title: that.data.tableName + that.data.titleSubfix
       })
       common.getNormalQuestions(that, dataLoadTimer)
       // this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
 
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titleSubfix
+        title: that.data.tableName + that.data.titleSubfix
       })
       common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer );
 
     } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titleSubfix
+        title: that.data.tableName + that.data.titleSubfix
       })
       common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
     }
@@ -687,7 +687,7 @@ Page({
   /**
    * 关闭显示得分层
    */
-  closeChineseMeaning: function (params) {
+  closeMeanDialog: function (params) {
     let that = this
     that.setData({
       isShownMeanDialog: false,

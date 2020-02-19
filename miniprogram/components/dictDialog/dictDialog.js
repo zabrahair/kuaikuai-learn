@@ -103,17 +103,13 @@ Component({
         success: (res, res2) => {
           
           let context = res.data.replace(/(\r|\n|\t)/gi, '')
-          // let context = data.replace(/\n/gi, '')
-          // let pyRegExp = new RegExp('class="z_ts2">(拼音).+?class="dicpy">([^<]+?)</span>','gi')
-          // debugLog('request.success.context', context)
-          
-          // let pyRst = pyRegExp.exec('<p><span class="z_ts2">拼音</span> <span class="dicpy">tóng gān gòng kǔ</span>  <span class="z_d song"><span class="ptr"><a class="audio_play_button i_volume - up ptr cd_au" title="同甘共苦"></a></span></span></p>')
           let rst = regex.exec(context)
-          debugLog('request.success.rst', rst)
+          // debugLog('request.success.rst', rst)
           try{
+            let meaning = rst[1] + '></div></div></div>'
             
-            let meaning = rst[1] + '</div></div></div>'
-            meaning = meaning.replace(/\[.+?\]/gi, '')
+            meaning = meaning.replace(/\[[^<>]+?\]/gi, '')
+            meaning = meaning.replace(/<script.+?<\/script>/gi,'')
             // debugLog('meaning', meaning)
             that.setData({
               meaning: meaning
@@ -151,10 +147,8 @@ Component({
           // let context = data.replace(/\n/gi, '')
           let regex = new RegExp('(<div class="di-body">.+?)(?:<small)','gi')
           // debugLog('request.success.context', context)
-
-          // let pyRst = pyRegExp.exec('<p><span class="z_ts2">拼音</span> <span class="dicpy">tóng gān gòng kǔ</span>  <span class="z_d song"><span class="ptr"><a class="audio_play_button i_volume - up ptr cd_au" title="同甘共苦"></a></span></span></p>')
           let rst = regex.exec(context)
-          debugLog('request.success.rst', rst)
+          // debugLog('request.success.rst', rst)
           try {
 
             let meaning = rst[1] + ''

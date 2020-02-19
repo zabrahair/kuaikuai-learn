@@ -18,11 +18,16 @@ exports.main = async (event, context) => {
   let pageIdx = event.pageIdx
   console.log('event', JSON.stringify(event, null, 4))
   try {
-    let result = await db.collection(table)
-      .where(where)
-      .skip(pageIdx * rowsPerPage)
-      .limit(rowsPerPage)
-      .get()
+    let result = await db.collection('learn-history')
+      .where({
+        answerType: _.exists(false)
+      })
+      // .update({
+      //   answerType: ''
+      // })
+      // .skip(pageIdx * rowsPerPage)
+      // .limit(rowsPerPage)
+      // .get()
     console.log('Query Result:', JSON.stringify(result, null, 4))
     return result;
   } catch (e) {

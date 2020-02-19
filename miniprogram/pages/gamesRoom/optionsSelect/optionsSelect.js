@@ -25,7 +25,6 @@ const _ = db.command
 var scoreTimer = null;
 var dataLoadTimer = null;
 
-const titleSubfix = '选择题'
 
 Page({
 
@@ -33,6 +32,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    titleSubfix: '选择题',
     // Time related
     timerInterval: 1000,
     curDeciSecond: 0,
@@ -336,19 +336,19 @@ Page({
     })
     if (gameMode == gConst.GAME_MODE.NORMAL) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + titleSubfix
+        title: that.data.tableName + that.data.titleSubfix
       })
       common.getNormalQuestions(that, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.WRONG) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.WRONG + titleSubfix
+        title: that.data.tableName + gConst.GAME_MODE.WRONG + that.data.titleSubfix
       })
       common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
 
     } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
       wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + titleSubfix
+        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
       })
       common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
     }

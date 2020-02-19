@@ -87,6 +87,7 @@ function recordHistory(that, question, answer) {
   let historyRecord = {};
   historyRecord['table'] = that.data.tableValue
   historyRecord['question'] = question
+  historyRecord['answerType'] = that.data.titleSubfix
   // delete question._id
   // Object.assign(historyRecord, question)
   Object.assign(historyRecord, answer)
