@@ -24,6 +24,14 @@ Component({
       type: String,
       value: '',
     },
+    char: {
+      type: String,
+      value: null,
+    },
+    dictMode: {
+      type: String,
+      value: gConst.DICT_SEARCH_MODE.WORD,
+    },    
   },
 
   /**
@@ -33,12 +41,18 @@ Component({
     meaning: '',
   },
   observers: {
-    'isShown, word': function (isShown, word) {
+    'isShown, dictMode, word, char': function (isShown, dictMode, word, char) {
       let that = this
-      // debugLog('observers.isShown', isShown)
+      debugLog('observers.dictMode', dictMode)
       if(isShown == true){
-        // debugLog('observers.word', word)
-        that.searchMeaning(that, word);
+        if (dictMode == gConst.DICT_SEARCH_MODE.WORD){
+          debugLog('observers.word', word)
+          that.searchWordMeaning(that, word);
+        } else if (dictMode == gConst.DICT_SEARCH_MODE.CHAR && char != null && char.length > 0){
+          debugLog('observers.char', char)
+          that.searchCharMeaning(that, char);
+        }
+        
       }
     },
   },
@@ -49,9 +63,28 @@ Component({
     /**
      * 获取单词解释
      */
-    searchMeaning(that, word){
+    searchWordMeaning(that, word){
+      // let regex = new RegExp('data-type-block="词语解释"[^>]+?>(?:.+?)(<div class="content definitions".+?)(?:<div class="div copyright">)', 'gi')
+      let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(data-type-block="网友讨论")', 'gi')
+      that.searchMeaning(that, regex, word)
+    },
+
+    /**
+     * 获取字的解释
+     */
+    searchCharMeaning(that, char) {
+      let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(?:data-type-block="网友讨论")', 'gi')
+      that.searchMeaning(that, regex, char)
+    },    
+    /**
+     * 获取单词/字解释
+     */
+    searchMeaning(that, regex, content){
+      that.setData({
+        meaning: ''
+      })
       const MEANING_URI_PREFIX = 'https://www.zdic.net/hans/'
-      let uri = MEANING_URI_PREFIX + word
+      let uri = MEANING_URI_PREFIX + content
       let timeout = 10000
       wx.request({
         method: 'GET',
@@ -63,13 +96,13 @@ Component({
           // let context = data.replace(/\n/gi, '')
           // let pyRegExp = new RegExp('class="z_ts2">(拼音).+?class="dicpy">([^<]+?)</span>','gi')
           // debugLog('request.success.context', context)
-          let pyRegExp = new RegExp('data-type-block="词语解释"[^>]+?>(?:.+?)(<div class="content definitions".+?)(?:<div class="div copyright">)', 'gi')
+          
           // let pyRst = pyRegExp.exec('<p><span class="z_ts2">拼音</span> <span class="dicpy">tóng gān gòng kǔ</span>  <span class="z_d song"><span class="ptr"><a class="audio_play_button i_volume - up ptr cd_au" title="同甘共苦"></a></span></span></p>')
-          let pyRst = pyRegExp.exec(context)
-          // debugLog('request.success.pyRst', pyRst[1])
+          let rst = regex.exec(context)
+          debugLog('request.success.rst', rst)
           try{
             
-            let meaning = pyRst[1] + '</div>'
+            let meaning = rst[1] + '</div></div></div>'
             meaning = meaning.replace(/\[.+?\]/gi, '')
             // debugLog('meaning', meaning)
             that.setData({

@@ -30,7 +30,7 @@
         {{thinkSecondsStr}}
       </view> 
       <movable-view direction='all' x='285' y='20'>
-        <image class="dict" src="{{gConst.DICT_ICON}}" bindtap="tapDict"/>
+        <image class="dict" src="{{gConst.DICT_ICON}}" bindtap="openDictDialog"/>
       </movable-view>
       <movable-view direction='all' x='8' y='180'>
         <image class="play-sound" src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
@@ -41,20 +41,18 @@
       <view class='current_tags'>
         {{filterTags}}
       </view>   
-        
       <view class="alphabet_cards">
         <view class='alphabet_card {{spellCard.cardState}}'
         style="width: {{cardFontSize*1.2}}vw; height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
         wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
-        bindtap="onTapReciteCard" bindtouchmove="onLongPressAnswerCard"
-        bindlongpress="onLongPressAnswerCard">
+        bindtap="onTapReciteCard"
+        bindlongpress="openDictDialog">
         <image wx:if="{{(spellCard.cardState=='card_used')?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>  
         {{spellCard.letter}}
         </view>
       </view>
-
     </movable-area>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <view class='buttons' animation="{{fadeInOutQuestionBlock}}">
@@ -106,6 +104,8 @@
   <chinese-meaning
   isShown="{{isShownChineseMeaning}}"
   word="{{curQuestion.word}}"
+  dictMode="{{dictMode}}"
+  char="{{dictSearchChar}}"
   bindclose="closeChineseMeaning"
 />
 </scroll-view>

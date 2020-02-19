@@ -424,28 +424,6 @@ Page({
     }
   },
 
-  // /**
-  //  * Fade In Out Question
-  //  */
-  // fadeInOut: function (animationName, fadeOptions, callback) {
-  //   let that = this;
-  //   let option = {
-  //     duration: fadeOptions.duration, // 动画执行时间
-  //     timingFunction: fadeOptions.timingFunction // 动画执行效果
-  //   };
-  //   var fadeInOut = wx.createAnimation(option)
-  //   fadeInOut.rotateY(fadeOptions.rotateY);
-  //   // moveOne.translateX('100vw');
-  //   fadeInOut.opacity(fadeOptions.opacity).step();
-  //   that.setData({
-  //     [animationName]: fadeInOut.export(),// 开始执行动画
-  //   }, function () {
-  //     if (callback) {
-  //       callback()
-  //     };
-  //   })
-  // },
-
   /**
    * 
    */
@@ -544,11 +522,23 @@ Page({
   /**
    * 点击词典图标
    */
-  tapDict: function (e) {
+  openDictDialog: function (e) {
     let that = this
+    let dictMode = gConst.DICT_SEARCH_MODE.WORD
+    let dictSearchChar = null
+    try{
+      let dataset = utils.getDataset(e)
+      debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
+      if(dataset.spellCard.letter.length > 0){
+        dictMode = gConst.DICT_SEARCH_MODE.CHAR
+        dictSearchChar = dataset.spellCard.letter
+      }
+    }catch(e){}
     if (that.data.tableValue.includes('chinese')) {
       that.setData({
-        isShownChineseMeaning: true
+        isShownChineseMeaning: true,
+        dictMode: dictMode,
+        dictSearchChar: dictSearchChar,
       })
     } else {
       wx.showToast({
@@ -563,7 +553,9 @@ Page({
   closeChineseMeaning: function (params) {
     let that = this
     that.setData({
-      isShownChineseMeaning: false
+      isShownChineseMeaning: false,
+      dictMode: gConst.DICT_SEARCH_MODE.WORD,
+      dictSearchChar: null,
     })
   }
 })

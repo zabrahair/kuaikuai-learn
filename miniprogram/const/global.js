@@ -143,4 +143,8 @@ module.exports = {
     SYSTEM_CONFIG: 'SYSTEM_CONFIG',
     COMBO_TYPE: 'COMBO_TYPE',
   },
+  DICT_SEARCH_MODE: {
+    WORD: 'WORD',
+    CHAR: 'CHAR',
+  }
 }

@@ -577,16 +577,28 @@ Page({
   /**
    * 点击词典图标
    */
-  tapDict: function (e) {
+  openDictDialog: function (e) {
     let that = this
+    let dictMode = gConst.DICT_SEARCH_MODE.WORD
+    let dictSearchChar = null
+    try {
+      let dataset = utils.getDataset(e)
+      debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
+      if (dataset.spellCard.letter.length > 0) {
+        dictMode = gConst.DICT_SEARCH_MODE.CHAR
+        dictSearchChar = dataset.spellCard.letter
+      }
+    } catch (e) { }
     if (that.data.tableValue.includes('chinese')) {
       that.setData({
-        isShownChineseMeaning: true
+        isShownChineseMeaning: true,
+        dictMode: dictMode,
+        dictSearchChar: dictSearchChar,
       })
-    }else{
+    } else {
       wx.showToast({
         title: MSG.FEATURE_IS_DISABLE,
-      })     
+      })
     }
   },
 
@@ -596,7 +608,9 @@ Page({
   closeChineseMeaning: function (params) {
     let that = this
     that.setData({
-      isShownChineseMeaning: false
+      isShownChineseMeaning: false,
+      dictMode: gConst.DICT_SEARCH_MODE.WORD,
+      dictSearchChar: null,
     })
   }
 })

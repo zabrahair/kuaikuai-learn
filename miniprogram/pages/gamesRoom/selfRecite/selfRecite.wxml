@@ -30,7 +30,7 @@
         {{thinkSecondsStr}}
       </view> 
       <movable-view direction='all' x='285' y='20'>
-        <image class="dict" src="{{gConst.DICT_ICON}}" bindtap="tapDict"/>
+        <image class="dict" src="{{gConst.DICT_ICON}}" bindtap="openDictDialog"/>
       </movable-view>
       <movable-view class="play-sound" direction='all' x='130' y='25'>
         <image src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
@@ -52,6 +52,7 @@
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
         bindtap="onTapReciteCard" 
+        bindlongpress="openDictDialog"
         >
         <image wx:if="{{(spellCard.cardState=='card_used')?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>
         {{spellCard.letter}}
@@ -114,6 +115,8 @@
   <chinese-meaning
   isShown="{{isShownChineseMeaning}}"
   word="{{curQuestion.word}}"
+  dictMode="{{dictMode}}"
+  char="{{dictSearchChar}}"
   bindclose="closeChineseMeaning"
-  />
+/>
 </scroll-view>
