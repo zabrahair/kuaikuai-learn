@@ -19,12 +19,22 @@
     </view>
   </view>
   <scroll-view class='content' scroll-y='true'>
+    <view wx:if="{{userInfo.userRole == '家长'}}" class='feature' bindtap="tapProfileFeature" data-feature-name='myChildren'>
+    我的孩子
+    </view>
     <view class='feature' bindtap="tapProfileFeature" data-feature-name='history'>
     我的历史
     </view>
     <view class='feature' bindtap="tapProfileFeature" data-feature-name='myQcode'>
-    我的二维码
+    我的小程序码
     </view>    
+    <!-- <view class='feature' bindtap="tapProfileFeature" data-feature-name='scanQcode'>
+    扫描小程序码
+    </view>  -->
+
+    <view class='feature' bindtap="tapProfileFeature" data-feature-name='myStatistic'>
+    我的统计
+    </view>
     <view class='buttons'>
       <button wx:if="{{isSignIn}}" class="" type='warn' bindtap='toSignOut'>
         登出
@@ -33,5 +43,11 @@
   </scroll-view>
   <my-qcode
     isShown="{{isShownMyQcode}}"
+  />
+  <scan-qcode
+    isShown="{{isShownScanQcode}}"
+  />
+  <statistic-dialog
+    isShown="{{isShownStatisticDialog}}"
   />
 </view>

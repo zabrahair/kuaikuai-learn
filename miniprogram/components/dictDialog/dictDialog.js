@@ -20,6 +20,10 @@ Component({
       type: Boolean,
       value: false,
     },
+    table: {
+      type: String,
+      value: '',
+    },
     word: {
       type: String,
       value: '',
@@ -41,13 +45,19 @@ Component({
     meaning: '',
   },
   observers: {
-    'isShown, dictMode, word, char': function (isShown, dictMode, word, char) {
+    'isShown, table, dictMode, word, char': function (isShown, table, dictMode, word, char) {
       let that = this
       debugLog('observers.dictMode', dictMode)
+      debugLog('observers.dictMode', table)
       if(isShown == true){
         if (dictMode == gConst.DICT_SEARCH_MODE.WORD){
           debugLog('observers.word', word)
-          that.searchWordMeaning(that, word);
+          if(table.includes('chinese')){
+            that.searchCnWordMeaning(that, word);
+          } else if (table.includes('english')){
+            that.searchEnMeaning(that, word);
+          }
+          
         } else if (dictMode == gConst.DICT_SEARCH_MODE.CHAR && char != null && char.length > 0){
           debugLog('observers.char', char)
           that.searchCharMeaning(that, char);
@@ -63,10 +73,10 @@ Component({
     /**
      * 获取单词解释
      */
-    searchWordMeaning(that, word){
+    searchCnWordMeaning(that, word){
       // let regex = new RegExp('data-type-block="词语解释"[^>]+?>(?:.+?)(<div class="content definitions".+?)(?:<div class="div copyright">)', 'gi')
       let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(data-type-block="网友讨论")', 'gi')
-      that.searchMeaning(that, regex, word)
+      that.searchCnMeaning(that, regex, word)
     },
 
     /**
@@ -74,12 +84,12 @@ Component({
      */
     searchCharMeaning(that, char) {
       let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(?:data-type-block="网友讨论")', 'gi')
-      that.searchMeaning(that, regex, char)
+      that.searchCnMeaning(that, regex, char)
     },    
     /**
-     * 获取单词/字解释
+     * 获取中文单词/字解释
      */
-    searchMeaning(that, regex, content){
+    searchCnMeaning(that, regex, content){
       that.setData({
         meaning: ''
       })
@@ -109,6 +119,51 @@ Component({
               meaning: meaning
             })
           }catch(e){}
+
+        },
+        fail: (res, res2) => {
+          debugLog('request.fail.res', res)
+        },
+        complete: (res) => {
+          // debugLog('request.complete.res', res)
+        }
+      })
+    },
+
+    /**
+    * 获取英语单词/字解释
+    */
+    searchEnMeaning(that, content) {
+      that.setData({
+        meaning: ''
+      })
+      const MEANING_URI_PREFIX = 'https://dictionary.cambridge.org/zhs/词典/英语-汉语-简体/'
+      let uri = MEANING_URI_PREFIX + content
+      debugLog('searchEnMeaning.uri', uri)
+      let timeout = 10000
+      wx.request({
+        method: 'GET',
+        timeout: 10000,
+        url: uri,
+        success: (res, res2) => {
+
+          let context = res.data.replace(/(\r|\n|\t)/gi, '')
+          // let context = data.replace(/\n/gi, '')
+          let regex = new RegExp('(<div class="di-body">.+?)(?:<small)','gi')
+          // debugLog('request.success.context', context)
+
+          // let pyRst = pyRegExp.exec('<p><span class="z_ts2">拼音</span> <span class="dicpy">tóng gān gòng kǔ</span>  <span class="z_d song"><span class="ptr"><a class="audio_play_button i_volume - up ptr cd_au" title="同甘共苦"></a></span></span></p>')
+          let rst = regex.exec(context)
+          debugLog('request.success.rst', rst)
+          try {
+
+            let meaning = rst[1] + ''
+            meaning = meaning.replace(/\[.+?\]/gi, '')
+            // debugLog('meaning', meaning)
+            that.setData({
+              meaning: meaning
+            })
+          } catch (e) { }
 
         },
         fail: (res, res2) => {

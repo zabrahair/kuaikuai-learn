@@ -117,6 +117,9 @@ Page({
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
     filterTags: '',
+
+    // Meaning Dialog
+    isShownMeanDialog: false,
   },
 
   /**
@@ -645,5 +648,51 @@ Page({
       }
     }
     return false
+  },
+
+  /**
+ * 点击词典图标
+ */
+  openDictDialog: function (e) {
+    let that = this
+    let dictMode = gConst.DICT_SEARCH_MODE.WORD
+    let dictSearchChar = null
+    try {
+      let dataset = utils.getDataset(e)
+      debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
+      if (dataset.spellCard.letter.length > 0) {
+        dictMode = gConst.DICT_SEARCH_MODE.CHAR
+        dictSearchChar = dataset.spellCard.letter
+      }
+    } catch (e) { }
+    if (that.data.tableValue.includes('chinese')) {
+      that.setData({
+        isShownMeanDialog: true,
+        dictMode: dictMode,
+        dictSearchChar: dictSearchChar,
+      })
+    } else if (that.data.tableValue.includes('english')){
+      that.setData({
+        isShownMeanDialog: true,
+        dictMode: dictMode,
+        dictSearchChar: dictSearchChar,
+      })
+    }else{
+      wx.showToast({
+        title: MSG.FEATURE_IS_DISABLE,
+      })
+    }
+  },
+
+  /**
+   * 关闭显示得分层
+   */
+  closeChineseMeaning: function (params) {
+    let that = this
+    that.setData({
+      isShownMeanDialog: false,
+      dictMode: gConst.DICT_SEARCH_MODE.WORD,
+      dictSearchChar: null,
+    })
   }
 })

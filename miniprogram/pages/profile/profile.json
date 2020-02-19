@@ -1,6 +1,8 @@
 {
   "usingComponents": {
-    "my-qcode": "../../components/myQcodeDialog/myQcodeDialog"
+    "my-qcode": "../../components/myQcodeDialog/myQcodeDialog",
+    "scan-qcode": "../../components/scanQcode/scanQcode",
+    "statistic-dialog": "../../components/statisticDialog/statisticDialog"
   },
   "navigationBarTitleText": "我的资料"
 }

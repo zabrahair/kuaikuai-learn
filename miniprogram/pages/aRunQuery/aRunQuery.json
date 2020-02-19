@@ -1,6 +1,7 @@
 {
   "usingComponents": {
     "dict-dialog": "../../components/dictDialog/dictDialog",
-    "my-qcode": "../../components/myQcodeDialog/myQcodeDialog"
+    "my-qcode": "../../components/myQcodeDialog/myQcodeDialog",
+    "statistic-dialog": "../../components/statisticDialog/statisticDialog"
   }
 }

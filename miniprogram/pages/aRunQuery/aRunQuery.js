@@ -30,7 +30,10 @@ Page({
     word: '商量',
 
     // myQcodeDialog
-    isShownMyQcode: true
+    isShownMyQcode: false,
+
+    // statisticDialog
+    isShownStatisticDialog: true,
   },
 
   /**

@@ -28,7 +28,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.login();
+    let that = this
+    debugLog('profile.options', options)
+    that.login();
   },
 
   /**
@@ -272,6 +274,14 @@ Page({
     } else if (featureName == 'myQcode') {
       that.setData({
         isShownMyQcode: true
+      })
+    } else if (featureName == 'scanQcode') {
+      that.setData({
+        isShownScanQcode: true
+      })
+    } else if (featureName == 'myStatistic') {
+      that.setData({
+        isShownStatisticDialog: true
       })
     }
   }

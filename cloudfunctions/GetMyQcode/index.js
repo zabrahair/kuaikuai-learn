@@ -15,7 +15,7 @@ exports.main = async (event, context) => {
     let userRole = event.userRole
 
     if(openid && userRole){
-      let path = 'page/index/index?openid=' + openid + '&userRole=' + userRole
+      let path = 'pages/profile/profile?openid=' + openid + '&userRole=' + userRole
       const result = await cloud.openapi.wxacode.get({
         path: path,
         width: 430

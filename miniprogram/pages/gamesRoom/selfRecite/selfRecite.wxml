@@ -113,7 +113,8 @@
     hitsCount="{{hitsCount}}"
    />
   <dict-dialog
-  isShown="{{isShownChineseMeaning}}"
+  isShown="{{isShownMeanDialog}}"
+  table="{{tableValue}}"
   word="{{curQuestion.word}}"
   dictMode="{{dictMode}}"
   char="{{dictSearchChar}}"

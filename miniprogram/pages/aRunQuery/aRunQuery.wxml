@@ -1,5 +1,6 @@
 <scroll-view class="container" scroll-Y='true'>
 <text>处理数据库</text>
+<slider class="days" bindchange="onDateRangeChange" min='1' max='100' step="-1" show-value/>
 <form class="query_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
   <text>方法名</text>
   <input class="" name='funcitonName' value="{{funcName}}"></input>
@@ -23,5 +24,8 @@
 />
 <my-qcode
   isShown="{{isShownMyQcode}}"
+/>
+<statistic-dialog
+  isShown="{{isShownStatisticDialog}}"
 />
 </scroll-view>

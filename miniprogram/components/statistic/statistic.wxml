@@ -1,0 +1,19 @@
+<view class='component-container'>
+  <view class="date-range">
+    <text class="title">从</text>
+      <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{lastDate}}" bindchange="bindLastDateChange">
+        <view class="picker">
+          {{lastDate}}
+        </view>
+      </picker>
+  </view>
+  <view class='component-content' >
+    <view class="stat-card"
+        wx:for-items='{{statistics}}' wx:for-item='stat' 
+        wx:for-index='idx' wx:key="name" >
+      <view class='title'>{{stat._id}}</view>
+      <view class='correct'>正确:{{stat.correct}}</view>
+      <view class='incorrect'>错误:{{stat.incorrect}}</view>
+    </view>
+  </view>
+</view>

@@ -114,8 +114,8 @@ Page({
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
 
-    // Chinese Meaning
-    isShownChineseMeaning: false,
+    // Meaning Dialog
+    isShownMeanDialog: false,
   },
 
   /**
@@ -536,7 +536,7 @@ Page({
     }catch(e){}
     if (that.data.tableValue.includes('chinese')) {
       that.setData({
-        isShownChineseMeaning: true,
+        isShownMeanDialog: true,
         dictMode: dictMode,
         dictSearchChar: dictSearchChar,
       })
@@ -553,7 +553,7 @@ Page({
   closeChineseMeaning: function (params) {
     let that = this
     that.setData({
-      isShownChineseMeaning: false,
+      isShownMeanDialog: false,
       dictMode: gConst.DICT_SEARCH_MODE.WORD,
       dictSearchChar: null,
     })

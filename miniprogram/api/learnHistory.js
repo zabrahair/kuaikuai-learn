@@ -217,7 +217,78 @@ function questCorrectStat(tableName, pWhere, pageIdx, callback){
     .catch(err => console.error(err)) 
 }
 
+/**
+ * 按题型统计
+ */
+function answerTypeStatsitic(pWhere, pageIdx, callback){
+  debugLog('answerTypeStatsitic.where', pWhere)
+  let answerTypes=[];
+  let perPageCount = 20
+  try{
+    let answerTypesObj = wx.getStorageSync(gConst.CONFIG_TAGS.ANSWER_TYPE)
+    debugLog('answerTypeStatsitic.answerTypesObj', answerTypesObj)
+    for (let i in answerTypesObj){
+      answerTypes.push(answerTypesObj[i].name)
+    }
+    debugLog('answerTypeStatsitic.answerTypes', answerTypes)
+  }catch(e){}
+  let where = {
+    question: {
+      tags: _.or(answerTypes)
+    }
+  }
+  Object.assign(where, pWhere)
+  if (typeof pageIdx != 'number') {
+    pageIdx = 0
+  }
+  debugLog('questCorrectStat.where', where)
+  db.collection(TABLE)
+    .aggregate()
+    .unwind('$question.tags')
+    .match(where)
+    .group({
+      _id: {
+        tags: '$question.tags',
+        isCorrect: '$isCorrect'
+      },
+      isCorrect: $.first('$isCorrect'),
+      count: $.sum(1),
+    })
+    .project({
+      _id: 1,
+      isCorrect: 1,
+      correct: $.cond({ if: '$isCorrect', then: '$count', else: 0, }),
+      incorrect: $.cond({ if: '$isCorrect', then: 0, else: '$count', }),
+    })
+    .group({
+      _id: '$_id.tags',
+      correct: $.sum('$correct'),
+      incorrect: $.sum('$incorrect'),
+    })
+    .project({
+      _id: 1,
+      correct: 1,
+      incorrect: 1,
+    })
+    .skip(pageIdx * perPageCount)
+    .end()
+    .then
+    ((res, e) => {
+      // debugLog('questCorrectStat.res', e)
+      // debugLog('questCorrectStat.res', res.list)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        callback(res.list, pageIdx)
+        return
+      } else {
+        callback([], pageIdx)
+      }
+    })
+    .catch(err => console.error(err)) 
+}
+
 module.exports = {
+  answerTypeStatsitic: answerTypeStatsitic,
   dailyStatistic: dailyStatistic,
   tagsStatistic: tagsStatistic,
   getHistoryQuestions: getHistoryQuestions,

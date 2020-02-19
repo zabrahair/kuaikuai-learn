@@ -1,9 +1,9 @@
 {
-  "usingComponents": {},
   "navigationBarTitleText": "英语单词拼写练习",
   "enablePullDownRefresh": false,
   "usingComponents": {
     "point-layer": "../../../components/getPoint/getPoint",
-    "score-title": "../../../components/scoreTitle/scoreTitle"
+    "score-title": "../../../components/scoreTitle/scoreTitle",
+    "dict-dialog": "../../components/dictDialog/dictDialog"
   }
 }
