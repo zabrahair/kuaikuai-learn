@@ -10,6 +10,11 @@ const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
+const common = require('../../pages/gamesRoom/common/common.js')
+//db
+const db = wx.cloud.database()
+const $ = db.command.aggregate
+const _ = db.command
 
 Component({
   /**
@@ -43,23 +48,38 @@ Component({
    */
   data: {
     meaning: '',
+    gConst: gConst,
   },
   observers: {
     'isShown, table, dictMode, word, char': function (isShown, table, dictMode, word, char) {
       let that = this
-      debugLog('observers.dictMode', dictMode)
-      debugLog('observers.dictMode', table)
+      // debugLog('observers.dictMode', dictMode)
+      // debugLog('observers.dictMode', table)
       if(isShown == true){
+        wx.showLoading({
+          title: MSG.ON_LOADING,
+        })
+        setTimeout(res=>{
+          wx.hideLoading()
+        }, 10000)
         if (dictMode == gConst.DICT_SEARCH_MODE.WORD){
-          debugLog('observers.word', word)
-          if(table.includes('chinese')){
-            that.searchCnWordMeaning(that, word);
-          } else if (table.includes('english')){
-            that.searchEnMeaning(that, word);
-          }
+          // debugLog('observers.word', word)
+          that.getWordMeaning(that, table, word, res=>{
+            debugLog('getWordMeaning.res', res)
+            if(!res){
+              debugLog('getWordMeaning.search.from.web', )
+              if (table.includes('chinese')) {
+                that.searchCnWordMeaning(that, word);
+              } else if (table.includes('english')) {
+                that.searchEnMeaning(that, word);
+              }
+            }
+
+          })
+
           
         } else if (dictMode == gConst.DICT_SEARCH_MODE.CHAR && char != null && char.length > 0){
-          debugLog('observers.char', char)
+          // debugLog('observers.char', char)
           that.searchCharMeaning(that, char);
         }
         
@@ -75,7 +95,7 @@ Component({
      */
     searchCnWordMeaning(that, word){
       // let regex = new RegExp('data-type-block="词语解释"[^>]+?>(?:.+?)(<div class="content definitions".+?)(?:<div class="div copyright">)', 'gi')
-      let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(data-type-block="网友讨论")', 'gi')
+      let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(?:<div class="zdict">[^<]+?<div class="dictentry">[^<]+?<div class="nr-box nr-box-shiyi wytl" data-type-block="网友讨论")', 'gi')
       that.searchCnMeaning(that, regex, word)
     },
 
@@ -83,7 +103,7 @@ Component({
      * 获取字的解释
      */
     searchCharMeaning(that, char) {
-      let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(?:data-type-block="网友讨论")', 'gi')
+      let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(?:<div class="zdict">[^<]+?<div class="dictentry">[^<]+?<div class="nr-box nr-box-shiyi wytl" data-type-block="网友讨论")', 'gi')
       that.searchCnMeaning(that, regex, char)
     },    
     /**
@@ -106,13 +126,25 @@ Component({
           let rst = regex.exec(context)
           // debugLog('request.success.rst', rst)
           try{
-            let meaning = rst[1] + '></div></div></div>'
+            let meaning = rst[1]
             
-            meaning = meaning.replace(/\[[^<>]+?\]/gi, '')
-            meaning = meaning.replace(/<script.+?<\/script>/gi,'')
+            try{
+              meaning = meaning.replace(/\[[^<>]+?\]/gi, '')
+              meaning = meaning.replace(/<script.+?<\/script>/gi, '')
+              meaning = meaning.replace(/<div class="div copyright"> © 汉典 <\/div>/gi, '')
+              meaning = meaning.replace(/<ins.+?<\/ins>/gi, '<br/>')
+              meaning = meaning.replace(/<a[^>]+?>/gi, '')
+              meaning = meaning.replace(/<\/a>/gi, '')
+            }catch(e){}
+
             // debugLog('meaning', meaning)
             that.setData({
               meaning: meaning
+            }, res => {
+              if(that.data.dictMode == gConst.DICT_SEARCH_MODE.WORD){
+                that.updateWordMeaning(that, that.data.table, that.data.word, that.data.meaning)
+              }
+              wx.hideLoading()
             })
           }catch(e){}
 
@@ -152,10 +184,19 @@ Component({
           try {
 
             let meaning = rst[1] + ''
-            meaning = meaning.replace(/\[.+?\]/gi, '')
+            meaning = meaning.replace(/<source.+?\/>/gi, '')
+            meaning = meaning.replace(/<amp-audio.+?>.+?<\/amp-audio>/gi, '')
+            meaning = meaning.replace(/<script.+?<\/script>/gi, '')
+            meaning = meaning.replace(/<a.+?<\/a>/gi, '')
+            // meaning = meaning.replace(/<\/a>/gi, '')
             // debugLog('meaning', meaning)
             that.setData({
               meaning: meaning
+            }, res=>{
+              if (that.data.dictMode == gConst.DICT_SEARCH_MODE.WORD) {
+                that.updateWordMeaning(that, that.data.table, that.data.word, that.data.meaning)
+              }
+              wx.hideLoading()
             })
           } catch (e) { }
 
@@ -177,6 +218,86 @@ Component({
         isShown: false
       }, res => {
         that.triggerEvent('close')
+      })
+    },
+    /** 
+     * 朗读当前卡片
+     */
+    playCardText: function (e) {
+      let that = this
+      // let meaning = that.data.meaning
+      // meaning = meaning.replace(/<[^>]+?>/gi,'')
+      // meaning = meaning.replace(/\s/gi, '')
+      // meaning = meaning.replace(/&[^;]+?;/gi, '')
+      // meaning = meaning.replace(/[a-z]/gi, '')
+      
+      // debugLog('playCardText.meaning', meaning)
+      common.readCurrentWord(that, that.data.dictMode == gConst.DICT_SEARCH_MODE.WORD ? that.data.word : that.data.char)
+    },
+    /**
+     * 更新单词的解释
+     */
+    updateWordMeaning: function(that, table, word, meaning){
+      debugLog('updateWordMeaning.run...')
+      wx.cloud.callFunction({
+        name: 'Update',
+        data: {
+          table: table,
+          where: {
+            word: word
+          },
+          update: {
+            htmlMeaning: meaning
+          }
+        },
+        success: res=>{
+          // debugLog('updateWordMeaning.res', res)
+        },
+        fail: err=>{
+          errorLog('updateWordMeaning.err', err)
+        }
+      })
+    },
+    /**
+     * 获取单词解释
+     */
+    getWordMeaning: function(that, table, word, callback){
+      debugLog('getWordMeaning.run...')
+      wx.cloud.callFunction({
+        name: 'Query',
+        data: {
+          table: table,
+          where: {
+            word: word,
+          },
+          limit: 1,
+          pageIdx: 0,
+          field: {
+            word: true,
+            htmlMeaning: true,
+          }
+        },
+        success: res => {
+          wx.hideLoading()
+          debugLog('getWordMeaning.res', res)
+          try{
+            let list = res.result.data
+            if (list && list.length > 0 && list[0].htmlMeaning.length > 0) {
+              callback(list[0])
+            } else {
+              callback(null)
+            }
+            that.setData({
+              meaning: list[0].htmlMeaning
+            })
+          }catch(err){
+            callback(null)
+          }
+
+        },
+        fail: err => {
+          errorLog('getWordMeaning.err', err)
+        }
       })
     }
   }

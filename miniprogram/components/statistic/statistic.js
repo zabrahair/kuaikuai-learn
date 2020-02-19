@@ -88,6 +88,18 @@ Component({
           statistics: res
         })
       })
+    },
+    /**
+     * 当选择日期时候
+     */
+    bindLastDateChange: function(e){
+      let that = this
+      let lastDate = utils.getEventDetailValue(e)
+      that.setData({
+        lastDate: lastDate
+      }, res=>{
+        that.refreshStatistic(that)
+      })
     }
   }
 })

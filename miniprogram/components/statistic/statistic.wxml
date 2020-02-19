@@ -1,9 +1,9 @@
 <view class='component-container'>
   <view class="date-range">
-    <text class="title">从</text>
+    <!-- <text class="title"></text> -->
       <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{lastDate}}" bindchange="bindLastDateChange">
         <view class="picker">
-          {{lastDate}}
+          从{{lastDate}}起
         </view>
       </picker>
   </view>

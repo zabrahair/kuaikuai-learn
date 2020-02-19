@@ -596,6 +596,12 @@ Page({
         dictMode: dictMode,
         dictSearchChar: dictSearchChar,
       })
+    } else if (that.data.tableValue.includes('english')) {
+      that.setData({
+        isShownMeanDialog: true,
+        dictMode: dictMode,
+        dictSearchChar: dictSearchChar,
+      })
     } else {
       wx.showToast({
         title: MSG.FEATURE_IS_DISABLE,

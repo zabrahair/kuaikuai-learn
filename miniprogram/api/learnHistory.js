@@ -96,7 +96,7 @@ function tagsStatistic(userInfo, whereFilter, pageIdx, callback){
 function getHistoryQuestions(userInfo, whereFilter, pageIdx, callback){
   dbApi.groupAggregate(TABLES.LEARN_HISTORY
     , whereFilter
-    , '$openid'
+    , '$_id'
     , {
       _id: '$question._id', 
       question: $.first('$question'),
@@ -117,11 +117,11 @@ function getTags(tableName, pWhere, pageIdx, callback) {
   let where = {
     table: tableName,
   }
-  // Object.assign(where, {question: pWhere})
+  Object.assign(where, pWhere)
   debugLog('where', where)
   db.collection(TABLE)
     .aggregate()
-    // .match(where)
+    .match(where)
     .unwind('$question.tags')
     .group({
       _id: '$question.tags',

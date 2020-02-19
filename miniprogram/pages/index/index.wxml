@@ -20,7 +20,7 @@
     </view>
   </view>
   <scroll-view class='content' scroll-y='true'>
-    <view class='game_item' bindtap="onClickMathDivide">
+    <!-- <view class='game_item' bindtap="onClickMathDivide">
       <text>九九除法练习</text>
       <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
     </view>
@@ -43,6 +43,7 @@
     <view class='game_item' bindtap="onClickChineseKnowledge">
       <text>语文知识学习</text>
       <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-    </view>
+    </view> -->
+    <statistic/>
   </scroll-view>
 </view>

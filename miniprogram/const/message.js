@@ -9,4 +9,5 @@ module.exports = {
   CONFIRM_RESET_MSG: '真的要重来吗？',
   CONFIRM_FINISHED_MSG: '恭喜你，完成了！要重来一遍么？',
   FEATURE_IS_DISABLE: '该功能暂时无法使用',
+  ON_LOADING: '努力加载中',
 }

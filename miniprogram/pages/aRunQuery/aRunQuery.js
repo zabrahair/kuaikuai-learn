@@ -8,7 +8,9 @@ const gConst = require('../../const/global.js');
 const storeKeys = require('../../const/global.js').storageKeys;
 const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
-
+const db = wx.cloud.database()
+const $ = db.command.aggregate
+const _ = db.command
 Page({
 
   /**
@@ -25,7 +27,7 @@ Page({
     }, null, 4),
     result: '',
     // Chinese Meaning
-    isShownChineseMeaning: true,
+    isShownChineseMeaning: false,
     word: '同舟共济',
     // word: '商量',
 
@@ -102,12 +104,12 @@ Page({
     debugLog('submitAnswer.update', update)
     wx.cloud.callFunction({
       // name: form.functionName,
-      name: 'Query',
+      name: 'Update',
       data: {
-        // table: form.tableName,
-        // where: where,
-        // update: update,
-        // pageIdx: 0
+        table: 'aaaa',
+        where: {a:1},
+        update: { a: 1 },
+        pageIdx: 0
       },
       success: res => {
         debugLog(form.functionName+'.res', res)
@@ -116,6 +118,32 @@ Page({
         console.error('[云函数] ['+form.functionName+'] 调用失败', err)
       }
     })
+    // db.collection("learn-history").where({
+    //   question:{
+    //     tags: _.in(["3 Hits"])
+    //   }
+    // }).get().then(res=>{
+    //   debugLog('res', res);
+    // })
+    // //   {
+    // //   // data: {
+    // //   //   question: {
+    // //   //     tags:  _.pull("")
+    // //   //   }
+    // //   // },
+    // //   success: res => {
+    // //     let result = res;
+    // //     debugLog('[数据库' + table + '][更新记录]成功', result);
+ 
+    // //   },
+    // //   fail: err => {
+    // //     wx.showToast({
+    // //       icon: 'none',
+    // //       title: '更新记录失败'
+    // //     })
+    // //     errorLog('[数据库' + table + '][更新记录]失败', err)
+    // //   }
+    // // })
   },
   resetAnswer: function(e){
     

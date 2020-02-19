@@ -18,9 +18,9 @@
 </form>
 <dict-dialog
   isShown="{{isShownChineseMeaning}}"
-  table="chinese-words"
-  word="同舟共济"
-  dictMode="CHAR"
+  table="english-word"
+  word="english"
+  dictMode="WORD"
   char="尼"
 />
 <my-qcode

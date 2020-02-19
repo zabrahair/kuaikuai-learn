@@ -1014,7 +1014,7 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
     tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
   }
   if (tagsConds) {
-    where['tags'] = tagsConds
+    where['question.tags'] = tagsConds
   }
 
   dataLoadTimer = setInterval(function () {
@@ -1200,7 +1200,12 @@ const audioCtx = wx.createInnerAudioContext()
 function readCurrentWord(that, word) {
   let lang = '';
   try {
-    lang = TABLES.MAP[that.data.tableValue].lang
+    if (that.data.tableValue){
+      lang = TABLES.MAP[that.data.tableValue].lang
+    } else if (that.data.table){
+      lang = TABLES.MAP[that.data.table].lang
+    }
+    
   } catch (e) { }
   // debugLog("lang", lang)
   plugin.textToSpeech({

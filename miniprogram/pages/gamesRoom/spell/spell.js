@@ -651,8 +651,8 @@ Page({
   },
 
   /**
- * 点击词典图标
- */
+   * 点击词典图标
+   */
   openDictDialog: function (e) {
     let that = this
     let dictMode = gConst.DICT_SEARCH_MODE.WORD

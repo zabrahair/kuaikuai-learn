@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
-  "navigationBarTitleText": "游戏目录"
+  "usingComponents": {
+    "statistic": "../../components/statistic/statistic"
+  },
+  "navigationBarTitleText": "欢迎页"
 }

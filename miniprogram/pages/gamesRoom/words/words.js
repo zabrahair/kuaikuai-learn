@@ -519,21 +519,27 @@ Page({
   },
 
   /**
-   * 点击词典图标
-   */
+  * 点击词典图标
+  */
   openDictDialog: function (e) {
     let that = this
     let dictMode = gConst.DICT_SEARCH_MODE.WORD
     let dictSearchChar = null
-    try{
+    try {
       let dataset = utils.getDataset(e)
       debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
-      if(dataset.spellCard.letter.length > 0){
+      if (dataset.spellCard.letter.length > 0) {
         dictMode = gConst.DICT_SEARCH_MODE.CHAR
         dictSearchChar = dataset.spellCard.letter
       }
-    }catch(e){}
+    } catch (e) { }
     if (that.data.tableValue.includes('chinese')) {
+      that.setData({
+        isShownMeanDialog: true,
+        dictMode: dictMode,
+        dictSearchChar: dictSearchChar,
+      })
+    } else if (that.data.tableValue.includes('english')) {
       that.setData({
         isShownMeanDialog: true,
         dictMode: dictMode,
