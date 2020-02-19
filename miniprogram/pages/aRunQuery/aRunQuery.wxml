@@ -15,4 +15,9 @@
     {{result}}
   </scroll-view>
 </form>
+<chinese-meaning
+  isShown="{{isShownChineseMeaning}}"
+  word="{{word}}"
+  bindclose="closeChineseMeaning"
+/>
 </scroll-view>

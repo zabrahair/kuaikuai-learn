@@ -29,6 +29,9 @@
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
+      <movable-view direction='all' x='285' y='20'>
+        <image class="dict" src="{{gConst.DICT_ICON}}" bindtap="tapDict"/>
+      </movable-view>
       <movable-view direction='all' x='8' y='180'>
         <image class="play-sound" src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
       </movable-view>
@@ -100,4 +103,9 @@
   hitsAccuScore="{{hitsAccuScore}}"
   hitsCount="{{hitsCount}}"
   />
+  <chinese-meaning
+  isShown="{{isShownChineseMeaning}}"
+  word="{{curQuestion.word}}"
+  bindclose="closeChineseMeaning"
+/>
 </scroll-view>

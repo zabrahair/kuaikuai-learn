@@ -13,6 +13,8 @@
     "pages/gamesRoom/optionsSelect/optionsSelect",
     "pages/gamesRoom/selfRecite/selfRecite",
     "components/scoreTitle/scoreTitle",
+    "components/ChineseMeaning/ChineseMeaning",
+    "components/getPoint/getPoint",
     "pages/aRunQuery/aRunQuery"
   ],
   "window": {

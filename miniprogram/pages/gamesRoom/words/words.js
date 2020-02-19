@@ -113,6 +113,9 @@ Page({
     tags: [],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
+
+    // Chinese Meaning
+    isShownChineseMeaning: false,
   },
 
   /**
@@ -159,7 +162,6 @@ Page({
    */
   onShow: function () {
     let that = this
-   
   },
 
   whenPageOnShow: function(that){
@@ -539,4 +541,29 @@ Page({
 
   },
 
+  /**
+   * 点击词典图标
+   */
+  tapDict: function (e) {
+    let that = this
+    if (that.data.tableValue.includes('chinese')) {
+      that.setData({
+        isShownChineseMeaning: true
+      })
+    } else {
+      wx.showToast({
+        title: MSG.FEATURE_IS_DISABLE,
+      })
+    }
+  },
+
+  /**
+   * 关闭显示得分层
+   */
+  closeChineseMeaning: function (params) {
+    let that = this
+    that.setData({
+      isShownChineseMeaning: false
+    })
+  }
 })

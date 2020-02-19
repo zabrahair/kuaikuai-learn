@@ -1,0 +1,6 @@
+<view wx:if="{{isShown}}" class='component-container'>
+  <scroll-view class='component-content' scroll-y="true" scroll-x="true">
+    <rich-text class='scroll-content' nodes="{{meaning}}" bindtap="tap"/>
+  </scroll-view>
+  <image src='../../images/close.png' class='close_button' bindtap="onClose"/>  
+</view>

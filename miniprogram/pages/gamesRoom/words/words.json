@@ -1,9 +1,9 @@
 {
-  "usingComponents": {},
   "navigationBarTitleText": "中文词语",
   "enablePullDownRefresh": false,
   "usingComponents": {
     "point-layer": "../../../components/getPoint/getPoint",
-    "score-title": "../../../components/scoreTitle/scoreTitle"
+    "score-title": "../../../components/scoreTitle/scoreTitle",
+    "chinese-meaning": "../../components/ChineseMeaning/ChineseMeaning"
   }
 }

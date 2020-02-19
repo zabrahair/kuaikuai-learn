@@ -90,6 +90,14 @@
 
 }
 
+.dict {
+  position: absolute;
+  align-self: flex-start;
+
+  width: 10vw;
+  height: 10vw;
+}
+
 .favorite {
   position: absolute;
   display: flex;
