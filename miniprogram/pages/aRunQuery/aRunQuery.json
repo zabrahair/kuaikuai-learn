@@ -1,5 +1,6 @@
 {
   "usingComponents": {
-    "chinese-meaning": "../../components/ChineseMeaning/ChineseMeaning"
+    "dict-dialog": "../../components/dictDialog/dictDialog",
+    "my-qcode": "../../components/myQcodeDialog/myQcodeDialog"
   }
 }

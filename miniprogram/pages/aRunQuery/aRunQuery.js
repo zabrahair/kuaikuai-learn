@@ -25,9 +25,12 @@ Page({
     }, null, 4),
     result: '',
     // Chinese Meaning
-    isShownChineseMeaning: true,
+    isShownChineseMeaning: false,
     // word: '同舟共济',
     word: '商量',
+
+    // myQcodeDialog
+    isShownMyQcode: true
   },
 
   /**

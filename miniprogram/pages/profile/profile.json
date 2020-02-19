@@ -1,4 +1,6 @@
 {
-  "usingComponents": {},
+  "usingComponents": {
+    "my-qcode": "../../components/myQcodeDialog/myQcodeDialog"
+  },
   "navigationBarTitleText": "我的资料"
 }

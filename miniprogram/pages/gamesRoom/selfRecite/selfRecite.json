@@ -4,6 +4,6 @@
   "usingComponents": {
     "point-layer": "../../../components/getPoint/getPoint",
     "score-title": "../../../components/scoreTitle/scoreTitle",
-    "chinese-meaning": "../../components/ChineseMeaning/ChineseMeaning"
+    "dict-dialog": "../../components/dictDialog/dictDialog"
   }
 }

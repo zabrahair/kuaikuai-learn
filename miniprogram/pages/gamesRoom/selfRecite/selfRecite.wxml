@@ -112,7 +112,7 @@
     hitsAccuScore="{{hitsAccuScore}}"
     hitsCount="{{hitsCount}}"
    />
-  <chinese-meaning
+  <dict-dialog
   isShown="{{isShownChineseMeaning}}"
   word="{{curQuestion.word}}"
   dictMode="{{dictMode}}"

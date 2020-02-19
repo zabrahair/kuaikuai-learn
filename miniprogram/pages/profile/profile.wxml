@@ -19,11 +19,19 @@
     </view>
   </view>
   <scroll-view class='content' scroll-y='true'>
-    <view class='feature' bindtap="tapProfileFeature" data-feature-name='history'>我的历史</view>
+    <view class='feature' bindtap="tapProfileFeature" data-feature-name='history'>
+    我的历史
+    </view>
+    <view class='feature' bindtap="tapProfileFeature" data-feature-name='myQcode'>
+    我的二维码
+    </view>    
     <view class='buttons'>
       <button wx:if="{{isSignIn}}" class="" type='warn' bindtap='toSignOut'>
         登出
       </button>
     </view>
   </scroll-view>
+  <my-qcode
+    isShown="{{isShownMyQcode}}"
+  />
 </view>

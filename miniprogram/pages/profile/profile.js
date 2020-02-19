@@ -269,6 +269,10 @@ Page({
       wx.navigateTo({
         url: '/pages/history/history',
       })
+    } else if (featureName == 'myQcode') {
+      that.setData({
+        isShownMyQcode: true
+      })
     }
   }
 })

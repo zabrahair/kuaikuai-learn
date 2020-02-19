@@ -15,9 +15,13 @@
     {{result}}
   </scroll-view>
 </form>
-<chinese-meaning
+<dict-dialog
   isShown="{{isShownChineseMeaning}}"
-  word="{{word}}"
-  bindclose="closeChineseMeaning"
+  word="尼加拉瓜"
+  dictMode="CHAR"
+  char="尼"
+/>
+<my-qcode
+  isShown="{{isShownMyQcode}}"
 />
 </scroll-view>
