@@ -137,9 +137,9 @@
 				},
 				{
 					"id": 12,
-					"name": "词语 中文词语 近义词",
+					"name": "词语 中文词语 小学三年级上",
 					"pathName": "pages/gamesRoom/words/words",
-					"query": "gameMode=常规&tableValue=chinese-words&tableName=中文词语&filterTags=近义词",
+					"query": "gameMode=常规&tableValue=chinese-words&tableName=中文词语&filterTags=小学三年级上",
 					"scene": null
 				},
 				{

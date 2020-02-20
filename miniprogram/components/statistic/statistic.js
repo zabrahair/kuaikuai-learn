@@ -77,13 +77,13 @@ Component({
      * 获得整理出来的统计结果
      */
     refreshStatistic: function(that){
-      debugLog('refreshStatistic')
+      // debugLog('refreshStatistic')
       learnHistoryApi.answerTypeStatsitic(
         {
           answerTimeStr: _.gte(that.data.lastDate)
         },
         0,res=>{
-        debugLog('refreshStatistic.res', res)
+        // debugLog('refreshStatistic.res', res)
         that.setData({
           statistics: res
         })
@@ -95,6 +95,8 @@ Component({
     bindLastDateChange: function(e){
       let that = this
       let lastDate = utils.getEventDetailValue(e)
+      lastDate = lastDate.replace(/-/gi,'/')
+      // debugLog('lastDate', lastDate)
       that.setData({
         lastDate: lastDate
       }, res=>{

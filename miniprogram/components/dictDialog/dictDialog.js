@@ -127,15 +127,22 @@ Component({
           // debugLog('request.success.rst', rst)
           try{
             let meaning = rst[1]
-            
-            try{
-              meaning = meaning.replace(/\[[^<>]+?\]/gi, '')
-              meaning = meaning.replace(/<script.+?<\/script>/gi, '')
-              meaning = meaning.replace(/<div class="div copyright"> © 汉典 <\/div>/gi, '')
-              meaning = meaning.replace(/<ins.+?<\/ins>/gi, '<br/>')
-              meaning = meaning.replace(/<a[^>]+?>/gi, '')
-              meaning = meaning.replace(/<\/a>/gi, '')
-            }catch(e){}
+            meaning = meaning.replace(/\[[^<>]+?\]/gi, '')
+            meaning = meaning.replace(/<script.+?<\/script>/gi, '')
+            meaning = meaning.replace(/<div class="div copyright"> © 汉典 <\/div>/gi, '')
+            meaning = meaning.replace(/<ins.+?<\/ins>/gi, '<br/>')
+            meaning = meaning.replace(/<a[^>]+?>/gi, '')
+            meaning = meaning.replace(/<\/a>/gi, '')
+            if (!meaning || meaning.trim() == '') {
+              wx.showToast({
+                title: MSG.NO_MEANING,
+                duration: 1500,
+                complete: res=>{
+                  throw new Error("meaning is empty")
+                },
+              })
+              
+            }
 
             // debugLog('meaning', meaning)
             that.setData({
@@ -146,7 +153,12 @@ Component({
               }
               wx.hideLoading()
             })
-          }catch(e){}
+          } catch (e) {
+            that.setData({
+              meaning: '',
+            })
+            that.onClose()
+          }
 
         },
         fail: (res, res2) => {
@@ -183,12 +195,23 @@ Component({
           // debugLog('request.success.rst', rst)
           try {
 
-            let meaning = rst[1] + ''
-            meaning = meaning.replace(/<source.+?\/>/gi, '')
-            meaning = meaning.replace(/<amp-audio.+?>.+?<\/amp-audio>/gi, '')
-            meaning = meaning.replace(/<script.+?<\/script>/gi, '')
-            meaning = meaning.replace(/<a.+?<\/a>/gi, '')
+            let meaning = rst[1]
+              meaning = meaning.replace(/<source.+?\/>/gi, '')
+              meaning = meaning.replace(/<amp-audio.+?>.+?<\/amp-audio>/gi, '')
+              meaning = meaning.replace(/<script.+?<\/script>/gi, '')
+              meaning = meaning.replace(/<a.+?<\/a>/gi, '')
             // meaning = meaning.replace(/<\/a>/gi, '')
+              if(!meaning || meaning.trim() == ''){
+                wx.showToast({
+                  title: MSG.NO_MEANING,
+                  duration: 1500,
+                  complete: res => {
+                    throw new Error("meaning is empty")
+                  },
+                })
+              }
+
+
             // debugLog('meaning', meaning)
             that.setData({
               meaning: meaning
@@ -198,7 +221,12 @@ Component({
               }
               wx.hideLoading()
             })
-          } catch (e) { }
+          } catch (e) {
+            that.setData({
+              meaning: '',
+            })
+            that.onClose()
+          }
 
         },
         fail: (res, res2) => {

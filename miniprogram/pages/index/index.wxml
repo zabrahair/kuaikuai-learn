@@ -1,4 +1,4 @@
-<!--miniprogram/pages/index/index.wxml-->
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
 <view class='container'>
   <view class='header'>
     <image class='avatar'
@@ -20,14 +20,7 @@
     </view>
   </view>
   <scroll-view class='content' scroll-y='true'>
-    <!-- <view class='game_item' bindtap="onClickMathDivide">
-      <text>九九除法练习</text>
-      <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-    </view>
-    <view class='game_item' bindtap="onClickMathDivideWrongSlow">
-      <text>九九除法练习(错慢)</text>
-      <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-    </view>
+    <!--
     <view class='game_item' bindtap="onClickSpellEnglishWords">
       <text>英语单词拼写</text>
       <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
@@ -45,5 +38,15 @@
       <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
     </view> -->
     <statistic/>
+    <view class='items'>
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivide">
+          <text>九九除法练习</text>
+          <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view>
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivideWrongSlow">
+        <text>九九除法练习(错慢)</text>
+        <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view>
+    </view>
   </scroll-view>
 </view>

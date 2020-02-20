@@ -1,3 +1,5 @@
+@import '../../app.wxss';
+
 .component-container {
   display: flex;
   flex-direction: column;
@@ -19,31 +21,28 @@
   align-items: center;
   box-sizing: content-box;
 
+  width: 50%;
+  height: 5%;
+  margin-top: 3vw;
+  margin-bottom: 3vw;
+}
+
+.filter_date{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  box-sizing: content-box;
+    
   width: 100%;
-  height: 10vh; 
-  margin-left: 8vw;
-}
-
-.date-rang .title {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  box-sizing: content-box;
-
-  width: 13%;   
-}
-
-.date-range .days{
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  box-sizing: content-box;
-
-  width: 90%;   
+  height: 100%;
+  padding: 1vw;
+  padding-left: 3vw;
+  padding-right: 3vw;
+  border-radius: 2vw;
+  opacity: 1;
+  box-shadow: 2px 2px 2px 1px rgba(13, 24, 77, 0.822);
 }
 
 .component-content {
@@ -66,11 +65,12 @@
   align-items: center;
 
   margin: 1vw;
-  width: 29vw;
+  width: 27vw;
   height: 40vw;
   /* border: 4px solid black; */
   border-radius: 3vw;
-  background-color: rgba(200, 200, 255, 0.5);
+  opacity: 1;
+  box-shadow: 2px 2px 2px 1px rgba(13, 24, 77, 0.822);
 }
 
 .title {

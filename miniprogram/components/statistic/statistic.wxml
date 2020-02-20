@@ -1,17 +1,18 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
 <view class='component-container'>
-  <view class="date-range">
+  <view class="date-range " >
     <!-- <text class="title"></text> -->
-      <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{lastDate}}" bindchange="bindLastDateChange">
+      <picker class="filter_date bg_color_{{filter.randInteger(24)}}" mode="date" value="lastDate" start="2020-01-01" end="{{lastDate}}" bindchange="bindLastDateChange">
         <view class="picker">
-          从{{lastDate}}起
+          从{{filter.formatDate(lastDate)}}起
         </view>
       </picker>
   </view>
   <view class='component-content' >
-    <view class="stat-card"
+    <view class="stat-card bg_color_{{filter.randInteger(24)}}"
         wx:for-items='{{statistics}}' wx:for-item='stat' 
         wx:for-index='idx' wx:key="name" >
-      <view class='title'>{{stat._id}}</view>
+      <view class='title' >{{stat._id}}</view>
       <view class='correct'>正确:{{stat.correct}}</view>
       <view class='incorrect'>错误:{{stat.incorrect}}</view>
     </view>

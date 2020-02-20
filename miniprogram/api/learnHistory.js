@@ -221,16 +221,16 @@ function questCorrectStat(tableName, pWhere, pageIdx, callback){
  * 按题型统计
  */
 function answerTypeStatsitic(pWhere, pageIdx, callback){
-  debugLog('answerTypeStatsitic.where', pWhere)
+  // debugLog('answerTypeStatsitic.where', pWhere)
   let answerTypes=[];
   let perPageCount = 20
   try{
     let answerTypesObj = wx.getStorageSync(gConst.CONFIG_TAGS.ANSWER_TYPE)
-    debugLog('answerTypeStatsitic.answerTypesObj', answerTypesObj)
+    // debugLog('answerTypeStatsitic.answerTypesObj', answerTypesObj)
     for (let i in answerTypesObj){
       answerTypes.push(answerTypesObj[i].name)
     }
-    debugLog('answerTypeStatsitic.answerTypes', answerTypes)
+    // debugLog('answerTypeStatsitic.answerTypes', answerTypes)
   }catch(e){}
   let where = {
     answerType:  _.or(answerTypes)
@@ -239,7 +239,7 @@ function answerTypeStatsitic(pWhere, pageIdx, callback){
   if (typeof pageIdx != 'number') {
     pageIdx = 0
   }
-  debugLog('questCorrectStat.where', where)
+  // debugLog('questCorrectStat.where', where)
   db.collection(TABLE)
     .aggregate()
     // .unwind('$question.tags')
