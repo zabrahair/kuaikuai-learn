@@ -6,9 +6,10 @@
   align-items: center;
 
   width: 100vw;
-  height: 20vh;
+  height: 30vh;
   margin-bottom: 1vh;
   background-color: rgba(51, 226, 51, 0.5);
+  box-shadow: 2px 2px 4px 1px rgba(13, 24, 77, 0.822);
 }
 
 .tables-cloud {
@@ -18,7 +19,7 @@
   align-items: center;  
   box-sizing: content-box;
 
-
+  width: 100vw;
 }
 
 .answer_types_picker{
@@ -107,7 +108,7 @@
   align-items: center;
 
   width: 100vw;
-  height: 70vh;
+  height: 60vh;
 
   background-color: rgba(114, 183, 185, 0.5);
 }
@@ -191,4 +192,5 @@
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
+  margin-left: 5vw;
 }

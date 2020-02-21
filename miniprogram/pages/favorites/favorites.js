@@ -41,6 +41,11 @@ Page({
           tagsLocation: options.tagsLocation
         })
       }
+      if (options.answerType) {
+        that.setData({
+          selAnswerType: options.answerType
+        })
+      }
       common.initFilterAnswerTypes(that)
       common.initFilterTables(that, dataLoadTimer)
     })
@@ -104,14 +109,14 @@ Page({
     let that = this
     let selIdx = e.detail.value
 
-    common.resetTagsPageSelected(that, () => {
+    // common.resetTagsPageSelected(that, () => {
       that.setData({
         selAnswerType: that.data.answerTypesPickers[selIdx],
 
       }, res => {
         common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
       })
-    })
+    // })
   },
 
   /**
@@ -140,7 +145,9 @@ Page({
    */
   tapTag: function (e) {
     let that = this
-    common.tapTagInTagRoom(that, e)
+    common.tapTagInTagRoom(that, e, ()=>{
+      common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
+    })
   },
 
   onKeywordSearch: function (e) {

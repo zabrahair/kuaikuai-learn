@@ -960,6 +960,17 @@ function getNormalTags(that, tableName, dataLoadTimer) {
     tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
     // tagsConds.and(/第一课/gi)
   }
+
+  if (that.data.selectedTags.length > 0) {
+
+    let tags = []
+    that.data.selectedTags.find(elem=>{
+      tags.push(elem.text)
+    })
+    debugLog('tags', tags)
+    tagsConds = tagsConds.and(tags)
+  }
+
   if (tagsConds){
     // where['tags'] = /第一课/gim
     // where['tags'] = _.and(that.data.selAnswerType, new RegExp("第一课", "gim"))
@@ -971,7 +982,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
     dbApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
       // debugLog('getTags.pageIdx', pageIdx)
       debugLog('getTags.tags', tags)
-      if (!tags.length || tags.length < 1) {
+      if ((!tags.length || tags.length < 1) && pageIdx != 0) {
         // stop load
         // debugLog('getNormalTags.sort', that.data.tags)
         let tags = that.data.tags
@@ -979,8 +990,29 @@ function getNormalTags(that, tableName, dataLoadTimer) {
         // debugLog('getNormalTags.sort', that.data.tags)
         that.setData({
           tags: sortTags
+        }, ()=>{
+          // 恢复已经选择的Tags
+          recoverSelectedTags(that)
         })
         clearInterval(dataLoadTimer)
+      }
+      // 新数据空就清空原来的数据。从新装载。
+      if(pageIdx == 0 && tags.length > 0 && that.data.tags.length > 0){
+        // wx.showModal({
+        //   title: MSG.CONFIRM_TITLE,
+        //   content: MSG.WHETHER_WANT_TO_CLEAR_CURRENT_DATA,
+        //   success(res) {
+        //     if (res.confirm) {
+        //       // debugLog('用户点击确定')
+              that.setData({
+                tags: []
+              })
+              // resetTagsPageSelected(that)
+            // } else if (res.cancel) {
+            //   // errorLog('用户点击取消')
+            // }
+          // }
+        // })
       }
       // sort tags
       that.setData({
@@ -998,20 +1030,20 @@ function getFavoriteTags(that, tableName, dataLoadTimer) {
   let pageIdx = 0
   clearInterval(dataLoadTimer)
   let where = {}
-  // let tagsConds = _
-  // // debugLog('getFavoriteTags.selAnswerType', that.data.selAnswerType)
-  // if (that.data.selAnswerType) {
-  //   tagsConds = tagsConds.and(that.data.selAnswerType)
-  // }
-  // // debugLog('getFavoriteTags.userKeyword', that.data.userKeyword)
-  // if (that.data.userKeyword) {
-  //   tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
-  //   // tagsConds.and(new RegExp("第一课", "gim"))
-  // }
-  // if (tagsConds) {
-  //   where['tags'] = tagsConds
-  //   // where['tags'] = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
-  // }
+  let tagsConds = _
+  // debugLog('getFavoriteTags.selAnswerType', that.data.selAnswerType)
+  if (that.data.selAnswerType) {
+    tagsConds = tagsConds.and(that.data.selAnswerType)
+  }
+  // debugLog('getFavoriteTags.userKeyword', that.data.userKeyword)
+  if (that.data.userKeyword) {
+    tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
+    // tagsConds.and(new RegExp("第一课", "gim"))
+  }
+  if (tagsConds) {
+    where['tags'] = tagsConds
+    // where['tags'] = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
+  }
 
   dataLoadTimer = setInterval(function () {
     favoritesApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
@@ -1023,10 +1055,30 @@ function getFavoriteTags(that, tableName, dataLoadTimer) {
         let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
         that.setData({
           tags: sortTags
+        }, () => {
+          // 恢复已经选择的Tags
+          recoverSelectedTags(that)
         })        
         clearInterval(dataLoadTimer)
       }
-      // 
+      // 新数据空就清空原来的数据。从新装载。
+      if (pageIdx == 0 && tags.length > 0 && that.data.tags.length > 0) {
+        // wx.showModal({
+        //   title: MSG.CONFIRM_TITLE,
+        //   content: MSG.WHETHER_WANT_TO_CLEAR_CURRENT_DATA,
+        //   success(res) {
+        //     if (res.confirm) {
+        //       // debugLog('用户点击确定')
+        that.setData({
+          tags: []
+        })
+        // resetTagsPageSelected(that)
+        // } else if (res.cancel) {
+        //   // errorLog('用户点击取消')
+        // }
+        // }
+        // })
+      }
       that.setData({
         tags: that.data.tags.concat(tags)
       })
@@ -1148,7 +1200,8 @@ function initFilterTables(that, dataLoadTimer, callback){
   // debugLog('tables', tables)
   that.setData({
     tables: tables,
-    selectedTable: tables[0]
+    selectedTable: tables[0],
+    selectedTags: [],
   }, res => {
     getTags(that, that.data.selectedTable.value, dataLoadTimer)
     // that.getTags(that.data.selectedTable.value);
@@ -1181,10 +1234,30 @@ function initFilterAnswerTypes(that,callback) {
 }
 
 /**
+ * recover selected tags
+ */
+function recoverSelectedTags(that){
+  let selectedTags = that.data.selectedTags
+  let tags = that.data.tags
+  debugLog('selectedTags', selectedTags)
+  tags.find(tagCard=>{
+    for (let i in selectedTags){
+      if (selectedTags[i].text == tagCard.text) {
+        debugLog('selectedTags[i].text', selectedTags[i].text)
+        tagCard['css'] = SELECTED_CSS
+        break;
+      } else {
+        tagCard['css'] = ''
+      }
+    }
+  })
+}
+
+/**
  * tap Tag
  * 
  */
-function tapTagInTagRoom(that, e) {
+function tapTagInTagRoom(that, e, callback) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
   let dataset = utils.getEventDataset(e)
   let tagText = dataset.tagText
@@ -1218,6 +1291,10 @@ function tapTagInTagRoom(that, e) {
   that.setData({
     selectedTags: selectedTags,
     tags: tags,
+  }, res=>{
+    if(typeof callback == 'function'){
+      callback()
+    }
   })
 }
 
@@ -1365,7 +1442,7 @@ module.exports = {
   initFilterAnswerTypes: initFilterAnswerTypes,
   initDataBodyInTagRoom: initDataBodyInTagRoom,
   resetTagsPageSelected: resetTagsPageSelected,
-
+  recoverSelectedTags: recoverSelectedTags,
   getTags: getTags,
   getNormalTags: getNormalTags,
   getFavoriteTags: getFavoriteTags,

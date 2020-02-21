@@ -1,6 +1,6 @@
 <wxs module="filter" src="../../utils/filter.wxs"></wxs>
 <view class='container'>
-  <scroll-view class="tables-container" scroll-x='true'>
+  <scroll-view class="tables-container" scroll-y='true'>
     <view class='tables-cloud'>
       <view class='table {{table.css}}'
         wx:for-items='{{tables}}' wx:for-item='table' 
@@ -13,19 +13,12 @@
       </view>
       <view class="filters" 
             wx:if="{{gameMode != gConst.GAME_MODE.NORMAL && gameMode != gConst.GAME_MODE.FAVORITES}}">
-        <!-- <image class='filters_icon' src='{{gConst.FILTERS_ICON}}'/> -->
         <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{userConfigs.filterQuesLastDate}}" bindchange="bindLastDateChange">
           <view class="picker">
             {{filter.formatDate(lastDate)}} ▾
           </view>
         </picker>
-        <!-- <picker class='filter_time' mode="time" value="{{lastTime}}" start="00:00" end="{{userConfigs.filterQuesLastTime}}" bindchange="bindLastTimeChange">
-          <view class="picker">
-            {{lastTime}}
-          </view>
-        </picker>
-        <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" /> -->
-      </view>      
+      </view>
       <view class="keyword_search">
         <input class="input_keyword" 
         type="text" confirm-type="search" 

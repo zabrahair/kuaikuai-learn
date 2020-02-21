@@ -12,4 +12,5 @@ module.exports = {
   ON_LOADING: '努力加载中',
   NO_MEANING: '找不到解释呀！',
   SELECT_SOME_TAG: '请选择至少一个标签。',
+  WHETHER_WANT_TO_CLEAR_CURRENT_DATA: '要清空现有数据吗',
 }

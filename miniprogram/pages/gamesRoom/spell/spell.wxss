@@ -3,7 +3,7 @@
   /* justify-items: flex-start;
   align-items: center;
   width: 100vw; */
-  height: 130vh;
+  /* height: 130vh; */
 }
 
 .content {

@@ -122,10 +122,10 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 10,
 					"name": "pages/favorites/favorites",
 					"pathName": "pages/favorites/favorites",
-					"query": "",
+					"query": "answerType=自助默写",
 					"scene": null
 				},
 				{
@@ -178,10 +178,10 @@
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 18,
 					"name": "做错的题",
 					"pathName": "pages/historyBook/historyBook",
-					"query": "gameMode=错题",
+					"query": "gameMode=错题&answerType=自助默写",
 					"scene": null
 				},
 				{

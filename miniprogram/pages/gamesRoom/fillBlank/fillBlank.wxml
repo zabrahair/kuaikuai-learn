@@ -29,9 +29,9 @@
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
-      <movable-view direction='all' x='10' y='170'>
+      <!-- <movable-view direction='all' x='10' y='170'>
         <image class="play-sound" src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
-      </movable-view>
+      </movable-view> -->
       <view class='current_question_index'>
         {{curQuestionIndex+1}}/{{questions.length}}
       </view>  
@@ -59,7 +59,6 @@
       </view>   
     </form>    
     <scroll-view class='bottom_content' scroll-y='true'>
-
       <view class='sperator_title'>其他练习 ‣</view> 
       <scroll-view class="all_words_container" scroll-y="true">
         <view class="all_words">

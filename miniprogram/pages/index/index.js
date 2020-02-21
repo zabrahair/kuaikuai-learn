@@ -125,7 +125,7 @@ Page({
     let dataset = utils.getEventDataset(e)
     let answerType = dataset.answerType
     wx.navigateTo({
-      url: '/pages/TagsRoom/TagsRoom?answerType=' + answerType,
+      url: '/pages/TagsRoom/TagsRoom?answerType=' + answerType + '&gameMode =' + gConst.GAME_MODE.NORMAL,
     })
   },
 
@@ -134,7 +134,7 @@ Page({
    */
   onClickTagsRoom: function(e){
     wx.navigateTo({
-      url: '/pages/TagsRoom/TagsRoom',
+      url: '/pages/TagsRoom/TagsRoom?gameMode=' + gConst.GAME_MODE.NORMAL + '&answerType=自助默写',
     })
   },
 
@@ -143,7 +143,7 @@ Page({
    */
   onClickFavorites: function (e) {
     wx.navigateTo({
-      url: '/pages/favorites/favorites',
+      url: '/pages/favorites/favorites?gameMode=' + gConst.GAME_MODE.FAVORITES + '&answerType=自助默写',
     })
   },
   /**
@@ -151,15 +151,15 @@ Page({
    */
   onClickWrongBook: function(e){
     wx.navigateTo({
-      url: '/pages/historyBook/historyBook?gameMode='+ gConst.GAME_MODE.WRONG,
+      url: '/pages/historyBook/historyBook?gameMode=' + gConst.GAME_MODE.WRONG + '&answerType=自助默写',
     })
   },
   /**
-   * 语文知识学习
+   * 历史记录
    */
   onClickHistoryBook: function(e){
     wx.navigateTo({
-      url: '/pages/historyBook/historyBook?gameMode=' + gConst.GAME_MODE.HISTORY,
+      url: '/pages/historyBook/historyBook?gameMode=' + gConst.GAME_MODE.HISTORY + '&answerType=自助默写',
     })
   },
   /**

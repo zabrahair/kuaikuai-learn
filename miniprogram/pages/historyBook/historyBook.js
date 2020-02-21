@@ -59,6 +59,11 @@ Page({
           tagsLocation: options.tagsLocation
         })
       }
+      if (options.answerType) {
+        that.setData({
+          selAnswerType: options.answerType
+        })
+      }
       common.initFilterAnswerTypes(that)
       common.initFilterTables(that, dataLoadTimer)
     })
