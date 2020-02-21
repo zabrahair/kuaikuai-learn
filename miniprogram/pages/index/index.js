@@ -105,28 +105,28 @@ Page({
   },
 
   /**
-   * 英语单词拼写
+   * 题库
    */
-  onClickSpellEnglishWords: function(e){
+  onClickTagsRoom: function(e){
     wx.navigateTo({
-      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.NORMAL + '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name
+      url: '/pages/TagsRoom/TagsRoom',
     })    
   },
 
   /**
- * 英语单词拼写(错)
- */
-  onClickSpellEnglishWordsWrong: function (e) {
+   * 收藏
+   */
+  onClickFavorites: function (e) {
     wx.navigateTo({
-      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.WRONG + '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name + "(错)",
+      url: '/pages/favorites/favorites',
     })
   },
   /**
-   * 检索收藏的单词
+   * 错题本
    */
-  onClickSpellEnglishWordsFavorites: function(e){
+  onClickWrongBook: function(e){
     wx.navigateTo({
-      url: '/pages/gamesRoom/spell/spell?gameMode=' + gConst.GAME_MODE.FAVORITES + '&filterTags=收藏' + '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name + '收藏',
+      url: '/pages/wrongBook/wrongBook',
     })
   },
   /**

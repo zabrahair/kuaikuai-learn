@@ -104,7 +104,7 @@ Page({
     debugLog('submitAnswer.update', update)
     wx.cloud.callFunction({
       // name: form.functionName,
-      name: 'Update',
+      name: 'Aggregate',
       data: {
         table: 'aaaa',
         where: {a:1},
@@ -112,7 +112,8 @@ Page({
         pageIdx: 0
       },
       success: res => {
-        debugLog(form.functionName+'.res', res)
+        debugLog(form.functionName+'.res', res.result.list)
+        debugLog(form.functionName + '.res.length', res.result.list.length)
       },
       fail: err => {
         console.error('[云函数] ['+form.functionName+'] 调用失败', err)

@@ -20,6 +20,29 @@
     </view>
   </view>
   <scroll-view class='content' scroll-y='true'>
+    <view class='items'>
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivide">
+          <text>九九除法练习</text>
+          <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view>
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivideWrongSlow">
+        <text>九九除法练习(错慢)</text>
+        <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view>
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickTagsRoom">
+        <text>题库</text>
+        <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view>  
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickFavorites">
+        <text>收藏</text>
+        <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view> 
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickWrongBook">
+        <text>错题本</text>
+        <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view>         
+    </view>
+    <statistic/>
     <!--
     <view class='game_item' bindtap="onClickSpellEnglishWords">
       <text>英语单词拼写</text>
@@ -37,16 +60,6 @@
       <text>语文知识学习</text>
       <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
     </view> -->
-    <statistic/>
-    <view class='items'>
-      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivide">
-          <text>九九除法练习</text>
-          <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-      </view>
-      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivideWrongSlow">
-        <text>九九除法练习(错慢)</text>
-        <image class="goto_icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-      </view>
-    </view>
+    
   </scroll-view>
 </view>

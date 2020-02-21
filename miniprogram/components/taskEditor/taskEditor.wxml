@@ -1,0 +1,48 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<view wx:if="{{isShown}}" class='component-container'>
+  <view class='component-content view_shadow' scroll-y="true" scroll-x="true">
+    <scroll-view class="scroll-content">
+      <form class="form">
+        <!-- 被委派任务的人 -->
+        <picker name="assingee" class='form_item' 
+        bindchange="selectAssingee" value="{{index}}" range="{{children}}" range-key="name">
+          <view class="picker">
+          委派: {{children[selChildrenIdx].name}} ▾
+          </view>
+        </picker>  
+        <!-- 内容要求 -->
+        <textarea name="taskContent" class="form_item task_content" bindblur="bindTaskContentInputed" placeholder="输入任务内容" auto-height />
+        <!-- 积分奖励 -->
+        <picker name="bonusPoint" class='form_item' 
+        bindchange="selectBonus" value="{{index}}" range="{{BonusClasses}}" range-key="name">
+          <view class="picker">
+          奖励: {{BonusClasses[selBonusIdx].value}} 点 ▾
+          </view>
+        </picker> 
+        <!-- 完成时间        -->
+        <view name="deadlineDate" class='form_item' class="form_item">
+          <picker mode="date" value="{{deadlineDate}}" start="{{deadlineDate}}" end="2099-12-31" bindchange="bindDeadlineDateChange">
+            <view class="picker">
+              在 {{filter.formatDate(deadlineDate)}} ▾ - 
+            </view>
+          </picker>
+          <picker name="deadlineTime" mode="time" value="{{deadlineTime}}" start="00:00" end="23:59" bindchange="bindDeadlineTimeChange">
+            <view class="picker">
+              {{deadlineTime}} ▾ 前完成
+            </view>
+          </picker>
+        </view>
+      </form>
+    </scroll-view>
+    <view class="actions bg_color_{{filter.randInteger(24)}}">
+      <button class="button" bindtap="onClickEnter" type='default' size="mini">保存</button>
+      <button class="button" bindtap="onClickEnter" type='default' size="mini">发布</button>
+      <button class="button" bindtap="onClickEnter" type='default' size="mini">接受</button>
+      <button class="button" bindtap="onClickEnter" type='default' size="mini">完成</button>
+      <button class="button" bindtap="onClickEnter" type='default' size="mini">确认</button>
+    </view>
+  </view>
+  
+  <image src='../../images/close.png' class='close_button' bindtap="onClose"/> 
+</view>
+ 

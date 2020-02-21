@@ -1,0 +1,13 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<view class='container'>
+  <view class='header bg_color_{{filter.randInteger(24)}}'>
+  </view>
+  <scroll-view class='content' scroll-y='true'>
+
+  </scroll-view>
+  <view class="footer bg_color_{{filter.randInteger(24)}}">
+  </view>
+  <task-editor
+    isShown="{{isShownTaskEditor}}"
+  />
+</view>

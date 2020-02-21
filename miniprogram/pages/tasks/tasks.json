@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "task-editor":"../../components/taskEditor/taskEditor"
+  },
+  "navigationBarTitleText": "任务"
+}

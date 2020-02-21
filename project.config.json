@@ -169,6 +169,13 @@
 					"pathName": "pages/aRunQuery/aRunQuery",
 					"query": "",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "任务列表",
+					"pathName": "pages/tasks/tasks",
+					"query": "",
+					"scene": null
 				}
 			]
 		}
