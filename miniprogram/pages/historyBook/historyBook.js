@@ -33,9 +33,26 @@ Page({
    */
   onLoad: function (options) {
     let that = this
+    // 设置历史的性质
+    let tagsLocation = ""
+    let gameMode = ""
+    try{
+      gameMode = options.gameMode
+      if (gameMode == gConst.GAME_MODE.WRONG){
+        tagsLocation = gConst.TAGS_LOCATION.WRONG_HISTORY
+      }else{
+        tagsLocation = gConst.TAGS_LOCATION.HISTORY
+      }
+    }catch(err){
+      tagsLocation = gConst.TAGS_LOCATION.WRONG_HISTORY
+      gameMode = gConst.GAME_MODE.HISTORY
+    }
+    wx.setNavigationBarTitle({
+      title: gameMode
+    })
     common.initDataBodyInTagRoom(that, {
-      tagsLocation: gConst.TAGS_LOCATION.WRONG_HISTORY,
-      gameMode: gConst.GAME_MODE.WRONG,
+      tagsLocation: tagsLocation,
+      gameMode: gameMode,
     }, res => {
       if (options.tagsLocation) {
         that.setData({
@@ -144,9 +161,28 @@ Page({
     common.tapTagInTagRoom(that, e)
   },
   
+  /**
+   * 当改变过滤关键字
+   */
   onKeywordSearch: function (e) {
     let that = this
     // debugLog('onKeywordSearch.e', e)
     common.onKeywordSearch(that, e, dataLoadTimer)
-  }
+  },
+
+  /**
+   * 当改变时间
+   */
+  bindLastDateChange: function (e) {
+    let that = this
+    
+    let lastDate = utils.getEventDetailValue(e);
+    lastDate = lastDate.replace(/-/ig, '/')
+    // debugLog('bindLastDateChange.lastDate', lastDate)
+    that.setData({
+      lastDate: lastDate,
+    }, res => {
+      common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
+    })
+  },
 })

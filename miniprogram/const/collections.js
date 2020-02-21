@@ -20,7 +20,11 @@ module.exports = {
     {
       name: '中文知识',
       value: 'chinese-knowledge',
-    },    
+    },   
+    {
+      name: '两位四则运算',
+      value: 'math-divide',
+    },  
   ],
   MAP: {
     'english-words': {
@@ -38,5 +42,10 @@ module.exports = {
       value: 'chinese-knowledge',
       lang: 'zh_CN', 
     },
+    'math-divide': {
+      name: '两位四则运算',
+      value: 'math-divide',
+      lang: 'zh_CN',
+    },    
   }
 }

@@ -1,4 +1,4 @@
-<!--miniprogram/pages/index/index.wxml-->
+<wxs module="filter" src="../../../utils/filter.wxs"></wxs>
 <scroll-view class='container'>
   <score-title
     curScore="{{curScore}}"
@@ -11,12 +11,12 @@
       <image class='filters_icon' src='{{gConst.FILTERS_ICON}}'/>
       <picker class="filter_date" mode="date" value="lastDate" start="2020-01-01" end="{{userConfigs.filterQuesLastDate}}" bindchange="bindLastDateChange">
         <view class="picker">
-          {{lastDate}}
+          {{filter.formatDate(lastDate)}}
         </view>
       </picker>
       <picker class='filter_time' mode="time" value="{{lastTime}}" start="00:00" end="{{userConfigs.filterQuesLastTime}}" bindchange="bindLastTimeChange">
         <view class="picker">
-          {{lastTime}}
+          {{filter.formatTime(lastTime)}}
         </view>
       </picker>
       <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />

@@ -264,7 +264,7 @@ Page({
    */
   tapProfileFeature: function(e){
     let that = this
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     let featureName = dataset.featureName
 
     if (featureName == 'history'){

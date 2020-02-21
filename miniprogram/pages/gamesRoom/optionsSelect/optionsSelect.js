@@ -38,7 +38,7 @@ Page({
     curDeciSecond: 0,
     thinkSeconds: 0,
     questionWaitTime: 0,
-    
+
     // Question Related
     ANSWER_TYPES: gConst.ANSWER_TYPES.OPTIONS_SELECT,
     questions: [],
@@ -57,8 +57,6 @@ Page({
     isPause: false,
     pauseBtnText: '暂停',
     inputAnswerDisabled: false,
-    fadeInOutQuestion: null,
-    fadeInOutPauseBtn: null,
     isFavorited: false,
 
     // score related
@@ -82,9 +80,10 @@ Page({
 
     // page show
     questionViewWidth: 50,
-    cardFontSize: 13.5,
-    maxCardFontSize: 15,
-    minCardFontSize: 5,
+
+    // 画面效果
+    fadeInOutQuestionBlock: null,
+    fadeInOutContinueBtn: null,
 
     // filters
     tags: [],
@@ -98,6 +97,11 @@ Page({
   onLoad: function (options) {
     // debugLog('onLoad.options', options)
     let that = this
+    that.initOnLoad(that, options);
+    that.whenPageOnShow(that)
+  },
+
+  initOnLoad: function(that, options){
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
@@ -125,7 +129,7 @@ Page({
    * 生命周期函数--监听页面初次渲染完成
    */
   onReady: function () {
-
+    let that = this
   },
 
   /**
@@ -133,6 +137,9 @@ Page({
    */
   onShow: function () {
     let that = this
+  },
+
+  whenPageOnShow: function(that){
     let userInfo = that.data.userInfo
     let gameMode = that.data.gameMode
     utils.getTotalScore(userInfo, userScore => {
@@ -140,16 +147,11 @@ Page({
         totalScore: userScore.score.toFixed(1),
       })
     })
-    this.getQuestions(gameMode)
-    this.resetAnswer()
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
+    that.resetAnswer()
 
     // 隐藏暂停按钮
-    that.fadeInOut('fadeInOutPauseBtn', {
-      duration: 10,
-      timingFunction: 'ease-in',
-      rotateY: 0,
-      opacity: 0,
-    });
+    animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
   },
 
   /**
@@ -228,7 +230,7 @@ Page({
       // 因为异常所以错误
       return false
     }
-    
+
   },
   /**
    * 提交答案
@@ -260,8 +262,8 @@ Page({
     // debugLog('isCorrect', isCorrect)
 
     that.setData({
-      curAnswer: '',
-      thinkSeconds: 0,
+      curAnswer: answer ? answer : null,
+      curIsCorrect: isCorrect,
     })
 
     common.scoreApprove(that, curQuestion, isCorrect, () => {
@@ -325,44 +327,44 @@ Page({
   },
 
 
-  /**
-   * 获取所有题目
-   */
-  getQuestions: function (gameMode) {
-    debugLog('getQuestions.gameMode', gameMode)
-    let that = this
-    that.setData({
-      questions: []
-    })
-    if (gameMode == gConst.GAME_MODE.NORMAL) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + that.data.titleSubfix
-      })
-      common.getNormalQuestions(that, dataLoadTimer);
+  // /**
+  //  * 获取所有题目
+  //  */
+  // getQuestions: function (gameMode) {
+  //   debugLog('getQuestions.gameMode', gameMode)
+  //   let that = this
+  //   that.setData({
+  //     questions: []
+  //   })
+  //   if (gameMode == gConst.GAME_MODE.NORMAL) {
+  //     wx.setNavigationBarTitle({
+  //       title: that.data.tableName + that.data.titleSubfix
+  //     })
+  //     common.getNormalQuestions(that, dataLoadTimer);
 
-    } else if (gameMode == gConst.GAME_MODE.WRONG) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.WRONG + that.data.titleSubfix
-      })
-      common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
+  //   } else if (gameMode == gConst.GAME_MODE.WRONG) {
+  //     wx.setNavigationBarTitle({
+  //       title: that.data.tableName + gConst.GAME_MODE.WRONG + that.data.titleSubfix
+  //     })
+  //     common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
 
-    } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
-      })
-      common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
-    }
-  },
+  //   } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
+  //     wx.setNavigationBarTitle({
+  //       title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
+  //     })
+  //     common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
+  //   }
+  // },
 
 
 
   /**
    * 暂停
    */
-  onClickPause: function (e) {
+  onClickPauseSwitch: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
-    if (utils.getDataset(e).isContinueButton
+    if (utils.getEventDataset(e).isContinueButton
       && that.data.isPause == false) {
       return;
     }
@@ -372,19 +374,9 @@ Page({
         pauseBtnText: '暂停',
         inputAnswerDisabled: false,
       })
-      that.fadeInOut('fadeInOutQuestion', {
-        duration: 1000,
-        timingFunction: 'ease-out',
-        rotateY: 0,
-        opacity: 1,
-      });
+      animation.playFade(that, animation.MAP.FADE_OUT_QUESTION_BLOCK.name)
 
-      that.fadeInOut('fadeInOutPauseBtn', {
-        duration: 1,
-        timingFunction: 'ease-in',
-        rotateY: 0,
-        opacity: 0,
-      })
+      animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
 
     } else {
       that.setData({
@@ -393,17 +385,11 @@ Page({
         inputAnswerDisabled: true,
       })
 
-      that.fadeInOut('fadeInOutQuestion', {
-        duration: 1000,
-        timingFunction: 'ease-in',
-        rotateY: 180,
-        opacity: 0,
-      }, that.fadeInOut('fadeInOutPauseBtn', {
-        duration: 1500,
-        timingFunction: 'ease-out',
-        rotateY: 0,
-        opacity: 1,
-      }));
+      animation.playFade(that, animation.MAP.FADE_IN_QUESTION_BLOCK.name,
+        null,
+        res => {
+          animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
+        })
     }
   },
 
@@ -430,7 +416,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastDateChange: function (e) {
     let that = this
@@ -442,11 +428,10 @@ Page({
       lastDate: lastDate,
       lastDateObj: date,
     })
-
   },
 
   /**
-   * 
+   *
    */
   bindLastTimeChange: function (e) {
     let that = this
@@ -462,13 +447,13 @@ Page({
   },
 
   /**
-   * Search questions with filter 
-   * 
+   * Search questions with filter
+   *
    */
   onClickSearch: function (e) {
     let that = this
     debugLog('search now...')
-    that.getQuestions(that.data.gameMode);
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer();
   },
 
@@ -484,7 +469,7 @@ Page({
   onLongPressAnswerCard: function (e) {
     // debugLog('onLongPressAnswerCard.e', e.target.dataset);
     let that = this
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
     if (spellCard.cardState == CARD_STATE.USED) {
@@ -506,7 +491,7 @@ Page({
  */
   onClickLeftCard: function (e) {
     let that = this
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     let curQuestionIndex = that.data.curQuestionIndex
     let clickCardIdx = dataset.cardIdx
     let idxOffSet = clickCardIdx - curQuestionIndex
@@ -516,7 +501,7 @@ Page({
 
   /**
    * tap Answer Option
-   * 
+   *
    */
   tapSelectOption: function (e) {
     let that = this
@@ -531,7 +516,7 @@ Page({
     common.processSelectOptions(that, nextQuestion)
   },
 
-  /** 
+  /**
    * 朗读当前卡片
    */
   playCardText: function (e) {

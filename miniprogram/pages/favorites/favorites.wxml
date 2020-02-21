@@ -34,6 +34,10 @@
         data-tag-idx='{{idx}}'
         bindtap="tapTag"
       >
+        <view wx:if="{{tag.count > 0}}"
+          class="count_point">
+          {{tag.count}}
+        </view>
         {{tag.text}}
       </view>
     </view>

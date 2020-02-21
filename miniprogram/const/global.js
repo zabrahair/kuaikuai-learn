@@ -110,6 +110,8 @@ module.exports = {
     // SLOW: 'SLOW',
     // WRONG_SLOW: 'WRONG_SLOW',
     // FAVORITES: 'FAVORITES',
+    HISTORY: '做过的题',
+    CORRECT: '正确的题',
     WRONG: '错题',
     NORMAL: '常规',
     SLOW: '慢速',
@@ -125,6 +127,7 @@ module.exports = {
   DEFAULT_DATE_FORMAT_OPTIONS: DEFAULT_DATE_FORMAT_OPTIONS,
   IS_FAVORITED: '收藏',
   ANSWER_TYPES: {
+    SELF_RECITE: '自助默写',
     MANUAL_CHECK: '默写卡',
     SPELLING: '拼写',
     OPTIONS_SELECT: '选择题',
@@ -135,7 +138,8 @@ module.exports = {
     NORMAL: 'NORMAL',
     FAVORITES: 'FAVORITES',
     HISTORY: 'HISTORY',
-    WRONG_HISTORY: 'WRONG_HISTORY'
+    CORRECT_HISTORY: 'CORRECT_HISTORY',
+    WRONG_HISTORY: 'WRONG_HISTORY',
   },
   CONFIG_TAGS: {
     USER_ROLE_TAG: 'USER_ROLE',

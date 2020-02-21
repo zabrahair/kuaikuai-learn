@@ -23,7 +23,7 @@
         <view name="deadlineDate" class='form_item' class="form_item">
           <picker mode="date" value="{{deadlineDate}}" start="{{deadlineDate}}" end="2099-12-31" bindchange="bindDeadlineDateChange">
             <view class="picker">
-              在 {{filter.formatDate(deadlineDate)}} ▾ - 
+              在 {{filter.formatDate(deadlineDate)}} ▾ 
             </view>
           </picker>
           <picker name="deadlineTime" mode="time" value="{{deadlineTime}}" start="00:00" end="23:59" bindchange="bindDeadlineTimeChange">

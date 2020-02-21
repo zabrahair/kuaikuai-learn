@@ -16,10 +16,14 @@ const formatTime = date => {
   return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
 }
 
-function mergeDateTime(dateStr, timeStr){
-  let date = new Date(dateStr + 'T' + timeStr + ':00Z');
-  date.setHours(date.getHours() - 8)
+function mergeDateTime(pDateStr, pTimeStr){
+  // debugLog('bindLastDateChange.dateStr', pDateStr)
+  // debugLog('bindLastDateChange.timeStr', pTimeStr)
+  let dateStr = pDateStr.replace(/\//ig, '-')
+  let date = new Date(dateStr + 'T' + pTimeStr + ':00Z');
   // debugLog('bindLastDateChange.date', date)
+  // 因为中国处于东八区
+  date.setHours(date.getHours() - 8)
   // debugLog('bindLastDateChange.date', date.toLocaleString())
   return date;
 }
@@ -439,7 +443,7 @@ function getEventDetailValue(e){
 /**
  * 获得Event事件的Dataset
  */
-function getDataset(e){
+function getEventDataset(e){
   // debugLog('getDataset.e',e)
   let dataset1
   let dataset2
@@ -469,7 +473,7 @@ function getStorage(key){
 module.exports = {
   /** 工具型方法 */
   /* -- Event 方法 -- */
-  getDataset: getDataset,
+  getEventDataset: getEventDataset,
   getEventDetailValue: getEventDetailValue,
 
   formatTime: formatTime,

@@ -116,7 +116,7 @@ function recordHistory(that, question, answer) {
    */
 function clickFavoriteSwitch(that, e) {
   // debugLog('clickFavoriteSwitch.dataset', e.target.dataset)
-  let dataset = utils.getDataset(e)
+  let dataset = utils.getEventDataset(e)
   let curQuesId = dataset.curQuestionIndex
 
   if (that.data.isFavorited == true) {
@@ -157,7 +157,7 @@ function clickFavoriteSwitch(that, e) {
  * 默写卡点击字卡片
  */
 function onTapReciteCard(that, e, unusedCallback, usedCallback) {
-  let dataset = utils.getDataset(e)
+  let dataset = utils.getEventDataset(e)
   // debugLog('onTapAnswerCard.dataset', dataset)
   let curSpellCards = that.data.curSpellCards;
   let cardIdx = parseInt(dataset.cardIdx)
@@ -204,7 +204,7 @@ function onTapReciteCard(that, e, unusedCallback, usedCallback) {
    * 点击拼写字母卡片
    */
 function onTapSpellCard(that, e, callback) {
-  let dataset = utils.getDataset(e);
+  let dataset = utils.getEventDataset(e);
   // debugLog('onTapSpellCard.dataset', dataset)
   let curSpellCards = that.data.curSpellCards;
   let cardIdx = parseInt(dataset.cardIdx)
@@ -247,7 +247,7 @@ function onTapSpellCard(that, e, callback) {
 /**
   * Get Normal Question
   */
-function getNormalQuestions(that, dataLoadTimer) {
+function getNormalQuestions(that, dataLoadTimer, callback) {
   let pageIdx = 0
   clearInterval(dataLoadTimer)
   // debugLog('getNormalQuestions.tags', that.data.tags)
@@ -259,8 +259,8 @@ function getNormalQuestions(that, dataLoadTimer) {
       },
       pageIdx,
       (res, pageIdx) => {
-        // debugLog('getNormalQuestions.getWords.res', res)
-        // debugLog('getNormalQuestions.getWords.pageIdx', pageIdx)
+        // debugLog('getNormalQuestions.res', res)
+        // debugLog('getNormalQuestions.pageIdx', pageIdx)
         if (res.length && res.length > 0) {
           let questions = that.data.questions.concat(res)
           that.setData({
@@ -277,8 +277,10 @@ function getNormalQuestions(that, dataLoadTimer) {
             // debugLog('getNormalQuestions.questions', that.data.questions)
             // debugLog('getNormalQuestions.questionsDone', that.data.questionsDone)
             clearInterval(dataLoadTimer)
+            if (typeof callback == 'function') {
+              callback(that)
+            } 
           })
-          
         }
       })
     pageIdx++
@@ -377,7 +379,9 @@ function finishScoreApprove(that, params) {
   try {
     if (params.detail.isCorrect) {
       recQuest.score = recQuest.score + params.detail.hitsScore
-      recQuest.tags.push(params.detail.hitsClass)
+      if (params.detail.hitsClass && params.detail.hitsClass.trim()!=''){
+        recQuest.tags.push(params.detail.hitsClass)
+      }
     } else {
     }
   } catch (e) { }
@@ -427,7 +431,7 @@ function finishScoreApprove(that, params) {
  */
 function tapSelectOption(that, e) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
-  let dataset = utils.getDataset(e)
+  let dataset = utils.getEventDataset(e)
   let optionText = dataset.optionText
   let optionIdx = parseInt(dataset.optionIdx)
   let selectedOptions = that.data.selectedOptions
@@ -505,11 +509,11 @@ function getFavoritesQuestions(that, mode, dataLoadTimer, callback) {
           // when finish questions load
           writeQuestionsCorrectStat(that, dataLoadTimer, res => {
             clearInterval(dataLoadTimer)
+            if (typeof callback == 'function') {
+              callback(that)
+            } 
           })
         }
-        if (typeof callback == 'function'){
-          callback(things, pageIdx)
-        } 
       })
     pageIdx++
   }, utils.getDataLoadInterval())
@@ -541,22 +545,21 @@ function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
   // debugLog('getHistoryQuestions.lastDate', that.data.lastDate)
   // debugLog('getHistoryQuestions.lastTime', that.data.lastTime)
   let filterDate = utils.mergeDateTime(that.data.lastDate, that.data.lastTime).getTime();
-  debugLog('getHistoryQuestions.filterDate', filterDate)
+  // debugLog('getHistoryQuestions.filterDate', filterDate)
   // debugLog('getHistoryQuestions.filterDateStr', utils.mergeDateTime(that.data.lastDate, that.data.lastTime))
-  let wherefilters
-  if (gConst.GAME_MODE.WRONG == mode) {
-    wherefilters = _.and(
-      {
-        table: that.data.tableValue,
-        question: _.exists(true),
-        answerTime: _.gte(filterDate),
-        question: {
-          tags: _.all(that.data.tags)
-        }
-      },
-      _.or([{ isCorrect: false },
-        // { thinkSeconds: _.gt('$question.minFinishTime') }
-      ]))
+  let wherefilters = {
+    table: that.data.tableValue,
+    question: _.exists(true),
+    answerTime: _.gte(filterDate),
+    question: {
+      tags: _.all(that.data.tags)
+    }
+  }
+
+  if(mode == gConst.GAME_MODE.WRONG){
+    wherefilters['isCorrect'] = false
+  } else if (mode == gConst.GAME_MODE.CORRECT) {
+    wherefilters['isCorrect'] = true
   }
 
   clearInterval(dataLoadTimer)
@@ -579,7 +582,7 @@ function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
             }, function () {
               if (pageIdx == 0) {
                 // 生成下一道题目
-                debugLog('生成第一道题目', questions[0])
+                // debugLog('生成第一道题目', questions[0])
                 onClickNextQuestion(that, null, null, 0)
               }
             })
@@ -588,7 +591,7 @@ function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
             writeQuestionsCorrectStat(that, dataLoadTimer, res => {
               clearInterval(dataLoadTimer)
               if (typeof callback == 'function') {
-                callback(things, pageIdx)
+                callback(that)
               } 
             })
           }
@@ -615,6 +618,7 @@ const OPTION_CARD_TEMPLATE = {
   state: '',
   isUsed: false,
 }
+
 /**
  * 处理当前选择题的答案和选项
  */
@@ -643,6 +647,23 @@ function processSelectOptions(that, question) {
     that.setData({
       curOptions: curOptions,
       // cardFontSize: cardFontSize,
+    })
+  }
+}
+
+/**
+ * 处理当前数学除法题
+ */
+function processFillBlankQuestion(that) {
+  if (that.data.tableValue == TABLES.MATH_DIVIDE) {
+    for (let i in that.data.questions) {
+      let question = that.data.questions[i]
+      let questionText = question.op1 + question.operator + question.op2 + question.then
+      question['questionText'] = questionText
+      // debugLog('processMathDivideOptions', question)
+    }
+    that.setData({
+      questions: that.data.questions,
     })
   }
 }
@@ -695,12 +716,45 @@ function processWordsIntoCards(that, question) {
 }
 
 /**
+   * 获取所有题目
+   */
+function getQuestions(that, gameMode, dataLoadTimer, callback) {
+  that.setData({
+    questions: []
+  })
+  if (gameMode == gConst.GAME_MODE.NORMAL) {
+    wx.setNavigationBarTitle({
+      title: that.data.tableName + that.data.titleSubfix
+    })
+    getNormalQuestions(that, dataLoadTimer, callback);
+
+  } else if (gameMode == gConst.GAME_MODE.WRONG) {
+    wx.setNavigationBarTitle({
+      title: that.data.tableName + gConst.GAME_MODE.WRONG + that.data.titleSubfix
+    })
+    getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer, callback);
+
+  } else if (gameMode == gConst.GAME_MODE.HISTORY) {
+    wx.setNavigationBarTitle({
+      title: that.data.tableName + gConst.GAME_MODE.HISTORY + that.data.titleSubfix
+    })
+    getHistoryQuestions(that, gConst.GAME_MODE.HISTORY, dataLoadTimer, callback);
+
+  } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
+    wx.setNavigationBarTitle({
+      title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
+    })
+    getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer, callback);
+  }
+}
+
+/**
  * 下一题
  */
 function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   let dataset
   // try {
-  dataset = e ? utils.getDataset(e) : null
+  dataset = e ? utils.getEventDataset(e) : null
   if (dataset && dataset.idxOffset) {
       idxOffset = parseInt(dataset.idxOffset)
     }
@@ -727,15 +781,16 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
   let questionsDone = that.data.questionsDone
   let question = that.data.curQuestion
 
+  // 计算下一题的Index,并且获得下一题的对象
   let nextQuestionIndex
   if (curQuestionIndex == 0 && idxOffset < 0) {
     nextQuestionIndex = questions.length - 1
   } else {
     nextQuestionIndex = Math.abs((curQuestionIndex + idxOffset)) % questions.length
   }
-
-
   let nextQuestion = questions[nextQuestionIndex]
+  
+  // 如果上一题正确，把它放到已经完成的里面
   if (isCorrect) {
     questionsDone.push(question)
     questions.splice(curQuestionIndex, 1)
@@ -743,7 +798,6 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
       nextQuestionIndex -= 1
     }
   }
-
 
   if (questions.length > 0) {
 
@@ -755,19 +809,6 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
       success: function (res) {
         if (res.confirm) {
           that.resetAnswer();
-          // for (let i in questionsDone) {
-          //   questions.push(questionsDone[i])
-          // }
-          // questionsDone = []
-          // curQuestionIndex = 0
-          // question = {}
-          // wx.showToast({
-          //   image: gConst.ANSWER_CORRECT,
-          //   title: MSG.FINISH_ALL_QUESTIONS,
-          //   duration: 1000,
-          // }, function () {
-
-          // })
         }else{
           return;
         }
@@ -844,9 +885,12 @@ const DATA_BODY_IN_TAG_ROOM = {
 
   // Picker of answerTypes
 
-  selAnswerType: '选择题型',
+  selAnswerType: '',
   // 共通函数通过这个数值判断到那种表里面获取标签列表
   tagsLocation: gConst.TAGS_LOCATION.NORMAL,
+
+  // 过滤条件
+  lastDate: utils.formatDate(new Date()),
 }
 
 function initDataBodyInTagRoom(that, diffs, callback){
@@ -900,7 +944,7 @@ function getTags(that, tableName, dataLoadTimer, callback) {
  * 獲取所有的標籤,只获取标签在记录第一层的标签。
  */
 function getNormalTags(that, tableName, dataLoadTimer) {
-  debugLog('getNormalTags.tableName', tableName)
+  // debugLog('getNormalTags.tableName', tableName)
   let pageIdx = 0
   clearInterval(dataLoadTimer)
   let where = {}
@@ -926,7 +970,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
   dataLoadTimer = setInterval(function () {
     dbApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
       // debugLog('getTags.pageIdx', pageIdx)
-      // debugLog('getTags.tags', tags)
+      debugLog('getTags.tags', tags)
       if (!tags.length || tags.length < 1) {
         // stop load
         // debugLog('getNormalTags.sort', that.data.tags)
@@ -1004,12 +1048,20 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
     }
   }
 
+  if(that.data.lastDate){
+    where['answerTimeStr'] = that.data.lastDate
+  }
+
+  if (that.data.selAnswerType){
+    where['answerType'] = that.data.selAnswerType
+  }
+
   let tagsConds = _
-  debugLog('getFavoriteTags.selAnswerType', that.data.selAnswerType)
+  // debugLog('getFavoriteTags.selAnswerType', that.data.selAnswerType)
   if (that.data.selAnswerType) {
     tagsConds = tagsConds.and(that.data.selAnswerType)
   }
-  debugLog('getFavoriteTags.userKeyword', that.data.userKeyword)
+  // debugLog('getFavoriteTags.userKeyword', that.data.userKeyword)
   if (that.data.userKeyword) {
     tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
   }
@@ -1047,7 +1099,7 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
 const SELECTED_CSS = 'selected'
 function tapFilterTable(that, e, dataLoadTimer, callback) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
-  let dataset = utils.getDataset(e)
+  let dataset = utils.getEventDataset(e)
   let tableValue = dataset.tableValue
   let tableIdx = parseInt(dataset.tableIdx)
   let selectedTable = that.data.selectedTable
@@ -1084,7 +1136,16 @@ function tapFilterTable(that, e, dataLoadTimer, callback) {
  */
 function initFilterTables(that, dataLoadTimer, callback){
   let tables = TABLES.LIST
-  tables[0]['css'] = SELECTED_CSS
+  let isSet = false
+  tables.find(table => { 
+    if (table['css'] == SELECTED_CSS){
+      isSet |= true
+    }
+  })
+  if (!isSet){
+    tables[0]['css'] = SELECTED_CSS
+  }
+  // debugLog('tables', tables)
   that.setData({
     tables: tables,
     selectedTable: tables[0]
@@ -1097,18 +1158,25 @@ function initFilterTables(that, dataLoadTimer, callback){
 /**
  * 初始化题目类型
  */
-function initFilterAnswerTypes(that) {
+function initFilterAnswerTypes(that,callback) {
   // Set Answer Types
   let answerTypesObjects = wx.getStorageSync(gConst.CONFIG_TAGS.ANSWER_TYPE)
   // debugLog('initAnswerTypes.answerTypesObjects', answerTypesObjects)
   let answerTypesPickers = utils.getArrFromObjectsArr(answerTypesObjects, 'name')
   // debugLog('initAnswerTypes.answerTypesPickers', answerTypesPickers)
-  let selAnswerType = answerTypesPickers.length > 0 ? answerTypesPickers[0] : ''
+  let selAnswerType = that.data.selAnswerType
+  if (selAnswerType == ''){
+    selAnswerType = answerTypesPickers.length > 0 ? that.data.selAnswerType : ''
+  }
 
   that.setData({
     answerTypesPickers: answerTypesPickers,
     answerTypesObjects: answerTypesObjects,
     selAnswerType: selAnswerType,
+  }, res=>{
+    if(callback){
+      callback();
+    }
   })
 }
 
@@ -1118,7 +1186,7 @@ function initFilterAnswerTypes(that) {
  */
 function tapTagInTagRoom(that, e) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
-  let dataset = utils.getDataset(e)
+  let dataset = utils.getEventDataset(e)
   let tagText = dataset.tagText
   let tagIdx = parseInt(dataset.tagIdx)
   let tagCount = dataset.tagCount
@@ -1161,6 +1229,13 @@ function onClickEnterInTagRoom(that, e) {
   let selectedTags = that.data.selectedTags
   let tagsStr = utils.arrayJoin(selectedTags, 'text')
   let url = ''
+  if(!tagsStr || tagsStr.trim() == ''){
+    wx.showModal({
+      title: MSG.CONFIRM_TITLE,
+      title: MSG.SELECT_SOME_TAG,
+    })
+    return;
+  }
   if (that.data.selAnswerType == '默写卡') {
     url = '/pages/gamesRoom/words/words?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   } else if (that.data.selAnswerType == '拼写') {
@@ -1169,11 +1244,24 @@ function onClickEnterInTagRoom(that, e) {
     url = '/pages/gamesRoom/optionsSelect/optionsSelect?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   } else if (that.data.selAnswerType == '自助默写') {
     url = '/pages/gamesRoom/selfRecite/selfRecite?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
+  } else if (that.data.selAnswerType == '填空题') {
+    url = '/pages/gamesRoom/fillBlank/fillBlank?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   }
 
-  if(that.data.gameMode == gConst.GAME_MODE.WRONG){
-    
-    selectedTags.sort((a, b)=>{
+  if (that.data.gameMode == gConst.GAME_MODE.WRONG 
+  || that.data.gameMode == gConst.GAME_MODE.HISTORY){
+    url += '&lastDate=' + that.data.lastDate
+  }
+  wx.navigateTo({
+    url: url
+  })
+}
+
+/**
+ * 对Tags按lastDate排序
+ */
+function sortTagsByLastDate(tags){
+  tags.sort((a, b) => {
       if(a.lastDate < b.lastDate){
         return -1
       } else if (a.lastDate > b.lastDate){
@@ -1182,14 +1270,7 @@ function onClickEnterInTagRoom(that, e) {
         return 0
       }
     })
-    let lastDate = selectedTags[0].lastDate
-    lastDate = lastDate.replace(/\//g,'-')
-    debugLog('selectedTags', selectedTags)
-    url += '&lastDate=' + lastDate
-  }
-  wx.navigateTo({
-    url: url
-  })
+  return tags
 }
 
 /**
@@ -1260,7 +1341,8 @@ module.exports = {
   recordHistory: recordHistory,
   processWordsIntoCards: processWordsIntoCards,
   processSelectOptions: processSelectOptions,
-  
+  processFillBlankQuestion: processFillBlankQuestion,
+  getQuestions: getQuestions,
 
   /* -- 页面事件 -- */
   clickFavoriteSwitch: clickFavoriteSwitch,
@@ -1288,6 +1370,7 @@ module.exports = {
   getNormalTags: getNormalTags,
   getFavoriteTags: getFavoriteTags,
   getHistoryTags: getHistoryTags,
+  sortTagsByLastDate: sortTagsByLastDate,
 
   tapFilterTable: tapFilterTable,
   tapTagInTagRoom: tapTagInTagRoom,

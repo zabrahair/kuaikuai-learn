@@ -205,6 +205,7 @@ page {
 }
 
 .icon {
+  margin: 3px;
   -webkit-filter: drop-shadow(1px 1px 2px #222);
   filter: drop-shadow(1px 1px 2px #222);
 }

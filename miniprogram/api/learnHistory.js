@@ -111,14 +111,14 @@ function getHistoryQuestions(userInfo, whereFilter, pageIdx, callback){
 }
 
 function getTags(tableName, pWhere, pageIdx, callback) {
-  debugLog('tableName', tableName)
+  // debugLog('tableName', tableName)
   // debugLog('pWhere', pWhere)
   let perPageCount = 20
   let where = {
     table: tableName,
   }
   Object.assign(where, pWhere)
-  debugLog('where', where)
+  // debugLog('where', where)
   db.collection(TABLE)
     .aggregate()
     .match(where)
@@ -285,8 +285,38 @@ function answerTypeStatsitic(pWhere, pageIdx, callback){
     .catch(err => console.error(err)) 
 }
 
+/**
+ * 获得做过题目的数量
+ */
+function getHistoryCount(where, callback){
+
+  // debugLog('getHistoryCount.where', where)
+  db.collection(TABLE)
+    .aggregate()
+    .match(where)
+    .group({
+      _id: "计数",
+      count: $.sum(1),
+    })
+    .end()
+    .then
+    ((res, e) => {
+      // debugLog('getHistoryCount.res', res)
+      // debugLog('questCorrectStat.res', res.list)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        callback(res.list[0].count)
+        return
+      } else {
+        callback(0)
+      }
+    })
+    .catch(err => console.error(err)) 
+}
+
 module.exports = {
   answerTypeStatsitic: answerTypeStatsitic,
+  getHistoryCount: getHistoryCount,
   dailyStatistic: dailyStatistic,
   tagsStatistic: tagsStatistic,
   getHistoryQuestions: getHistoryQuestions,

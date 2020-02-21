@@ -65,5 +65,5 @@
       </view>
     </form>
   </view>
-  <button class="btn_continue" bindtap='onClickPause' type="primary" size='default' animation="{{fadeInOutPauseBtn}}">{{pauseBtnText}}</button>
+  <button class="btn_continue" bindtap='onClickPause' type="primary" size='default' animation="{{fadeInOutContinueBtn}}">{{pauseBtnText}}</button>
 </view>

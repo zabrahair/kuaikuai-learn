@@ -32,6 +32,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    debugLog('onLoad')
     let that = this
     common.initDataBodyInTagRoom(that, {
       tagsLocation: gConst.TAGS_LOCATION.NORMAL,
@@ -40,6 +41,11 @@ Page({
       if (options.tagsLocation) {
         that.setData({
           tagsLocation: options.tagsLocation
+        })
+      }
+      if (options.answerType) {
+        that.setData({
+          selAnswerType: options.answerType
         })
       }
       common.initFilterAnswerTypes(that)

@@ -11,4 +11,5 @@ module.exports = {
   FEATURE_IS_DISABLE: '该功能暂时无法使用',
   ON_LOADING: '努力加载中',
   NO_MEANING: '找不到解释呀！',
+  SELECT_SOME_TAG: '请选择至少一个标签。',
 }

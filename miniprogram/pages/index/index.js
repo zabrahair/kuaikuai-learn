@@ -11,7 +11,8 @@ const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
 const userApi = require('../../api/user.js')
-
+const learnHistoryApi = require('../../api/learnHistory.js')
+const favoritesApi = require('../../api/favorites.js')
 Page({
 
   /**
@@ -29,7 +30,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    
+
   },
 
   /**
@@ -43,12 +44,42 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    let that = this
     // debugLog('onShow', true)
-    this.setData({
+    that.setData({
       authLogin: '请授权',
       totalScore: 0,
     })
-    this.login();
+    that.login();
+    // 获得卡片需要的Badge上标。做过的题目数
+    learnHistoryApi.getHistoryCount({
+      answerTimeStr: utils.formatDate(new Date())
+    }, count => {
+      that.setData({
+        doneCount: count
+      })
+    })
+    // 错过的题目总数
+    learnHistoryApi.getHistoryCount({
+      isCorrect: false,
+      // answerTimeStr: utils.formatDate(new Date())
+    }, count=>{
+      that.setData({
+        incorrectCount: count
+      })
+    })
+    // 收藏过的题目数量
+    favoritesApi.getFavoritesCount({
+    }, count => {
+      that.setData({
+        favoritesCount: count
+      })
+    })
+    // 生成题型卡片
+    let answerTypes = wx.getStorageSync(gConst.CONFIG_TAGS.ANSWER_TYPE)
+    that.setData({
+      answerTypes: answerTypes
+    })
   },
 
   /**
@@ -87,20 +118,14 @@ Page({
   },
 
   /**
-   * 九九除法
+   * 点击各种题型
    */
-  onClickMathDivide: function(e){
+  onClickAnswerType: function(e){
+    let that = this
+    let dataset = utils.getEventDataset(e)
+    let answerType = dataset.answerType
     wx.navigateTo({
-      url: '/pages/gamesRoom/mathDivide/mathDivide?gameMode=' + gConst.GAME_MODE.NORMAL,
-    })
-  },
-
-/**
- * 九九除法(错慢)
- */
-  onClickMathDivideWrongSlow: function (e) {
-    wx.navigateTo({
-      url: '/pages/gamesRoom/mathDivide/mathDivide?gameMode=' + gConst.GAME_MODE.WRONG_SLOW,
+      url: '/pages/TagsRoom/TagsRoom?answerType=' + answerType,
     })
   },
 
@@ -110,7 +135,7 @@ Page({
   onClickTagsRoom: function(e){
     wx.navigateTo({
       url: '/pages/TagsRoom/TagsRoom',
-    })    
+    })
   },
 
   /**
@@ -126,15 +151,15 @@ Page({
    */
   onClickWrongBook: function(e){
     wx.navigateTo({
-      url: '/pages/wrongBook/wrongBook',
+      url: '/pages/historyBook/historyBook?gameMode='+ gConst.GAME_MODE.WRONG,
     })
   },
   /**
    * 语文知识学习
    */
-  onClickChineseKnowledge: function(e){
+  onClickHistoryBook: function(e){
     wx.navigateTo({
-      url: '/pages/gamesRoom/ChineseKnowledge/ChineseKnowledge?gameMode=' + gConst.GAME_MODE.NORMAL,
+      url: '/pages/historyBook/historyBook?gameMode=' + gConst.GAME_MODE.HISTORY,
     })
   },
   /**

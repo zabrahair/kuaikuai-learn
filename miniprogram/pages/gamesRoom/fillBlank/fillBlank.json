@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "point-layer": "../../../components/getPoint/getPoint",
+    "score-title": "../../../components/scoreTitle/scoreTitle"
+  }
+}

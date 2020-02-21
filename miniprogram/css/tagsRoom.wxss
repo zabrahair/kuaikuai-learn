@@ -1,7 +1,7 @@
 .tables-container {
   position: relative;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
 
@@ -16,11 +16,10 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;  
+  box-sizing: content-box;
 
-  width: 90%;
 
 }
-
 
 .answer_types_picker{
   position: absolute;
@@ -89,8 +88,7 @@
   justify-content: flex-end;
   align-items: center;  
 
-
-  height: 4vh;
+  height: 5vh;
   margin: 1vw;
   margin-left: 2vw;
   padding: 1.5vw;
@@ -125,6 +123,7 @@
 }
 
 .tag {
+  position: relative;
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
@@ -135,12 +134,36 @@
   height: 4vh;
   margin: 1vw;
   margin-left: 2vw;
+  margin-top: 3vw;
   padding: 1.5vw;
   background-color: rgba(82, 136, 236, 0.9);
   border-radius: 2vw;
 
   font-size: 5vw;
   font-weight: 100;
+}
+
+.count_point {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+
+  min-width: 5vw;
+  height: 5vw;
+
+  padding-left: 1vw;
+  padding-right: 1vw;
+  color: white;
+  font-size: 3vw;
+  font-weight: 800;
+  border-radius: 2.5vw;
+  background-color: rgb(240, 158, 6);
+
+  right: -2.5vw;
+  top: -2.5vw;
 }
 
 .selected {

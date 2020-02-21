@@ -229,7 +229,7 @@ Page({
         }, function(res){
           wx.setStorageSync(storeKeys.totalScore, parseFloat(that.data.totalScore))
         })
-        
+
       }else{
         wx.showToast({
           image: gConst.ANSWER_INCORRECT,
@@ -326,7 +326,7 @@ Page({
     }
     try{
       let that = this
-      let targetValues = e ? utils.getDataset(e):null
+      let targetValues = e ? utils.getEventDataset(e):null
       let questions = this.data.questions
       let questionsDone = this.data.questionsDone
       let question = this.data.curQuestion
@@ -512,7 +512,7 @@ Page({
         opacity: 1,
       }));
 
-      
+
     }
 
   },
@@ -523,7 +523,7 @@ Page({
   onInputAnswer: function(e){
     if (this.checkPauseStatus()) {
       return;
-    }    
+    }
   },
 
   /**
@@ -549,7 +549,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastDateChange: function(e){
     let that = this
@@ -565,7 +565,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastTimeChange: function(e){
     let that = this
@@ -581,13 +581,13 @@ Page({
   },
 
   /**
-   * Search questions with filter 
-   * 
+   * Search questions with filter
+   *
    */
   onClickSearch: function(e){
     let that = this
     debugLog('search now...')
-    that.getQuestions(that.data.gameMode);
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer();
   }
 })

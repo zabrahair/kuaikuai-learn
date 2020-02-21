@@ -101,10 +101,10 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "pages/TagsRoom/TagsRoom",
+					"id": 7,
+					"name": "标签房",
 					"pathName": "pages/TagsRoom/TagsRoom",
-					"query": "gameMode=NORMAL",
+					"query": "answerType=默写卡",
 					"scene": null
 				},
 				{
@@ -129,10 +129,10 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "pages/wrongBook/wrongBook",
-					"pathName": "pages/wrongBook/wrongBook",
-					"query": "",
+					"id": 11,
+					"name": "做过的题",
+					"pathName": "pages/historyBook/historyBook",
+					"query": "gameMode=做过的题",
 					"scene": null
 				},
 				{
@@ -175,6 +175,20 @@
 					"name": "任务列表",
 					"pathName": "pages/tasks/tasks",
 					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "做错的题",
+					"pathName": "pages/historyBook/historyBook",
+					"query": "gameMode=错题",
+					"scene": null
+				},
+				{
+					"id": 19,
+					"name": "填空题 数学",
+					"pathName": "pages/gamesRoom/fillBlank/fillBlank",
+					"query": "gameMode=常规&tableValue=math-divide&tableName=数学四则运算&filterTags=九九除法",
 					"scene": null
 				}
 			]

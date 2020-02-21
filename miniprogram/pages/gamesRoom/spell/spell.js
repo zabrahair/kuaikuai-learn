@@ -157,7 +157,7 @@ Page({
     })
   },
 
-  
+
 
   /**
    * 生命周期函数--监听页面初次渲染完成
@@ -182,7 +182,7 @@ Page({
         totalScore: userScore.score.toFixed(1),
       })
     })
-    that.getQuestions(gameMode)
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer()
 
     // 隐藏暂停按钮
@@ -274,7 +274,7 @@ Page({
     let isCorrect = false
     if (answer == curQuestion.word) {
       isCorrect = true
-    } 
+    }
 
     that.setData({
       curAnswer: '',
@@ -339,32 +339,32 @@ Page({
     })
   },
 
-  /**
-   * 获取所有题目
-   */
-  getQuestions: function (gameMode) {
-    let that = this
+  // /**
+  //  * 获取所有题目
+  //  */
+  // getQuestions: function (gameMode) {
+  //   let that = this
 
-    if (gameMode == gConst.GAME_MODE.NORMAL) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + that.data.titleSubfix
-      })
-      common.getNormalQuestions(that, dataLoadTimer)
-      // this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
+  //   if (gameMode == gConst.GAME_MODE.NORMAL) {
+  //     wx.setNavigationBarTitle({
+  //       title: that.data.tableName + that.data.titleSubfix
+  //     })
+  //     common.getNormalQuestions(that, dataLoadTimer)
+  //     // this.getNormalQuestions(gConst.GAME_MODE.NORMAL);
 
-    } else if (gameMode == gConst.GAME_MODE.WRONG) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + that.data.titleSubfix
-      })
-      common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer );
+  //   } else if (gameMode == gConst.GAME_MODE.WRONG) {
+  //     wx.setNavigationBarTitle({
+  //       title: that.data.tableName + that.data.titleSubfix
+  //     })
+  //     common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer );
 
-    } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + that.data.titleSubfix
-      })
-      common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
-    }
-  },
+  //   } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
+  //     wx.setNavigationBarTitle({
+  //       title: that.data.tableName + that.data.titleSubfix
+  //     })
+  //     common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
+  //   }
+  // },
 
   /**
    * 暂停
@@ -372,7 +372,7 @@ Page({
   onClickPauseSwitch: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
-    if (utils.getDataset(e).isContinueButton 
+    if (utils.getEventDataset(e).isContinueButton
       && that.data.isPause == false){
       return;
     }
@@ -382,13 +382,13 @@ Page({
         pauseBtnText: '暂停',
         inputAnswerDisabled: false,
       })
-      animation.playFade(that, 
-        animation.MAP.FADE_OUT_QUESTION_BLOCK.name, 
-        null, 
+      animation.playFade(that,
+        animation.MAP.FADE_OUT_QUESTION_BLOCK.name,
+        null,
         res=>{
           animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
       })
-      
+
 
     } else {
       that.setData({
@@ -406,7 +406,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastDateChange: function (e) {
     let that = this
@@ -422,7 +422,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastTimeChange: function (e) {
     let that = this
@@ -438,13 +438,13 @@ Page({
   },
 
   /**
-   * Search questions with filter 
-   * 
+   * Search questions with filter
+   *
    */
   onClickSearch: function (e) {
     let that = this
     // debugLog('search now...')
-    that.getQuestions(that.data.gameMode);
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer();
   },
 
@@ -452,10 +452,10 @@ Page({
    * 点击拼写空档
    */
   onTapSpellBlank: function(e){
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     // debugLog('onTapSpellBlank.dataset', dataset)
     let that = this
-    
+
     let blankIdx = parseInt(dataset.blankIdx)
     // debugLog('typeof blankIdx', typeof blankIdx)
     let selectedBlank = dataset.spellBlank
@@ -482,7 +482,7 @@ Page({
           }
         })
       }
-   
+
     }
     that.setData({
       selectedCard: selectedCard,
@@ -502,7 +502,7 @@ Page({
    onTapSpellCard: function(e){
     // debugLog('onTapSpellCard.e', e);
     let that = this
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
     if(spellCard.cardState == CARD_STATE.USED){
@@ -513,7 +513,7 @@ Page({
       target: {
         dataset: {
           cardIdx: cardIdx,
-          spellCard: spellCard,          
+          spellCard: spellCard,
         }
       }
     }, res=>{
@@ -535,10 +535,10 @@ Page({
           break;
         }
       }
-      
+
     })
   },
-  
+
   /**
    * 当点击收藏按钮
    */
@@ -552,7 +552,7 @@ Page({
    */
   onClickLeftCard: function (e) {
     let that = this
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     let curQuestionIndex = that.data.curQuestionIndex
     let clickCardIdx = dataset.cardIdx
     let idxOffSet = clickCardIdx - curQuestionIndex
@@ -567,7 +567,7 @@ Page({
     common.processWordsIntoCards(that, nextQuestion)
   },
 
-  /** 
+  /**
    * 朗读当前卡片
    */
   playCardText: function(e){
@@ -611,14 +611,14 @@ Page({
           }
         })
         // 填上一个正确答案，只添一个
-        let rst = that.findCorrectCardAndClick(curSpellCards, corSpellArray[i])     
+        let rst = that.findCorrectCardAndClick(curSpellCards, corSpellArray[i])
         // 如果找不到正确的，说明已经被用了。找下一个。
         if(rst){
           that.data.curQuestion.score = parseFloat(that.data.curQuestion.score) - parseFloat(that.data.curQuestion.discount)
           that.setData({
             curQuestion: that.data.curQuestion
           })
-          return 
+          return
         }else {
           continue
         }
@@ -643,7 +643,7 @@ Page({
             }
           }
         })
-        
+
         return true
       }
     }
@@ -658,7 +658,7 @@ Page({
     let dictMode = gConst.DICT_SEARCH_MODE.WORD
     let dictSearchChar = null
     try {
-      let dataset = utils.getDataset(e)
+      let dataset = utils.getEventDataset(e)
       debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
       if (dataset.spellCard.letter.length > 0) {
         dictMode = gConst.DICT_SEARCH_MODE.CHAR

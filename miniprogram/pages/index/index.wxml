@@ -21,23 +21,38 @@
   </view>
   <scroll-view class='content' scroll-y='true'>
     <view class='items'>
-      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivide">
-          <text>九九除法练习</text>
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' 
+          wx:for-items='{{answerTypes}}' wx:for-item='answerType' 
+          wx:for-index='idx' wx:key="id" 
+          data-answer-type="{{answerType.name}}" bindtap="onClickAnswerType" >
+          <text>{{answerType.name}}</text>
           <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
       </view>
-      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickMathDivideWrongSlow">
-        <text>九九除法练习(错慢)</text>
-        <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-      </view>
-      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickTagsRoom">
+      <!-- <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickTagsRoom">
         <text>题库</text>
         <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-      </view>  
+      </view>   -->
       <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickFavorites">
+        <view wx:if="{{favoritesCount > 0}}"
+        class="count_point">
+        {{favoritesCount}}
+        </view>  
         <text>收藏</text>
         <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
       </view> 
+      <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickHistoryBook">
+        <view wx:if="{{doneCount > 0}}"
+        class="count_point">
+        {{doneCount}}
+        </view>      
+        <text>做过的题目</text>
+        <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
+      </view>         
       <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickWrongBook">
+        <view wx:if="{{incorrectCount > 0}}"
+        class="count_point">
+        {{incorrectCount}}
+        </view>
         <text>错题本</text>
         <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
       </view>         

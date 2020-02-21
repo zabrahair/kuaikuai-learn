@@ -24,8 +24,6 @@
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  justify-self: center;
-  align-self: center;
   box-sizing: border-box;
 
   margin-top: 2vh;
@@ -39,15 +37,13 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
-  justify-self: flex-start;
-  align-self: center;
   box-sizing: content-box;
 
   width: 90vw;
   height: 80%;
-  padding: 3%;
+  padding: 3vw;
   color: black;
   font-size: 6vw;
   font-weight: 300;
@@ -59,8 +55,7 @@
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
-  margin-top: 5vh;
-  width: 90vw;
+  width: 100%;
   min-height: 80%;
 }
 
@@ -71,8 +66,7 @@
   justify-content: flex-start;
   align-items: center;
 
-  width: 87vw;
-  margin-left: 1vw;
+  width: 100%;
   margin-top: 1vh;
   min-height: 8vh;
   /* box-shadow: 0px 0px 3px 2px rgb(97, 96, 96); */
@@ -83,8 +77,8 @@
 .task_content {
 
   align-items: center;
-  width: 87vw;
-  /* min-height: 10vh; */
+  width: 100%;
+  min-height: 20vh;
 }
 
 .actions {

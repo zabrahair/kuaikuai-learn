@@ -38,7 +38,7 @@
       <view class='current_tags'>
         {{filterTags}}
       </view>   
-      <view class="question_text">
+      <view class="question_text" style="font-size: {{cardFontSize}}vw;">
         {{curQuestion.questionText}}
       </view>
     </movable-area>
@@ -50,21 +50,16 @@
         <image class="btn_pause" bindtap='onClickPauseSwitch' src="{{gConst.PAUSE_ICON}}"/>
         
         <image class="btn_next_question" bindtap='onClickNextQuestion' type="warn" size='mini' data-idx-offset="1" src="{{gConst.NEXT_ICON}}"/>
-      </view>    
+      </view> 
+      <view class='answer' animation="{{fadeInOutQuestionBlock}}">
+        <input name='answer' class='input_answer' 
+        placeholder="输入答案" placeholder-class="input_answer_ph" 
+        bindinput='onInputAnswer' bindconfirm="submitAnswer" 
+        type="{{answerType}}" adjust-position="{{ false }}" disabled='{{inputAnswerDisabled}}' value="{{curAnswer?curAnswer:''}}"/>
+      </view>   
     </form>    
     <scroll-view class='bottom_content' scroll-y='true'>
-      <view wx:if="{{curOptions.length>0}}" class='sperator_title' animation="{{fadeInOutQuestionBlock}}">选项 ‣</view>
-      <view class="option_tags" scroll-y='true' animation="{{fadeInOutQuestionBlock}}">
-        <view class='option_tag {{option.state}}'
-        wx:for-items='{{curOptions}}' wx:for-item='option' 
-        wx:for-index='idx' wx:key="id" 
-        data-option-text='{{option.text}}' data-option-idx='{{idx}}'
-        bindtap="tapSelectOption">
-        <image class="option_select_icon {{option.state}}" 
-        src="{{gConst.ANSWER_CORRECT}}"/>
-        <text>{{option.text}}</text>
-        </view>
-      </view>   
+
       <view class='sperator_title'>其他练习 ‣</view> 
       <scroll-view class="all_words_container" scroll-y="true">
         <view class="all_words">
@@ -72,7 +67,7 @@
             wx:for-items='{{questionsDone}}' wx:for-item='question' 
             wx:for-index='idx' wx:key="_id" 
           >
-            {{question.title}}
+            {{question.questionText}}
           </view> 
           <view class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
             wx:for-items='{{questions}}' wx:for-item='question' 
@@ -85,7 +80,7 @@
             style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
             {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
             </view>
-            {{question.title}}
+            {{question.questionText}}
           </view>
         
         </view>

@@ -44,7 +44,7 @@ Page({
   data: {
     titleSubfix: '自助默写',
     // Question Related
-    ANSWER_TYPES: gConst.ANSWER_TYPES.MANUAL_CHECK,
+    ANSWER_TYPES: gConst.ANSWER_TYPES.SELF_RECITE,
     questions: [],
     questionsDone: [],
     curQuestionIndex: 0,
@@ -74,7 +74,7 @@ Page({
     // 画面效果
     fadeInOutQuestionBlock: null,
     fadeInOutContinueBtn: null,
-    turnOverSpellCard: null,    
+    turnOverSpellCard: null,
 
     // score related
     curScore: 0,
@@ -97,9 +97,6 @@ Page({
 
     // page show
     questionViewWidth: 50,
-    cardFontSize: 13.5,
-    maxCardFontSize: 15,
-    minCardFontSize: 5,
 
     // filters
     tags: [],
@@ -121,6 +118,7 @@ Page({
   },
 
   initOnLoad: function(that, options){
+    // debugLog('initOnLoad.options', options)
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
@@ -155,7 +153,7 @@ Page({
    */
   onShow: function () {
     let that = this
-    
+
   },
 
   whenPageOnShow: function(that){
@@ -166,7 +164,7 @@ Page({
         totalScore: userScore.score.toFixed(1),
       })
     })
-    that.getQuestions(gameMode)
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer()
 
     // 隐藏暂停按钮
@@ -175,7 +173,7 @@ Page({
     // 将单词卡反过来
     if (that.data.isAnswerVisible){
       // animation.playFade(that, animation.MAP.TURN_OVER_SPELL_CARD.name)
-    } 
+    }
   },
 
   /**
@@ -266,7 +264,7 @@ Page({
     let manualCheckResult
     let isCorrect = false
     try {
-      dataset = utils.getDataset(e)
+      dataset = utils.getEventDataset(e)
       // debugLog('submitAnswer.dataset', dataset)
       manualCheckResult = dataset.manualCheckResult
       for (let i in MANUAL_CHECK_RESULT) {
@@ -291,7 +289,7 @@ Page({
     if (answer == curQuestion.word) {
       isCorrect = true
     }
-    
+
     that.setData({
       curAnswer: answer?answer:null,
       curIsCorrect: isCorrect,
@@ -356,42 +354,12 @@ Page({
   },
 
   /**
-   * 获取所有题目
-   */
-  getQuestions: function (gameMode) {
-    let that = this
-    that.setData({
-      questions: []
-    })
-    if (gameMode == gConst.GAME_MODE.NORMAL) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + that.data.titleSubfix
-      })
-      common.getNormalQuestions(that, dataLoadTimer);
-
-    } else if (gameMode == gConst.GAME_MODE.WRONG) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.WRONG + that.data.titleSubfix
-      })
-      common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
-
-    } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
-      wx.setNavigationBarTitle({
-        title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
-      })
-      common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
-    }
-  },
-
-
-
-  /**
    * 暂停
    */
   onClickPauseSwitch: function (e) {
     let that = this
     // 对于继续按钮做特殊处理，防止误触发
-    if (utils.getDataset(e).isContinueButton
+    if (utils.getEventDataset(e).isContinueButton
       && that.data.isPause == false) {
       return;
     }
@@ -412,8 +380,8 @@ Page({
         inputAnswerDisabled: true,
       })
 
-      animation.playFade(that, animation.MAP.FADE_IN_QUESTION_BLOCK.name, 
-      null, 
+      animation.playFade(that, animation.MAP.FADE_IN_QUESTION_BLOCK.name,
+      null,
       res=>{
         animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
       })
@@ -422,7 +390,7 @@ Page({
 
 
   /**
-   * 
+   *
    */
   bindLastDateChange: function (e) {
     let that = this
@@ -438,7 +406,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastTimeChange: function (e) {
     let that = this
@@ -454,25 +422,25 @@ Page({
   },
 
   /**
-   * Search questions with filter 
-   * 
+   * Search questions with filter
+   *
    */
   onClickSearch: function (e) {
     let that = this
     debugLog('search now...')
-    that.getQuestions(that.data.gameMode);
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer();
   },
 
   onTapReciteCard: function (e) {
     let that = this
     // debugLog('onTapReciteCard.e', e)
-    
-    common.onTapReciteCard(that, e, 
+
+    common.onTapReciteCard(that, e,
     (thats, curSpellCards, cardIdx)=>{
       // 当卡反过来的时候
 
-    }, 
+    },
     (thats, curSpellCards, cardIdx) => {
       // 反一次卡，扣分1/n
       // let curQuestion = that.data.curQuestion
@@ -492,7 +460,7 @@ Page({
   onLongPressAnswerCard: function (e) {
     // debugLog('onLongPressAnswerCard.e', e.target.dataset);
     let that = this
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     let cardIdx = dataset.cardIdx
     let spellCard = dataset.spellCard
     if (spellCard.cardState == CARD_STATE.USED) {
@@ -509,7 +477,7 @@ Page({
     common.clickFavoriteSwitch(that, e)
   },
 
-  /** 
+  /**
    * 朗读当前卡片
    */
   playCardText: function (e) {
@@ -566,7 +534,7 @@ Page({
    */
   onClickLeftCard: function (e) {
     let that = this
-    let dataset = utils.getDataset(e)
+    let dataset = utils.getEventDataset(e)
     let curQuestionIndex = that.data.curQuestionIndex
     let clickCardIdx = dataset.cardIdx
     let idxOffSet = clickCardIdx - curQuestionIndex
@@ -583,7 +551,7 @@ Page({
     let dictMode = gConst.DICT_SEARCH_MODE.WORD
     let dictSearchChar = null
     try {
-      let dataset = utils.getDataset(e)
+      let dataset = utils.getEventDataset(e)
       debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
       if (dataset.spellCard.letter.length > 0) {
         dictMode = gConst.DICT_SEARCH_MODE.CHAR

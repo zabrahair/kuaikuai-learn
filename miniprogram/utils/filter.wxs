@@ -3,6 +3,9 @@ function randInteger(to, from=1){
 }
 
 function formatDate(pDateStr, format="年月日") {
+  if(!pDateStr || pDateStr.trim() == ''){
+    return;
+  }
   // console.log(pDateStr)
   var seperators = format.split('')
   // console.log(seperators)
@@ -18,8 +21,28 @@ function formatDate(pDateStr, format="年月日") {
   return dateString
 }
 
+function formatTime(pDateStr, format = "时分秒") {
+  if (!pDateStr || pDateStr.trim() == '') {
+    return;
+  }
+  // console.log(pDateStr)
+  var seperators = format.split('')
+  // console.log(seperators)
+  var dateParts = pDateStr.split(':')
+  // console.log(dateParts)
+  if (dateParts == pDateStr) {
+    dateParts = pDateStr.split('-')
+  }
+  var dateString = ''
+  for (var i = 0; i < dateParts.length; i++) {
+    dateString += dateParts[i] + seperators[i]
+  }
+  return dateString
+}
+
 // 导出对外暴露的属性
 module.exports = {
   randInteger: randInteger,
   formatDate: formatDate,
+  formatTime: formatTime,
 }

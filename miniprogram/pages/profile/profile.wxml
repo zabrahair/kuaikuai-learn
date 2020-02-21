@@ -1,3 +1,4 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
 <view class='container'>
   <view class='header'>
     <image class='avatar'

@@ -187,7 +187,37 @@ function getFavorites(tableName, pWhere, pageIdx, callback) {
   })
 }
 
+/**
+ * 获得做过题目的数量
+ */
+function getFavoritesCount(where, callback) {
+
+  // debugLog('getFavoritesCount.where', where)
+  db.collection(TABLE)
+    .aggregate()
+    .match(where)
+    .group({
+      _id: "计数",
+      count: $.sum(1),
+    })
+    .end()
+    .then
+    ((res, e) => {
+      // debugLog('getFavoritesCount.res', res)
+      // debugLog('questCorrectStat.res', res.list)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        callback(res.list[0].count)
+        return
+      } else {
+        callback(0)
+      }
+    })
+    .catch(err => console.error(err))
+}
+
 module.exports = {
+  getFavoritesCount, getFavoritesCount,
   createFavorite: createFavorite,
   removeFavorite: removeFavorite,
   getFavorites: getFavorites,

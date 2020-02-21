@@ -7,7 +7,7 @@ const errorLog = require('../../../utils/log.js').error;
 const gConst = require('../../../const/global.js');
 const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
-const animation = require('../../../utils/animation.js');
+const animation = require('../../../utils/animation.js')
 const TABLES = require('../../../const/collections.js')
 // Api Handler
 const dbApi = require('../../../api/db.js')
@@ -20,30 +20,11 @@ const common = require('../common/common.js')
 const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
-const MANUAL_CHECK_RESULT = {
-  RIGHT: {
-    name: '对',
-    value: true,
-  },
-  WRONG: {
-    name: '错',
-    value: false,
-  }
-}
+
 // 练习计时器
 var scoreTimer = null;
 var dataLoadTimer = null;
 
-// Alphabet Variables
-const alphabet = "abcdefghijklmnopqrstuvwxyz"
-const alphabetArray = alphabet.split('')
-const card_x_offset = 0;
-const card_y_offset = 300;
-const card_width = 50;
-const card_height = 60;
-
-// Page Const Value
-const BLANK_EMPTY = '_'
 
 Page({
 
@@ -51,26 +32,22 @@ Page({
    * 页面的初始数据
    */
   data: {
-    titleSubfix: '默写卡',
-    // Question Related
-    ANSWER_TYPES: gConst.ANSWER_TYPES.MANUAL_CHECK,
-    alphabetArray: alphabetArray,
-    questions: [],
-    questionsDone: [],
-    curQuestionIndex: 0,
-    curQuestion: {},
-    curSpellCards: [],
-    selectedCard: null,
-    isRandomSpell: false,
-
-    // User Info related
-    userInfo: null,
-
+    titleSubfix: '填空题',
     // Time related
     timerInterval: 1000,
     curDeciSecond: 0,
     thinkSeconds: 0,
     questionWaitTime: 0,
+
+    // Question Related
+    ANSWER_TYPES: gConst.ANSWER_TYPES.FILL_BLANK,
+    questions: [],
+    questionsDone: [],
+    curQuestionIndex: 0,
+    curQuestion: {},
+
+    // User Info related
+    userInfo: null,
 
     // Answer Related
     curAnswer: '',
@@ -78,8 +55,6 @@ Page({
     isPause: false,
     pauseBtnText: '暂停',
     inputAnswerDisabled: false,
-    fadeInOutQuestion: null,
-    fadeInOutPauseBtn: null,
     isFavorited: false,
 
     // score related
@@ -87,13 +62,16 @@ Page({
     totalScore: 0,
     historyRecord: {},
     userConfigs: utils.getUserConfigs(),
-
     // 得分效果和历史记录用的
     hitsCount: 0,
     isShowPointLayer: false,
     hitsAccuScore: 0,
     curIsCorrect: false,
     curAnswer: false,
+
+    // 画面效果
+    fadeInOutQuestionBlock: null,
+    fadeInOutContinueBtn: null,
 
     // gConst
     gConst: gConst,
@@ -112,28 +90,24 @@ Page({
     tags: [],
     lastDate: utils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
-
-    // Meaning Dialog
-    isShownMeanDialog: false,
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    debugLog('words.options', options)
+    // debugLog('onLoad.options', options)
     let that = this
-    that.initOnLoad(that, options)
+    that.initOnLoad(that, options);
     that.whenPageOnShow(that)
   },
 
-  initOnLoad: function (that, options) {
-    debugLog('initOnLoad.options', options)
+  initOnLoad: function(that, options){
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
     let lastDate = (typeof options.lastDate == 'string' && options.lastDate != '') ? options.lastDate : that.data.lastDate
-    let tags = []
+    let tags = [that.data.ANSWER_TYPES]
     if (options.filterTags) {
       let filterTagsStr = options.filterTags;
       tags = tags.concat(filterTagsStr.split(','))
@@ -148,8 +122,10 @@ Page({
       tableName: tableName,
       filterTags: options.filterTags,
       lastDate: lastDate,
+      selectedOptions: [],
     })
   },
+
   /**
    * 生命周期函数--监听页面初次渲染完成
    */
@@ -162,6 +138,7 @@ Page({
    */
   onShow: function () {
     let that = this
+
   },
 
   whenPageOnShow: function(that){
@@ -172,12 +149,15 @@ Page({
         totalScore: userScore.score.toFixed(1),
       })
     })
-    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer, that => {
+      common.processFillBlankQuestion(that)
+    });
     that.resetAnswer()
 
     // 隐藏暂停按钮
     animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
   },
+
   /**
    * 生命周期函数--监听页面隐藏
    */
@@ -214,13 +194,6 @@ Page({
   },
 
   /**
-   * 对当前题目进行处理
-   */
-  processCurrentQuestion: function(that, nextQuestion){
-    common.processWordsIntoCards(that, nextQuestion)
-  },
-
-  /**
    * 暂停判断
    */
   checkPauseStatus: function () {
@@ -238,14 +211,24 @@ Page({
   },
 
   /**
-   * 组合拼写结果
+   * 检查答案是否正确
    */
-  combineSpellAnswer: function (spellAnswer) {
-    if (spellAnswer && spellAnswer.length > 0) {
-      let answerWord = spellAnswer.map(card => card.blankValue).join('')
-      return answerWord;
+  checkAnswer: function (standardResult, myAnswer) {
+    try {
+      let resultValue = parseFloat(standardResult)
+      if (resultValue == myAnswer) {
+        return true
+      } else {
+        // 因为个数不一样所以错误
+        return false
+      }
+    } catch (e) {
+      // 因为异常所以错误
+      return false
     }
+
   },
+
   /**
    * 提交答案
    */
@@ -257,45 +240,27 @@ Page({
       }
     } catch (e) { }
 
-
+    
     // debugLog('submitAnswer.e', e)
-    let dataset ;
-    let answer
+    let dataset;
+    let answer = that.data.curAnswer
     let curQuestion = that.data.curQuestion
-    let manualCheckResult
     let isCorrect = false
-    try{
-      dataset = utils.getEventDataset(e)
-      debugLog('submitAnswer.dataset', dataset)
-      manualCheckResult = dataset.manualCheckResult
-      for(let i in MANUAL_CHECK_RESULT){
-        if (manualCheckResult == MANUAL_CHECK_RESULT[i].name){
-          debugLog('MANUAL_CHECK_RESULT[i].value', MANUAL_CHECK_RESULT[i].value)
-          if (MANUAL_CHECK_RESULT[i].value == true){
-            debugLog('curQuestion.word', curQuestion.word)
-            answer = curQuestion.word
-          }
-          break;
-        }
-      }
-    }catch(e){errorLog('submitAnswer.e', e)}
-
-
     // try{
 
+    // debugLog('formValues', formValues)
+
+    debugLog('curQuestion.answer', curQuestion)
+    debugLog('answer', answer)
     // 同時針對回車和Button提交
-    let curSpellCards = that.data.curSpellCards
-    if (!manualCheckResult){
-      answer = that.combineSpellAnswer(curSpellCards)
-    }
-    if (answer == curQuestion.word) {
-      isCorrect = true
-    }
+    isCorrect = that.checkAnswer(curQuestion.result, answer)
+    // debugLog('isCorrect', isCorrect)
 
     that.setData({
-      curAnswer: '',
-      thinkSeconds: 0,
+      curAnswer: answer ? answer : null,
+      curIsCorrect: isCorrect,
     })
+
     common.scoreApprove(that, curQuestion, isCorrect, () => {
       that.setData({
         curAnswer: '',
@@ -326,7 +291,7 @@ Page({
       return;
     }
 
-    if(e && e.timeStamp){
+    if (e && e.timeStamp) {
       wx.showModal({
         title: MSG.CONFIRM_TITLE,
         content: MSG.CONFIRM_RESET_MSG,
@@ -339,7 +304,7 @@ Page({
           }
         }
       })
-    }else{
+    } else {
       common.resetQuestionStatus(that, e, scoreTimer)
     }
   },
@@ -351,39 +316,10 @@ Page({
    */
   onClickNextQuestion: function (e, isCorrect, idxOffset) {
     let that = this
-    common.onClickNextQuestion(that, e, isCorrect, idxOffset, res=>{
+    common.onClickNextQuestion(that, e, isCorrect, idxOffset, res => {
 
     })
   },
-
-
-  // /**
-  //  * 获取所有题目
-  //  */
-  // getQuestions: function (gameMode) {
-  //   let that = this
-  //   that.setData({
-  //     questions: []
-  //   })
-  //   if (gameMode == gConst.GAME_MODE.NORMAL) {
-  //     wx.setNavigationBarTitle({
-  //       title: that.data.tableName + that.data.titleSubfix
-  //     })
-  //     common.getNormalQuestions(that, dataLoadTimer);
-
-  //   } else if (gameMode == gConst.GAME_MODE.WRONG) {
-  //     wx.setNavigationBarTitle({
-  //       title: that.data.tableName + gConst.GAME_MODE.WRONG + that.data.titleSubfix
-  //     })
-  //     common.getHistoryQuestions(that, gConst.GAME_MODE.WRONG, dataLoadTimer);
-
-  //   } else if (gameMode == gConst.GAME_MODE.FAVORITES) {
-  //     wx.setNavigationBarTitle({
-  //       title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
-  //     })
-  //     common.getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer);
-  //   }
-  // },
 
   /**
    * 暂停
@@ -401,11 +337,9 @@ Page({
         pauseBtnText: '暂停',
         inputAnswerDisabled: false,
       })
-      animation.playFade(that,
-        animation.MAP.FADE_OUT_QUESTION_BLOCK.name, null,
-        res => {
-          animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
-      })
+      animation.playFade(that, animation.MAP.FADE_OUT_QUESTION_BLOCK.name)
+
+      animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
 
     } else {
       that.setData({
@@ -423,12 +357,34 @@ Page({
   },
 
   /**
-   * 当改变时间
+   * Fade In Out Question
+   */
+  fadeInOut: function (animationName, fadeOptions, callback) {
+    let that = this;
+    let option = {
+      duration: fadeOptions.duration, // 动画执行时间
+      timingFunction: fadeOptions.timingFunction // 动画执行效果
+    };
+    var fadeInOut = wx.createAnimation(option)
+    fadeInOut.rotateY(fadeOptions.rotateY);
+    // moveOne.translateX('100vw');
+    fadeInOut.opacity(fadeOptions.opacity).step();
+    that.setData({
+      [animationName]: fadeInOut.export(),// 开始执行动画
+    }, function () {
+      if (callback) {
+        callback()
+      };
+    })
+  },
+
+  /**
+   * 
    */
   bindLastDateChange: function (e) {
     let that = this
     debugLog('bindLastDateChange.e', e)
-    let lastDate = utils.getEventDetailValue(e);
+    let lastDate = e.detail.value;
     let lastTime = that.data.lastTime;
     let date = utils.mergeDateTime(lastDate, lastTime)
     that.setData({
@@ -438,7 +394,7 @@ Page({
   },
 
   /**
-   *
+   * 
    */
   bindLastTimeChange: function (e) {
     let that = this
@@ -454,17 +410,19 @@ Page({
   },
 
   /**
-   * Search questions with filter
-   *
+   * Search questions with filter 
+   * 
    */
   onClickSearch: function (e) {
     let that = this
     debugLog('search now...')
-    common.getQuestions(that, that.data.gameMode, dataLoadTimer);
+    common.getQuestions(that, that.data.gameMode, dataLoadTimer, that => {
+      common.processFillBlankQuestion(that)
+    });
     that.resetAnswer();
   },
 
-  onTapReciteCard: function(e){
+  onTapReciteCard: function (e) {
     let that = this
     common.onTapReciteCard(that, e)
   },
@@ -493,16 +451,6 @@ Page({
     common.clickFavoriteSwitch(that, e)
   },
 
-
-
-  /**
-   * 朗读当前卡片
-   */
-  playCardText: function (e) {
-    let that = this
-    common.readCurrentWord(that, that.data.curQuestion.word)
-  },
-
   /**
  * 当点击剩下的单词卡片
  */
@@ -517,48 +465,55 @@ Page({
   },
 
   /**
-  * 点击词典图标
-  */
-  openDictDialog: function (e) {
+   * tap Answer Option
+   * 
+   */
+  tapSelectOption: function (e) {
     let that = this
-    let dictMode = gConst.DICT_SEARCH_MODE.WORD
-    let dictSearchChar = null
-    try {
-      let dataset = utils.getEventDataset(e)
-      debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
-      if (dataset.spellCard.letter.length > 0) {
-        dictMode = gConst.DICT_SEARCH_MODE.CHAR
-        dictSearchChar = dataset.spellCard.letter
-      }
-    } catch (e) { }
-    if (that.data.tableValue.includes('chinese')) {
-      that.setData({
-        isShownMeanDialog: true,
-        dictMode: dictMode,
-        dictSearchChar: dictSearchChar,
-      })
-    } else if (that.data.tableValue.includes('english')) {
-      that.setData({
-        isShownMeanDialog: true,
-        dictMode: dictMode,
-        dictSearchChar: dictSearchChar,
-      })
-    } else {
-      wx.showToast({
-        title: MSG.FEATURE_IS_DISABLE,
-      })
-    }
+    // debugLog('tapSelectOption.e', e)
+    common.tapSelectOption(that, e)
   },
 
   /**
-   * 关闭显示得分层
+   * 对当前题目进行处理
    */
-  closeMeanDialog: function (params) {
+  processCurrentQuestion: function (that, nextQuestion) {
+    if (that.data.tableValue == TABLES.MATH_DIVIDE
+      && !nextQuestion.questionText) {
+      let questionText = nextQuestion.op1 + nextQuestion.operator + nextQuestion.op2 + nextQuestion.then
+      nextQuestion['questionText'] = questionText
+        // debugLog('processMathDivideOptions', question)
+      that.setData({
+        curQuestion: nextQuestion,
+      })
+    }
+
+  },
+    
+  /**
+   * When Input Answer
+   */
+  onInputAnswer: function (e) {
     let that = this
-    that.setData({
-      isShownMeanDialog: false,
-      dictMode: gConst.DICT_SEARCH_MODE.WORD,
-      dictSearchChar: null,
-    })
+    if (that.checkPauseStatus()) {
+      return;
+    }else{
+      try{
+        let answer = utils.getEventDetailValue(e)
+        answer = parseFloat(answer)
+        that.setData({
+          curAnswer: answer
+        })
+      }catch(err){errorLog('err',err)}
+      
+    }
+  },
+
+  /** 
+   * 朗读当前卡片
+   */
+  playCardText: function (e) {
+    let that = this
+    common.readCurrentWord(that, that.data.curQuestion.questionText)
   }
 })

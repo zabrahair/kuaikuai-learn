@@ -9,14 +9,15 @@
     "pages/gamesRoom/words/words",
     "pages/TagsRoom/TagsRoom",
     "pages/favorites/favorites",
-    "pages/wrongBook/wrongBook",
+    "pages/historyBook/historyBook",
     "pages/gamesRoom/optionsSelect/optionsSelect",
     "pages/gamesRoom/selfRecite/selfRecite",
     "components/scoreTitle/scoreTitle",
     "components/dictDialog/dictDialog",
     "components/getPoint/getPoint",
     "pages/aRunQuery/aRunQuery",
-    "pages/tasks/tasks"
+    "pages/tasks/tasks",
+    "pages/gamesRoom/fillBlank/fillBlank"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
@@ -40,7 +41,7 @@
         "selectedIconPath": "images/tags_selected.png",
         "iconPath": "images/wrong_book_unselected.png",
         "text": "任务"
-      },      
+      },
       {
         "pagePath": "pages/profile/profile",
         "selectedIconPath": "images/profile.png",

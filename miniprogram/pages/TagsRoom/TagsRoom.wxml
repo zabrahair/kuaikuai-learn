@@ -1,5 +1,5 @@
 <view class='container'>
-  <scroll-view class="tables-container" scroll-y='true'>
+  <scroll-view class="tables-container" scroll-x='true'>
     <view class='tables-cloud'>
       <view class='table {{table.css}}'
         wx:for-items='{{tables}}' wx:for-item='table' 
@@ -33,8 +33,11 @@
         data-tag-text='{{tag.text}}'  
         data-tag-idx='{{idx}}'
         data-tag-last-date='{{tag.lastDate}}'
-        bindtap="tapTag"
-      >
+        bindtap="tapTag">
+        <view wx:if="{{tag.count > 0}}"
+          class="count_point">
+          {{tag.count}}
+        </view>
         {{tag.text}}
       </view>
     </view>
