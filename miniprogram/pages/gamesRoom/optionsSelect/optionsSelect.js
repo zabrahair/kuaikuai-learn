@@ -500,6 +500,30 @@ Page({
   },
 
   /**
+ * 点击已经完成的卡片
+ */
+  onClickDoneCard: function (e) {
+    let that = this
+    let dataset = utils.getEventDataset(e)
+    let clickCardIdx = dataset.cardIdx
+    let clickDoneQuestion = that.data.questionsDone[clickCardIdx]
+    let questions = that.data.questions
+    // move done question to left questions
+    questions.push(clickDoneQuestion)
+    that.data.questionsDone.splice(clickCardIdx, 1)
+    let nowCardIdx = questions.length - 1
+    // mock up click left card
+    that.onClickLeftCard({
+      target: {
+        dataset: {
+          cardIdx: nowCardIdx,
+          question: clickDoneQuestion,
+        }
+      }
+    })
+  },
+
+  /**
    * tap Answer Option
    *
    */

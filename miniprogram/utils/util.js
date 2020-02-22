@@ -332,9 +332,9 @@ function refreshUserRoleConfigs(){
 }
 
 /**
- * 刷新用户角色
+ * 刷新系统配置
  */
-function refreshConfigs(configGroupTag) {
+function refreshConfigs(configGroupTag, callback) {
   const configsApi = require('../api/configs.js')
   let pageIdx = 0
   // let dataLoadTimer = null
@@ -350,6 +350,7 @@ function refreshConfigs(configGroupTag) {
           configsLoaded = []
         }
         configsLoaded = configsLoaded.concat(configs)
+        if(callback)callback(configGroupTag, configsLoaded)
         wx.setStorageSync(configGroupTag, configsLoaded)
       } else {
         clearInterval(dataLoadTimer)
@@ -357,6 +358,19 @@ function refreshConfigs(configGroupTag) {
     })
   //   pageIdx++
   // }, 100)
+}
+
+/**
+ * 按标签获取配置
+ */
+function getConfigs(configGroupTag, ifRefreshData, callback) {
+  let configs = wx.getStorageSync(configGroupTag)
+  if(ifRefreshData||!configs){
+    refreshConfigs(configGroupTag, (configType, configs)=>{
+      if (callback)callback(configType, configs)
+    })
+  }
+  return configs
 }
 
 /**
@@ -370,8 +384,24 @@ function getArrFromObjectsArr(objects, propName){
     }
   }
   
-  return array
-  
+  return array 
+}
+
+/**
+ * 以特定的字段为主键，把数组转化为对象
+ */
+function array2Object(array, pKey){
+  let object = {}
+  if (array && array.length > 0) {
+    for (let i in array) {
+      // debugLog('array[i]', array[i])
+      let key = array[i][pKey]
+      // debugLog('key', key)
+      object[key] = array[i]
+      // debugLog('object[key]', object)
+    }
+  }
+  return object  
 }
 
 /**
@@ -472,10 +502,12 @@ function getStorage(key){
 
 module.exports = {
   /** 工具型方法 */
+
   /* -- Event 方法 -- */
   getEventDataset: getEventDataset,
   getEventDetailValue: getEventDetailValue,
 
+  array2Object: array2Object,
   formatTime: formatTime,
   formatDate: formatDate,
   formatDeciTimer: formatDeciTimer,
@@ -492,6 +524,7 @@ module.exports = {
   /** 功能型方法 */
   refreshUserRoleConfigs: refreshUserRoleConfigs,
   refreshConfigs: refreshConfigs,
+  getConfigs: getConfigs,
   getGamingStatistics: getGamingStatistics,
   getUserConfigs: getUserConfigs,
   getUserRole: getUserRole,

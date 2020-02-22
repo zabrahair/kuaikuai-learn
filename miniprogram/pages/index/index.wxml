@@ -57,7 +57,9 @@
         <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
       </view>         
     </view>
-    <statistic/>
+    <statistic
+      isShown='{{isRefreshStatistic}}'
+    />
     <!--
     <view class='game_item' bindtap="onClickSpellEnglishWords">
       <text>英语单词拼写</text>

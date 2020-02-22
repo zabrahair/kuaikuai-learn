@@ -65,9 +65,9 @@ Component({
         if (dictMode == gConst.DICT_SEARCH_MODE.WORD){
           // debugLog('observers.word', word)
           that.getWordMeaning(that, table, word, res=>{
-            debugLog('getWordMeaning.res', res)
+            // debugLog('getWordMeaning.res', res)
             if(!res){
-              debugLog('getWordMeaning.search.from.web', )
+              // debugLog('getWordMeaning.search.from.web', )
               if (table.includes('chinese')) {
                 that.searchCnWordMeaning(that, word);
               } else if (table.includes('english')) {

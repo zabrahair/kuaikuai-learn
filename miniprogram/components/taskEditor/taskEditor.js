@@ -11,6 +11,7 @@ const TABLES = require('../../const/collections.js')
 
 /* DB API */
 const dbApi = require('../../api/db.js')
+const userApi = require('../../api/user.js')
 const taskCommon = require('../../common/task.js')
 
 /* DB Related */
@@ -26,15 +27,44 @@ Component({
     isShown: {
       type: Boolean,
       value: false,
+    }, 
+    curStatus: {
+      type: Object,
+      value: null,
+    },
+    curTask: {
+      type: Object,
+      value: null,
     },
   },
 
   /**
    * 组件的初始数据
    */
-  data: taskCommon.initEditorData({
+  data: taskCommon.defaultEditorData({
 
   }),
+  lifetimes: {
+    attached: function () {
+      let that = this
+      taskCommon.initEditor(that)
+  
+    },
+
+    show: function () {
+      // debugLog('getPoint.lifetimes.show')
+      let that = this
+    }
+  },
+
+  pageLifetimes: {
+    show: function () {
+      // debugLog('getPoint.pageLifetimes.show')
+      let that = this
+
+    }
+  },
+
   observers: {
     'isShown': function (isShown) {
       let that = this
@@ -85,6 +115,22 @@ Component({
       that.setData({
         selBonusIdx: selIdx
       })
-    }
+    },
+
+    onClickSave: function(e){
+
+    },
+    onClickCancel: function (e) {
+
+    },    
+    onClickAssign: function (e) {
+
+    },
+    onClickFinish: function (e) {
+
+    },
+    onClickApprove: function (e) {
+
+    },
   }
 })

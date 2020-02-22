@@ -1,45 +1,78 @@
 <wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<wxs module="task" src="./taskEditor.wxs"></wxs>
 <view wx:if="{{isShown}}" class='component-container'>
   <view class='component-content view_shadow' scroll-y="true" scroll-x="true">
     <scroll-view class="scroll-content">
+      <view class='current_status'>
+        {{curStatus.name}}
+      </view>
       <form class="form">
         <!-- 被委派任务的人 -->
-        <picker name="assingee" class='form_item' 
-        bindchange="selectAssingee" value="{{index}}" range="{{children}}" range-key="name">
+        <picker 
+          disabled="{{task.isDisabled(curTask, curStatus)}}"
+          name="assingee" class='form_item' 
+          bindchange="selectAssingee" value="{{index}}" 
+          range="{{children}}" range-key="name">
           <view class="picker">
-          委派: {{children[selChildrenIdx].name}} ▾
+          委派: {{curTask.toWho.name}} ▾
           </view>
         </picker>  
         <!-- 内容要求 -->
-        <textarea name="taskContent" class="form_item task_content" bindblur="bindTaskContentInputed" placeholder="输入任务内容" auto-height />
+        <textarea  disabled="{{task.isDisabled(curTask, curStatus)}}"
+          name="taskContent" class="form_item task_content" 
+          bindblur="bindTaskContentInputed" placeholder="输入任务内容" 
+          value="{{curTask.content}}"
+          auto-height  />
         <!-- 积分奖励 -->
-        <picker name="bonusPoint" class='form_item' 
-        bindchange="selectBonus" value="{{index}}" range="{{BonusClasses}}" range-key="name">
+        <picker disabled="{{(curStatus.value==TASK_STATUS_OBJ.CREATE.value || curStatus.value==TASK_STATUS_OBJ.SAVED.value)?false:true}}" 
+          name="bonusPoint" class='form_item' 
+          bindchange="selectBonus" value="{{index}}" 
+          range="{{BONUS_CLASSES}}" range-key="name">
           <view class="picker">
-          奖励: {{BonusClasses[selBonusIdx].value}} 点 ▾
+          奖励: {{curTask.bonus.value}} 点 ▾
           </view>
         </picker> 
         <!-- 完成时间        -->
         <view name="deadlineDate" class='form_item' class="form_item">
-          <picker mode="date" value="{{deadlineDate}}" start="{{deadlineDate}}" end="2099-12-31" bindchange="bindDeadlineDateChange">
+          <picker disabled="{{(curStatus.value==TASK_STATUS_OBJ.CREATE.value || curStatus.value==TASK_STATUS_OBJ.SAVED.value)?false:true}}" 
+           mode="date" value="{{deadlineDate}}" 
+           start="{{deadlineDate}}" end="2099-12-31" 
+           bindchange="bindDeadlineDateChange">
             <view class="picker">
-              在 {{filter.formatDate(deadlineDate)}} ▾ 
+              在 {{filter.formatDate(curTask.deadline.date)}} ▾ 
             </view>
           </picker>
-          <picker name="deadlineTime" mode="time" value="{{deadlineTime}}" start="00:00" end="23:59" bindchange="bindDeadlineTimeChange">
+          <picker disabled="{{(curStatus.value==TASK_STATUS_OBJ.CREATE.value || curStatus.value==TASK_STATUS_OBJ.SAVED.value)?false:true}}" 
+            name="deadlineTime" mode="time" value="{{deadlineTime}}" 
+            start="00:00" end="23:59" bindchange="bindDeadlineTimeChange">
             <view class="picker">
-              {{deadlineTime}} ▾ 前完成
+              {{filter.formatTime(curTask.deadline.time)}} ▾ 前完成
             </view>
           </picker>
         </view>
       </form>
     </scroll-view>
     <view class="actions bg_color_{{filter.randInteger(24)}}">
-      <button class="button" bindtap="onClickEnter" type='default' size="mini">保存</button>
-      <button class="button" bindtap="onClickEnter" type='default' size="mini">发布</button>
-      <button class="button" bindtap="onClickEnter" type='default' size="mini">接受</button>
-      <button class="button" bindtap="onClickEnter" type='default' size="mini">完成</button>
-      <button class="button" bindtap="onClickEnter" type='default' size="mini">确认</button>
+      <!-- <button class="button" bindtap="onClickSave" type='default' size="mini">保存</button> -->
+      <button wx:if="{{curStatus.value==TASK_STATUS_OBJ.CREATE.value || curStatus.value==TASK_STATUS_OBJ.SAVED.value}}" 
+      class="button" bindtap="onClickAssigned" 
+      type='default' size="mini">委派</button>
+
+      <button wx:if="{{curStatus.value==TASK_STATUS_OBJ.CREATE.value || curStatus.value==TASK_STATUS_OBJ.SAVED.value}}" 
+      class="button" bindtap="onClickCancel" 
+      type='default' size="mini">取消</button> 
+
+      <button wx:if="{{curStatus.value==TASK_STATUS_OBJ.ASSIGNED.value || urStatus.value==TASK_STATUS_OBJ.RECEIVED.value}}" 
+      class="button" bindtap="onClickClaim" 
+      type='default' size="mini">认领</button>
+
+      <button wx:if="{{curStatus.value==TASK_STATUS_OBJ.CLAIMED.value || curStatus.value==TASK_STATUS_OBJ.IMPLEMENTING.value}}" 
+      class="button" bindtap="onClickFinish" 
+      type='default' size="mini">完成</button>
+
+      <button wx:if="{{curStatus.value==TASK_STATUS_OBJ.FINISHED.value}}" 
+      class="button" bindtap="onClickApprove" 
+      type='default' size="mini">确认</button>
     </view>
   </view>
   

@@ -22,6 +22,10 @@ Component({
    * 组件的属性列表
    */
   properties: {
+    isShown: {
+      type: Boolean,
+      value: false,
+    },
   },
 
   /**
@@ -55,7 +59,12 @@ Component({
   },
 
   observers: {
-
+    'isShown': function (isShown) {
+      let that = this
+      if (isShown == true) {
+        that.refreshStatistic(that)
+      }
+    },
   },
   /**
    * 组件的方法列表

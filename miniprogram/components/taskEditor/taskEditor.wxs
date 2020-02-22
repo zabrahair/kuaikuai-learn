@@ -1,0 +1,12 @@
+function isDisabled(curTask, curStatus){
+  if(curStatus.value == TASK_STATUS_OBJ.CREATE.value || curStatus.value == TASK_STATUS_OBJ.SAVED.value){
+    return false;
+  }else{
+    return true;
+  }
+}
+
+// 导出对外暴露的属性
+module.exports = {
+  isDisabled: isDisabled,
+}

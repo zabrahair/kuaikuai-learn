@@ -146,9 +146,11 @@ module.exports = {
     ANSWER_TYPE: 'ANSWER_TYPE',
     SYSTEM_CONFIG: 'SYSTEM_CONFIG',
     COMBO_TYPE: 'COMBO_TYPE',
+    TASK_STATUS: 'TASK_STATUS',
+    BONUS_CLASSES: 'BONUS_CLASSES',
   },
   DICT_SEARCH_MODE: {
     WORD: 'WORD',
     CHAR: 'CHAR',
-  }
+  },
 }

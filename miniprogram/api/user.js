@@ -4,6 +4,9 @@ const gConst = require('../const/global.js');
 const storeKeys = require('../const/global.js').storageKeys;
 const utils = require('../utils/util.js');
 const TABLES = require('../const/collections.js');
+const TABLE = TABLES.USERS
+
+
 
 const queryUser = function (filters, callback) {
   const db = wx.cloud.database()
@@ -141,9 +144,94 @@ function updateUserConfigs(openid, userConfigs, callback){
         icon: 'none',
         title: '更新记录失败'
       })
+      callback(null)
       errorLog('[数据库USER] [更新记录] 失败：', err)
     }
   })
+}
+
+function getChildren(callback){
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
+
+  let userInfo = wx.getStorageSync('userInfo')
+  let openid;
+  if(userInfo && userInfo._openid){
+    openid = userInfo._openid
+    // 根据条件查询所有用户
+    db.collection(TABLE)
+      .where({ _id: openid})
+      .field({
+        _id: true,
+        children: true,
+      })
+      .get({
+      success: res => {
+        let result = res.data;
+        if(result.length > 0){
+          debugLog('children', result[0]);
+          callback(result[0])
+        }else{
+          wx.showToast({
+            icon: 'none',
+            title: '查询记录失败'
+          })
+          callback(null)
+        }
+
+      },
+      fail: err => {
+        wx.showToast({
+          icon: 'none',
+          title: '查询记录失败'
+        })
+        callback(null)
+        errorLog('[数据库] [查询记录] 失败：', err)
+      }
+    })
+  }
+}
+
+function getParents(){
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
+
+  let userInfo = wx.getStorageSync('userInfo')
+  let openid;
+  if (userInfo && userInfo._openid) {
+    openid = userInfo._openid
+    // 根据条件查询所有用户
+    db.collection(TABLE)
+      .where({ _id: openid })
+      .field({
+        _id: true,
+        parents: true,
+      })
+      .get({
+        success: res => {
+          let result = res.data;
+          if (result.length > 0) {
+            debugLog('parent', result[0]);
+            callback(result[0])
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: '查询记录失败'
+            })
+            callback(null)
+          }
+        },
+        fail: err => {
+          wx.showToast({
+            icon: 'none',
+            title: '查询记录失败'
+          })
+          errorLog('[数据库] [查询记录] 失败：', err)
+        }
+      })
+  }
 }
 
 module.exports = {
@@ -152,4 +240,6 @@ module.exports = {
   updateUser: updateUser,
   getUserConfigs: getUserConfigs,
   updateUserConfigs: updateUserConfigs,
+  getChildren: getChildren,
+  getParents: getParents,
 }

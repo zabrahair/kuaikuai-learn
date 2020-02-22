@@ -9,5 +9,7 @@
   </view>
   <task-editor
     isShown="{{isShownTaskEditor}}"
+    curStatus="{{TASK_STATUS_OBJ.SAVED}}"
+    curTask="{{curTask}}"
   />
 </view>

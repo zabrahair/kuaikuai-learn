@@ -24,6 +24,7 @@ Page({
     scoreIcon: gConst.SCORE_ICON,
     gConst: gConst,
     globalData: globalData,
+    isRefreshStatistic: true,
   },
 
   /**
@@ -79,6 +80,13 @@ Page({
     let answerTypes = wx.getStorageSync(gConst.CONFIG_TAGS.ANSWER_TYPE)
     that.setData({
       answerTypes: answerTypes
+    })
+    that.setData({
+      isRefreshStatistic: false,
+    },()=>{
+      that.setData({
+        isRefreshStatistic: true,
+      })
     })
   },
 

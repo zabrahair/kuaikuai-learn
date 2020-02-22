@@ -44,6 +44,6 @@
   </scroll-view>
   <view class='buttons'> 
     <button class="button" bindtap="onClickEnter" type='primary'>进入</button>
-    <button class="button" bindtap="onKeywordSearch" type='warn' size="mini">重来</button>
+    <!-- <button class="button" bindtap="onKeywordSearch" type='warn' size="mini">重来</button> -->
   </view>
 </view>
