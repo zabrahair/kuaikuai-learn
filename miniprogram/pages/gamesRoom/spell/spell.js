@@ -110,7 +110,7 @@ Page({
     questionViewWidth: 50,
     cardFontSize: 13.5,
     maxCardFontSize: 15,
-    minCardFontSize: 5,
+    minCardFontSize: 6,
 
     // filters
     tags: ['拼写'],

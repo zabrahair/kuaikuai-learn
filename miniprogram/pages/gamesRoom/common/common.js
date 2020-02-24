@@ -1180,7 +1180,6 @@ function tapFilterTable(that, e, dataLoadTimer, callback) {
       getTags(that, selectedTable.value, dataLoadTimer)
     })
   })
-
 }
 
 /**

@@ -81,6 +81,7 @@ Page({
     totalScore: 0,
     historyRecord: {},
     userConfigs: utils.getUserConfigs(),
+
     // 得分效果和历史记录用的
     hitsCount: 0,
     isShowPointLayer: false,
@@ -97,6 +98,9 @@ Page({
 
     // page show
     questionViewWidth: 50,
+    cardFontSize: 13.5,
+    maxCardFontSize: 15,
+    minCardFontSize: 8,
 
     // filters
     tags: [],

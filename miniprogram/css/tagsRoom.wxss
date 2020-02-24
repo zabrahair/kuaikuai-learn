@@ -184,8 +184,6 @@
   margin-top: 2vw;
 }
 
-
-
 .button {
   display: flex;
   flex-direction: row;

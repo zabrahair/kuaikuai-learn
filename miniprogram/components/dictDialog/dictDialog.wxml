@@ -1,9 +1,13 @@
-<movable-area wx:if="{{isShown}}" class='component-container' direction="all">
-  <scroll-view class='component-content' scroll-y="true" scroll-x="true">
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<movable-area wx:if="{{isShown}}" 
+  class='component-container' direction="all" animation='{{switchDialogStatus}}'>
+  <scroll-view class='component-content' 
+    scroll-y="true" scroll-x="true" >
     <rich-text class='scroll-content' nodes="{{meaning}}" bindtap="tap"/>
   </scroll-view>
-  <movable-view direction='all' x='285' y='55'>
+  <movable-view direction='all' x='320' y='70' >
     <image class="play-sound" src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
   </movable-view>
+  <view class='close_line' ></view >
   <image src='../../images/close.png' class='close_button' bindtap="onClose"/>  
 </movable-area>

@@ -8,23 +8,22 @@ const gConst = require('../../const/global.js');
 const storeKeys = require('../../const/global.js').storageKeys;
 const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
+const animation = require('../../utils/animation.js');
+const dialogCommon = require('../../common/dialog.js')
 
 const dbApi = require('../../api/db.js')
 const common = require('../../pages/gamesRoom/common/common.js')
+
 //db
 const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
-
+const ON_LOADING_TIMEOUT = 10000
 Component({
   /**
    * 组件的属性列表
    */
-  properties: {
-    isShown: {
-      type: Boolean,
-      value: false,
-    },
+  properties: dialogCommon.defaultDialogProperties({
     table: {
       type: String,
       value: '',
@@ -41,14 +40,28 @@ Component({
       type: String,
       value: gConst.DICT_SEARCH_MODE.WORD,
     },    
-  },
+  }),
 
   /**
    * 组件的初始数据
    */
-  data: {
+  data: dialogCommon.defaultDialogData({
     meaning: '',
-    gConst: gConst,
+  }),
+
+  lifetimes: {
+    attached: function(){
+      let that = this
+      dialogCommon.initDialog(that)
+    },
+    show: function(){
+      debugLog('dictDialog.lifetimes.show')
+    }
+  },
+  pageLifetimes: {
+    show: function () {
+      // debugLog('getPoint.pageLifetimes.show')
+    }
   },
   observers: {
     'isShown, table, dictMode, word, char': function (isShown, table, dictMode, word, char) {
@@ -56,12 +69,13 @@ Component({
       // debugLog('observers.dictMode', dictMode)
       // debugLog('observers.dictMode', table)
       if(isShown == true){
+        dialogCommon.whenIsShown(that)
         wx.showLoading({
           title: MSG.ON_LOADING,
         })
-        setTimeout(res=>{
+        setTimeout(res => {
           wx.hideLoading()
-        }, 10000)
+        }, ON_LOADING_TIMEOUT)  
         if (dictMode == gConst.DICT_SEARCH_MODE.WORD){
           // debugLog('observers.word', word)
           that.getWordMeaning(that, table, word, res=>{
@@ -240,14 +254,21 @@ Component({
     /**
      * 关闭对话框
      */
-    onClose: function (e) {
-      let that = this
-      that.setData({
-        isShown: false
-      }, res => {
-        that.triggerEvent('close')
-      })
-    },
+    onClose: dialogCommon.onClose,
+    // function (e) {
+    //   let that = this
+    //   animation.playSwitchDialog(
+    //     that, 
+    //     animation.MAP.CLOSE_DIALOG.name, 
+    //     {},
+    //     ()=>{
+    //       that.setData({
+    //         isShown: false
+    //       }, res => {
+    //         that.triggerEvent('close')
+    //       })
+    //   })
+    // },
     /** 
      * 朗读当前卡片
      */

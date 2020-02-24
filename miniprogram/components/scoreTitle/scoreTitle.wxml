@@ -1,3 +1,4 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
 <view class="component-container">
   <view class='current_score'>
     <image class='caption' src="{{gConst.SCORE_ICON}}"/>

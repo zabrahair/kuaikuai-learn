@@ -1,0 +1,30 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<view class='container'>
+  <scroll-view class="tables-container" scroll-y='true'>
+    <view class='tables-cloud'>
+      <view class='table {{lang.css}}'
+        wx:for-items='{{langs}}' wx:for-item='lang' 
+        wx:for-index='idx' wx:key="table" 
+        data-lang-value='{{lang.value}}' 
+        data-lang-idx='{{idx}}'
+        bindtap="tapLang"
+      >
+        {{lang.name}}
+      </view>
+      <view class="keyword_search">
+        <input class="input_keyword" 
+        type="text" confirm-type="search" 
+        bindconfirm="onKeywordSearch" bindblur="onKeywordSearch" 
+        placeholder="关键字过滤" placeholder-class="input_keyword_ph" confirm-type='search'/>
+      </view>
+    </view>
+  </scroll-view>
+  <scroll-view class="tags-container" scroll-y='true'>
+    <view class='tags-cloud'>
+      <rich-text class='scroll-content' nodes="{{meaning}}" bindtap="tap"/>
+    </view>
+  </scroll-view>
+  <!-- <view class='buttons'> 
+    <button class="button" bindtap="onClickEnter" type='primary'>进入</button>
+  </view> -->
+</view>

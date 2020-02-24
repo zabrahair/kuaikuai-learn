@@ -1,6 +1,8 @@
-<view wx:if="{{isShown}}" class='component-container'>
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<view wx:if="{{isShown}}" class='component-container' animation='{{switchDialogStatus}}'>
   <view class='component-content' scroll-y="true" scroll-x="true">
     <statistic/>
   </view>
+  <view class='close_line'></view>
   <image src='../../images/close.png' class='close_button' bindtap="onClose"/>  
 </view>

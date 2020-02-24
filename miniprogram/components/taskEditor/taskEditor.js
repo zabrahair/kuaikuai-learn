@@ -8,6 +8,8 @@ const gConst = require('../../const/global.js');
 const storeKeys = require('../../const/global.js').storageKeys;
 const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
+const animation = require('../../utils/animation.js');
+const dialogCommon = require('../../common/dialog.js')
 
 /* DB API */
 const dbApi = require('../../api/db.js')
@@ -23,11 +25,7 @@ Component({
   /**
    * 组件的属性列表
    */
-  properties: {
-    isShown: {
-      type: Boolean,
-      value: false,
-    }, 
+  properties: dialogCommon.defaultDialogProperties({
     curStatus: {
       type: Object,
       value: null,
@@ -36,7 +34,7 @@ Component({
       type: Object,
       value: null,
     },
-  },
+  }),
 
   /**
    * 组件的初始数据
@@ -71,8 +69,7 @@ Component({
       debugLog('children', that.data.children)
       debugLog('observers.isShown', isShown)
       if (isShown == true) {
-        
-
+        dialogCommon.whenIsShown(that)
       }
     },
   },
@@ -84,14 +81,7 @@ Component({
     /**
      * 关闭对话框
      */
-    onClose: function (e) {
-      let that = this
-      that.setData({
-        isShown: false
-      }, res => {
-        that.triggerEvent('close')
-      })
-    },
+    onClose: dialogCommon.onClose,
 
     /**
      * 选择委托人

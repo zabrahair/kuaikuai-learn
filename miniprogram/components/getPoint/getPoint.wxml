@@ -1,4 +1,4 @@
-<!--components/getPoint/getPoint.wxml-->
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
 <view wx:if="{{isShown}}" class='component-container'>
   <view class='component-content {{isShown?"playHits":""}}'>
     <text class="{{curTextCss}}">{{scoreText}}</text>

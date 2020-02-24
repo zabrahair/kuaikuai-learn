@@ -1,5 +1,5 @@
 <wxs module="filter" src="../../utils/filter.wxs"></wxs>
-<view class='component-container'>
+<view class='component-container' animation='{{switchDialogStatus}}'>
   <view class="date-range " >
     <!-- <text class="title"></text> -->
       <picker class="filter_date bg_color_{{filter.randInteger(24)}}" mode="date" value="lastDate" start="2020-01-01" end="{{lastDate}}" bindchange="bindLastDateChange">

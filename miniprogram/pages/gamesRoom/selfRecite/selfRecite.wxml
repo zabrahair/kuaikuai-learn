@@ -1,5 +1,6 @@
 <wxs module="filter" src="../../../utils/filter.wxs"></wxs>
-<scroll-view class='container'>
+<scroll-view class='scroll-container' scroll-y="true">
+<view class='container'>
   <score-title
     curScore="{{curScore}}"
     curDeciTimerStr="{{curDeciTimerStr}}"
@@ -21,7 +22,9 @@
       </picker>
       <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
     </view>
-    <movable-area class='question' animation="{{fadeInOutQuestionBlock}}">
+    <!-- style="height: {{cardFontSize*6}}vw;" -->
+    <movable-area class='question' style="height: {{cardFontSize*7}}vw;"
+      animation="{{fadeInOutQuestionBlock}}">
       <image class="favorite" data-question-id="{{curQuestion._id}}"
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
       bindtap="clickFavoriteSwitch"/>
@@ -29,13 +32,13 @@
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
-      <movable-view direction='all' x='285' y='20'>
+      <movable-view direction='all' x='320' y='30'>
         <image class="dict" src="{{gConst.DICT_ICON}}" bindtap="openDictDialog"/>
       </movable-view>
-      <movable-view class="play-sound" direction='all' x='130' y='25'>
+      <movable-view class="play-sound" direction='all' x='160' y='40'>
         <image src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
       </movable-view>
-      <movable-view class="btn_answer_switch" direction='all' x='135' y='200'>
+      <movable-view class="btn_answer_switch" direction='all' x='320' y='70'>
         <image class="btn_answer_switch" bindtap='switchAnswerVisibility' src="{{isAnswerVisible?gConst.VISIBILITY_ICON:gConst.INVISIBILITY_ICON}}"/>
       </movable-view>
       <view class='current_question_index'>
@@ -124,4 +127,5 @@
   char="{{dictSearchChar}}"
   bindclose="closeMeanDialog"
 />
+</view>
 </scroll-view>

@@ -1,4 +1,5 @@
 <wxs module="filter" src="../../../utils/filter.wxs"></wxs>
+<scroll-view class='scroll-container' scroll-y="true">
 <view class='container' >
   <score-title
     curScore="{{curScore}}"
@@ -29,8 +30,8 @@
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
-      <movable-view direction='all' x='10' y='170'>
-        <image class="play-sound" src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
+      <movable-view class="play-sound" direction='all' x='10' y='170'>
+        <image src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
       </movable-view>
       <view class='current_question_index'>
         {{curQuestionIndex+1}}/{{questions.length}}
@@ -104,3 +105,4 @@
   />
   <button class="btn_continue {{isPause}}" bindtap='onClickPauseSwitch' type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutContinueBtn}}">{{pauseBtnText}}</button>
 </view>
+</scroll-view>

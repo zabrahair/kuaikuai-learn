@@ -18,14 +18,23 @@ utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
 utils.refreshConfigs(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
 
 var dataLoadTimer;
-
+var DICTIONARUY_LANG = [
+  {
+    name: "中文",
+    value: 'chinese'
+  },
+  {
+    name: '英语',
+    value: 'english'
+  },
+]
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-
+    DICTIONARUY_LANG: DICTIONARUY_LANG,
   },
 
   /**

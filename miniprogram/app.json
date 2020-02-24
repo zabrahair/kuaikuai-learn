@@ -16,7 +16,8 @@
     "components/getPoint/getPoint",
     "pages/aRunQuery/aRunQuery",
     "pages/tasks/tasks",
-    "pages/gamesRoom/fillBlank/fillBlank"
+    "pages/gamesRoom/fillBlank/fillBlank",
+    "pages/dictionary/dictionary"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
@@ -41,6 +42,12 @@
         "iconPath": "images/wrong_book_unselected.png",
         "text": "任务"
       },
+      {
+        "pagePath": "pages/dictionary/dictionary",
+        "selectedIconPath": "images/dict.png",
+        "iconPath": "images/dict_unselected.png",
+        "text": "字词典"
+      },      
       {
         "pagePath": "pages/profile/profile",
         "selectedIconPath": "images/profile.png",

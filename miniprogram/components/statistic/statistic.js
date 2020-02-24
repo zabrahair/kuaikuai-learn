@@ -8,6 +8,8 @@ const gConst = require('../../const/global.js');
 const storeKeys = require('../../const/global.js').storageKeys;
 const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
+const animation = require('../../utils/animation.js');
+
 
 const dbApi = require('../../api/db.js')
 const learnHistoryApi = require('../../api/learnHistory.js')
@@ -32,24 +34,25 @@ Component({
    * 组件的初始数据
    */
   data: {
+    gConst: gConst,
     statistics: [
     ],
     lastDate: utils.formatDate(new Date(), '/')
   },
   lifetimes: {
     attached: function () {
-      // debugLog('getPoint.lifetimes.attached', this.properties)
       let that = this
       that.refreshStatistic(that);
     },
-
     show: function () {
-      // debugLog('getPoint.lifetimes.show')
-      let that = this
-      
-    },
+      debugLog('lifetimes.show')
+    }
   },
-
+  pageLifetimes: {
+    show: function () {
+      // debugLog('pageLifetimes.show')
+    }
+  },
   pageLifetimes: {
     show: function () {
       // debugLog('getPoint.pageLifetimes.show')

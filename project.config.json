@@ -101,15 +101,8 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
-					"pathName": "pages/gamesRoom/ChineseKnowledge/ChineseKnowledge",
-					"query": "gameMode=NORMAL&tableValue=chinese-knowledge&tableName=中文知识&filterTags=",
-					"scene": null
-				},
-				{
-					"id": 10,
-					"name": "pages/favorites/favorites",
+					"id": 7,
+					"name": "收藏",
 					"pathName": "pages/favorites/favorites",
 					"query": "answerType=自助默写",
 					"scene": null
@@ -175,6 +168,26 @@
 					"name": "填空题 数学",
 					"pathName": "pages/gamesRoom/fillBlank/fillBlank",
 					"query": "gameMode=常规&tableValue=math-divide&tableName=数学四则运算&filterTags=九九除法",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "自助默写 花卉",
+					"pathName": "pages/gamesRoom/selfRecite/selfRecite",
+					"query": "gameMode=常规&tableValue=english-words&tableName=英文单词&filterTags=花卉",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "拼写 花卉",
+					"pathName": "pages/gamesRoom/spell/spell",
+					"query": "gameMode=常规&tableValue=english-words&tableName=英语单词&filterTags=花卉",
+					"scene": null
+				},
+				{
+					"id": 19,
+					"name": "字词典",
+					"pathName": "pages/dictionary/dictionary",
 					"scene": null
 				}
 			]
