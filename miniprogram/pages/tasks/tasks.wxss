@@ -1,3 +1,5 @@
+@import '../../css/list.wxss';
+
 .container {
   position: relative;
   width: 100vw;
@@ -10,16 +12,18 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-start;
+  box-sizing: border-box;
 
   top: 0vw;
   left: 0vh;
   width: 100vw;
   height: 14vh;
-  opacity: 0.4;
+  opacity: 1;
   box-shadow: 0px 2px 2px 1px rgba(13, 24, 77, 0.822);
 }
 
 .content {
+  position: absolute;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -27,7 +31,36 @@
   align-items: center;
   box-sizing: border-box;
 
-  width: 70vw;
+  left: 0vw;
+  top: 14vh;
+  width: 100vw;
+  height: 72vh;
+  padding: 2vw;
+
+}
+
+.record_list {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+
+  width: 100vw;
+
+}
+
+.record {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  box-sizing: border-box;
+
+  width: 100vw;
+  height: 10vh;
 }
 
 .footer {
@@ -42,6 +75,6 @@
   left: 0vh;
   width: 100vw;  
   height: 14vh;
-  opacity: 0.4;
+  opacity: 1;
   box-shadow: 0px -2px 2px 1px rgba(13, 24, 77, 0.822);
 }

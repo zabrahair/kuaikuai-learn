@@ -39,9 +39,10 @@ Component({
   /**
    * 组件的初始数据
    */
-  data: taskCommon.defaultEditorData({
+  data: taskCommon.defaultEditorData(
+        dialogCommon.defaultDialogData({
 
-  }),
+  })),
   lifetimes: {
     attached: function () {
       let that = this
@@ -64,13 +65,13 @@ Component({
   },
 
   observers: {
-    'isShown': function (isShown) {
+    'isShown, curStatus, curTask': function (isShown) {
       let that = this
-      debugLog('children', that.data.children)
-      debugLog('observers.isShown', isShown)
-      if (isShown == true) {
-        dialogCommon.whenIsShown(that)
-      }
+      dialogCommon.whenIsShown(that, ()=>{
+          debugLog('children', that.data.children)
+          debugLog('observers.isShown', isShown)
+          taskCommon.whenIsShown(that)
+      })
     },
   },
   /**
@@ -89,9 +90,15 @@ Component({
     selectAssingee: function(e){
       let that = this
       let selIdx = utils.getEventDetailValue(e)
+      let curTask = that.data.curTask
+      curTask.toWho = {
+        name: that.data.assignees[selIdx].name,
+        openid: that.data.assignees[selIdx].openid,
+      }
       // debugLog('selectAssingee.value', value)
       that.setData({
-        selChildrenIdx: selIdx
+        selAssigneeIdx: selIdx,
+        curTask: curTask,
       })
     },
 
@@ -101,9 +108,56 @@ Component({
     selectBonus: function(e){
       let that = this
       let selIdx = utils.getEventDetailValue(e)
+      let curTask = that.data.curTask
+      curTask.bonus = {
+        name: that.data.BONUS_CLASSES[selIdx].name,
+        value: that.data.BONUS_CLASSES[selIdx].value,
+      }
       // debugLog('selectBonus.value', value)
       that.setData({
-        selBonusIdx: selIdx
+        curTask: curTask,
+        selBonusIdx: selIdx,
+      })
+    },
+
+    /**
+     * 当输入任务内容的时候
+     */
+    bindTaskContentInputed: function(e){
+      let that = this
+      let content = utils.getEventDetailValue(e)
+      let curTask = that.data.curTask
+      curTask.content = content
+      // debugLog('selectBonus.value', value)
+      that.setData({
+        curTask: curTask,
+      })
+    },
+
+    /**
+     * 输入最后任务完成日期
+     */
+    bindDeadlineDateChange: function(e){
+      let that = this
+      let dateStr = utils.getEventDetailValue(e)
+      dateStr = dateStr.replace(/-/ig, '/')
+      curTask.deadline.date = dateStr
+      // debugLog('selectBonus.value', value)
+      that.setData({
+        curTask: curTask,
+      })
+    },
+
+    /**
+     * 输入最后任务完成时间
+     */
+    bindDeadlineTimeChange: function(e){
+      let that = this
+      let timeStr = utils.getEventDetailValue(e)
+      curTask.deadline.time = timeStr
+      // debugLog('selectBonus.value', value)
+      that.setData({
+        curTask: curTask,
       })
     },
 
@@ -111,16 +165,118 @@ Component({
 
     },
     onClickCancel: function (e) {
-
+      let that = this
+      dialogCommon.onClose(null, that)
     },    
+    /**
+     * 指派任务
+     */
     onClickAssign: function (e) {
+      let that = this
+      wx.showModal({
+        title: MSG.CONFIRM_UPDATE_TITLE,
+        content: MSG.CONFIRM_UPDATE_MSG,
+        success(res) {
+          if (res.confirm) {
+            taskCommon.createTask(that, res => {
+              debugLog('afteronClickAssign ')
+              wx.showToast({
+                title: that.data.curStatus.message,
+                duration: gConst.TOAST_DURATION_TIME
+              })
+              setTimeout(() => {
+                dialogCommon.onClose(null, that)
+              }, gConst.TOAST_DURATION_TIME)
+            })
+          } else if (res.cancel) {
+            errorLog('用户点击取消')
+          }
+        }
+      })
 
     },
+
+    /**
+     * 认领任务
+     */
+    onClickClaim: function(e){
+      let that = this
+      wx.showModal({
+        title: MSG.CONFIRM_UPDATE_TITLE,
+        content: MSG.CONFIRM_UPDATE_MSG,
+        success: function (res) {
+          if (res.confirm) {
+            taskCommon.claimTask(that, res => {
+              debugLog('onClickClaim ')
+              wx.showToast({
+                title: that.data.curStatus.message,
+                duration: gConst.TOAST_DURATION_TIME
+              })
+              setTimeout(() => {
+                that.triggerEvent('refresh')
+                dialogCommon.onClose(null, that)
+              }, gConst.TOAST_DURATION_TIME)
+            })
+          } else {
+            return;
+          }
+        }
+      })
+    },
+
+    /**
+     * 完成任务
+     */
     onClickFinish: function (e) {
-
+      let that = this
+      wx.showModal({
+        title: MSG.CONFIRM_UPDATE_TITLE,
+        content: MSG.CONFIRM_UPDATE_MSG,
+        success: function (res) {
+          if (res.confirm) {
+            taskCommon.finishTask(that, res => {
+              debugLog('onClickFinish ', that.data.curStatus)
+              wx.showToast({
+                title: MSG.IS_UPDATED,
+                duration: gConst.TOAST_DURATION_TIME
+              })
+              setTimeout(() => {
+                that.triggerEvent('refresh')
+                dialogCommon.onClose(null, that)
+              }, gConst.TOAST_DURATION_TIME)
+            })
+          } else {
+            return;
+          }
+        }
+      })
     },
+    /**
+     * 审核任务
+     */
     onClickApprove: function (e) {
-
+      let that = this
+      wx.showModal({
+        title: MSG.CONFIRM_UPDATE_TITLE,
+        content: MSG.CONFIRM_UPDATE_MSG,
+        success: function (res) {
+          if (res.confirm) {
+            taskCommon.approveTask(that, res => {
+              debugLog('onClickApprove ', that.data.curStatus)
+              wx.showToast({
+                title: MSG.IS_UPDATED,
+                duration: gConst.TOAST_DURATION_TIME
+              })
+              setTimeout(() => {
+                that.triggerEvent('refresh')
+                dialogCommon.onClose(null, that)
+              }, gConst.TOAST_DURATION_TIME)
+            })
+          } else {
+            return;
+          }
+        }
+      })
     },
   }
 })

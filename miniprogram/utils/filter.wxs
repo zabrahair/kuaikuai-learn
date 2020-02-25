@@ -18,6 +18,7 @@ function formatDate(pDateStr, format="年月日") {
   for (var i = 0; i < dateParts.length; i++){
     dateString += dateParts[i] + seperators[i]
   }
+  // console.log(dateString)
   return dateString
 }
 

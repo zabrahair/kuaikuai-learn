@@ -99,14 +99,14 @@ const playSwitchDialog = function(that, name, pOptions, callback){
   if (!pOptions) {
     pOptions = {}
   }
-  debugLog('playFade.name', name)
+  // debugLog('playFade.name', name)
   // debugLog('playFade.pOptions', pOptions)
   let finalOptions = Object.assign(pOptions, MAP[name].options)
   let option = {
     duration: finalOptions.duration, // 动画执行时间
     timingFunction: finalOptions.timingFunction // 动画执行效果
   };
-  debugLog('playFade.finalOptions', finalOptions)
+  // debugLog('playFade.finalOptions', finalOptions)
   var switchDialog = wx.createAnimation(option)
   switchDialog.height(finalOptions.height);
   switchDialog.opacity(finalOptions.opacity).step();

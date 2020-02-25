@@ -16,31 +16,7 @@ exports.main = async (event, context) => {
   if (table && table.length > 0 
     && where && Object.keys(where).length > 0 
     && update && Object.keys(update).length > 0) {
-    
     try {
-      // let result = await db
-      //   .collection('learn-history')
-      //   .where({
-      //     question: {
-      //       tags: ''
-      //     }
-      //   })
-      //   .get()
-      // console.log('Query Result:', JSON.stringify(result, null, 4))
-      // result = await db
-      //   .collection('learn-history')
-      //   .where({
-      //     question: {
-      //       tags: ''
-      //     }
-      //   })
-      //   .update({
-      //     data: {
-      //       question: {
-      //         tags: _.pull("")
-      //       }
-      //     }
-      //   })
       let result = await db
         .collection(table)
         .where(where)

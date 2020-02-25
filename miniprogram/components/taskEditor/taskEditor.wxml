@@ -12,7 +12,7 @@
           disabled="{{task.isDisabled(curTask, curStatus)}}"
           name="assingee" class='form_item' 
           bindchange="selectAssingee" value="{{index}}" 
-          range="{{children}}" range-key="name">
+          range="{{assignees}}" range-key="name">
           <view class="picker">
           委派: {{curTask.toWho.name}} ▾
           </view>
@@ -55,7 +55,7 @@
     <view class="actions bg_color_{{filter.randInteger(24)}}">
       <!-- <button class="button" bindtap="onClickSave" type='default' size="mini">保存</button> -->
       <button wx:if="{{curStatus.value==TASK_STATUS_OBJ.CREATE.value || curStatus.value==TASK_STATUS_OBJ.SAVED.value}}" 
-      class="button" bindtap="onClickAssigned" 
+      class="button" bindtap="onClickAssign" 
       type='default' size="mini">委派</button>
 
       <button wx:if="{{curStatus.value==TASK_STATUS_OBJ.CREATE.value || curStatus.value==TASK_STATUS_OBJ.SAVED.value}}" 

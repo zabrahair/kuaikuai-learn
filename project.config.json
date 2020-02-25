@@ -73,10 +73,10 @@
 					"scene": null
 				},
 				{
-					"id": 5,
-					"name": "拼写 -  英语单词 M1U1",
+					"id": 3,
+					"name": "拼写 -  英语单词 M3U3",
 					"pathName": "pages/gamesRoom/spell/spell",
-					"query": "gameMode=常规&tableValue=english-words&tableName=英语单词&filterTags=M1U1",
+					"query": "gameMode=常规&tableValue=english-words&tableName=英语单词&filterTags=M3U3",
 					"scene": null
 				},
 				{
@@ -188,6 +188,7 @@
 					"id": 19,
 					"name": "字词典",
 					"pathName": "pages/dictionary/dictionary",
+					"query": "",
 					"scene": null
 				}
 			]

@@ -13,4 +13,7 @@ module.exports = {
   NO_MEANING: '找不到解释呀！',
   SELECT_SOME_TAG: '请选择至少一个标签。',
   WHETHER_WANT_TO_CLEAR_CURRENT_DATA: '要清空现有数据吗',
+  IS_UPDATED: '已更新！',
+  CONFIRM_UPDATE_TITLE: '更新确认',
+  CONFIRM_UPDATE_MSG: '确定要更新吗？',
 }

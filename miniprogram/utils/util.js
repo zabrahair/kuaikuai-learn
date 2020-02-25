@@ -16,6 +16,21 @@ const formatTime = date => {
   return [year, month, day].map(formatNumber).join('/') + ' ' + [hour, minute, second].map(formatNumber).join(':')
 }
 
+const formatOnlyTime = date => {
+  const hour = date.getHours()
+  const minute = date.getMinutes()
+  const second = date.getSeconds()
+
+  return [hour, minute, second].map(formatNumber).join(':')
+}
+
+function formatDateTime(date){
+  let dateStr = formatDate(date)
+  let timeStr = formatOnlyTime(date)
+  let dateTimeStr = dateStr + " " + timeStr
+  return dateTimeStr;
+}
+
 function mergeDateTime(pDateStr, pTimeStr){
   // debugLog('bindLastDateChange.dateStr', pDateStr)
   // debugLog('bindLastDateChange.timeStr', pTimeStr)
@@ -500,6 +515,16 @@ function getStorage(key){
   return storageVar;
 }
 
+function runCallback(callback){
+  if(callback && typeof callback == 'function'){
+    return callback
+  }else{
+    return ()=>{
+      debugLog('I am a null fuction')
+    }
+  }
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -508,10 +533,16 @@ module.exports = {
   getEventDetailValue: getEventDetailValue,
 
   array2Object: array2Object,
+  runCallback: runCallback,
+
+  /* -- 时间相关 -- */
+  formatOnlyTime: formatOnlyTime,
   formatTime: formatTime,
   formatDate: formatDate,
   formatDeciTimer: formatDeciTimer,
+  formatDateTime: formatDateTime,
   mergeDateTime: mergeDateTime,
+
   resetStatus: resetStatus,
   cloneObj: cloneObj,
   pickerMaker: pickerMaker,
@@ -520,6 +551,7 @@ module.exports = {
   getArrFromObjectsArr: getArrFromObjectsArr,
   ORDER: ORDER,
   sortByPropLenArray: sortByPropLenArray,
+  
 
   /** 功能型方法 */
   refreshUserRoleConfigs: refreshUserRoleConfigs,

@@ -77,5 +77,43 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  /**
+   * 调整页面式样
+   */
+  toCreateTask: function(e){
+    let that = this
+    that.setData({
+      curStatus: that.data.TASK_STATUS_OBJ.CREATE,
+    },()=>{
+      taskCommon.showTaskEditor(that)
+    })
+    
+  },
+
+  /**
+   * 显示任务详情
+   */
+  showCurrentTask: function(e){
+    let that = this
+    let dataset = utils.getEventDataset(e)
+    let curTask = dataset.task
+    that.setData({
+      curStatus: curTask.status,
+      curTask: curTask,
+    },()=>{
+      taskCommon.showTaskEditor(that)
+    })
+  },
+
+  /**
+   * 当关闭任务对话框
+   */
+  refreshTasks: function(e){
+    let that = this
+    // debugLog('refreshTasks')
+    taskCommon.refreshTasks(that, true)
   }
+  
 })

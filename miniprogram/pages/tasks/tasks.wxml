@@ -3,13 +3,28 @@
   <view class='header bg_color_{{filter.randInteger(24)}}'>
   </view>
   <scroll-view class='content' scroll-y='true'>
-
+      <view class='record_list'>
+        <view class='record'
+          wx:for-items='{{tasks}}' wx:key="_id" 
+          wx:for-item='task' wx:for-index='idx'>
+            {{task.content}}-{{task.status.name}}-{{task.assignTimeStr}}
+          <view class='record_actions'>
+            <button class="button" type='primary' size='mini'
+            bindtap='showCurrentTask' 
+            data-task="{{task}}">查看</button>
+          </view>
+        </view>
+      </view>
   </scroll-view>
   <view class="footer bg_color_{{filter.randInteger(24)}}">
+    <view class='buttons'> 
+      <button class="button" bindtap="toCreateTask" type='primary'>新建任务</button>
+    </view>
   </view>
   <task-editor
     isShown="{{isShownTaskEditor}}"
-    curStatus="{{TASK_STATUS_OBJ.SAVED}}"
+    curStatus="{{curStatus}}"
     curTask="{{curTask}}"
+    bindrefresh="refreshTasks"
   />
 </view>

@@ -17,9 +17,9 @@ function queryPages(tableName, pWhere, pageIdx, callback){
   db.collection(tableName)
     .where(pWhere)
     .skip(pageIdx * perPageCount)
+    .limit(perPageCount)
     .get()
-    .then
-    (res => {
+    .then(res => {
       // debugLog('queryPages', res)
       // debugLog('queryPages.length', res.data.length)
       if (res.data.length > 0) {
@@ -28,6 +28,9 @@ function queryPages(tableName, pWhere, pageIdx, callback){
       } else {
         callback([], pageIdx)
       }
+    })
+    .catch(err=>{
+      callback(null, pageIdx)
     })
 }
 
@@ -47,18 +50,15 @@ const query = function (table, filters, callback) {
         icon: 'none',
         title: '查询记录失败'
       })
-      errorLog('[数据库' + table + '][查询记录] 失败：', err)
+      errorLog('[查询记录] 失败：', err.stack)
     }
   })
 }
 
-const create = function (table, insertData, callback) {
+function create(table, insertData, callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
   const _ = db.command
-  insertData = Object.assign(insertData, {
-    _id: insertData.openId
-  })
   let now = new Date();
   let nowTimeString = utils.formatTime(now);
 
@@ -66,13 +66,14 @@ const create = function (table, insertData, callback) {
     createTimestamp: now.getTime(),
     createLocalTime: nowTimeString
   })
+  delete insertData._id
   // debugLog('insertData', insertData)
   // 根据条件插入所有Records
   db.collection(table).add({
     data: insertData,
     success: res => {
       let result = res;
-      // debugLog('[数据库' + table + '][插入记录]成功', result);
+      // debugLog('[插入记录]成功', result);
       callback(result)
     },
     fail: err => {
@@ -80,12 +81,12 @@ const create = function (table, insertData, callback) {
         icon: 'none',
         title: '插入记录失败'
       })
-      errorLog('[数据库' + table + '][插入记录]失败', err)
+      errorLog('[插入记录]失败', err.stack)
     }
   })
 }
 
-const update = function (table, id, updateObj, callback) {
+function update(table, id, updateObj, callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
   const _ = db.command
@@ -113,12 +114,47 @@ const update = function (table, id, updateObj, callback) {
         icon: 'none',
         title: '更新记录失败'
       })
-      errorLog('[数据库' + table + '][更新记录]失败', err)
+      errorLog('[更新记录]失败', err.stack)
     }
   })
 }
 
-const groupAggregate = function (table, matchObj, unwindObj, groupObj, projectObj, pageIdx, callback) {
+function whereUpdate(table, pWhere, updateObj, callback) {
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
+  let where = pWhere
+  let now = new Date();
+  let nowTimeString = utils.formatTime(now);
+
+  Object.assign(updateObj, {
+    updateTimestamp: now.getTime(),
+    updateLocalTime: nowTimeString
+  })
+  delete updateObj._id
+  // debugLog('id', id)
+  // debugLog('updateObj', updateObj)
+  // 根据条件更新所有Records
+  db.collection(table)
+    .where(where)
+    .update({
+    data: updateObj,
+    success: res => {
+      let result = res;
+      // debugLog('[数据库' + table + '][更新记录]成功', result);
+      callback(result)
+    },
+    fail: err => {
+      wx.showToast({
+        icon: 'none',
+        title: '更新记录失败'
+      })
+      errorLog('[更新记录]失败', err.stack)
+    }
+  })
+}
+
+function groupAggregate(table, matchObj, unwindObj, groupObj, projectObj, pageIdx, callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
   const _ = db.command
@@ -178,10 +214,35 @@ function getTags(tableName, pWhere, pageIdx, callback) {
     })
 }
 
+function cloudWhereUpdate(pTable, pWhere, pUpdateObj, callback){
+  let table = pTable
+  let where = pWhere
+  let now = new Date();
+  let nowTimeString = utils.formatTime(now);
+  let updateObj = pUpdateObj
+  Object.assign(updateObj, {
+    updateTimestamp: now.getTime(),
+    updateLocalTime: nowTimeString
+  })
+  delete updateObj._id
+  wx.cloud.callFunction({
+    name: 'Update',
+    data: {
+      table: table,
+      where: where,
+      update: updateObj
+    },
+    success: res => {utils.runCallback(callback)(res) },
+    fail: err => { utils.runCallback(callback)(null)}
+  })
+}
+
 module.exports = {
   query: query,
   create: create,
   update: update,
+  whereUpdate: whereUpdate,
+  cloudWhereUpdate: cloudWhereUpdate,
   groupAggregate: groupAggregate,
   queryPages: queryPages,
   getTags: getTags,

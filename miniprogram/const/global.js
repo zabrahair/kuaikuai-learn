@@ -153,4 +153,5 @@ module.exports = {
     WORD: 'WORD',
     CHAR: 'CHAR',
   },
+  TOAST_DURATION_TIME: 1000,
 }

@@ -35,6 +35,7 @@ function defaultDialogData(selfData) {
     gConst: gConst,
     /** 动画对象 */
     switchDialogStatus: null,
+    curShowStatus: false,
   }
   let finalData = Object.assign(selfData, defaultData)
   // debugLog('finalData', finalData)
@@ -55,25 +56,36 @@ function getPropertiesTemplate() {
   return properties
 }
 
-const onClose = function(e) {
-  let that = this
+const onClose = function(e, pThat) {
+  let that = pThat ? pThat : this
   animation.playSwitchDialog(
     that,
     animation.MAP.CLOSE_DIALOG.name,
     {},
     () => {
       that.setData({
-        isShown: false
+        isShown: false,
+        curShowStatus: false,
       }, res => {
         that.triggerEvent('close')
       })
     })
 }
 
-function whenIsShown(that){
+function whenIsShown(that, callback){
   animation.playSwitchDialog(
     that,
     animation.MAP.OPEN_DIALOG.name)
+  if (that.data.isShown != that.data.curShowStatus) {
+    that.setData({
+      curShowStatus: that.data.isShown
+    }, res => {
+      utils.runCallback(callback)(res)
+    })
+
+  } else {
+    // 相等说明已经打开了
+  }
 }
 
 module.exports = {
@@ -82,4 +94,5 @@ module.exports = {
   initDialog: initDialog,
   onClose: onClose,
   whenIsShown: whenIsShown,
+
 }

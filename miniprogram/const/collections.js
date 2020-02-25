@@ -1,5 +1,6 @@
 module.exports = {
   CONFIGS: 'configs',
+  TASK: 'task',
   MATH_DIVIDE: 'math-divide',
   ENGLISH_WORDS: 'english-words',
   CHINESE_WORDS: 'chinese-words',
