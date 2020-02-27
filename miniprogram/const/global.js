@@ -117,6 +117,7 @@ module.exports = {
     SLOW: '慢速',
     WRONG_SLOW: '错而慢',
     FAVORITES: '收藏',
+    EBBINGHAUSE: '艾宾浩斯',
   },
   DEFAULT_USER_CONFIGS: {
     divideSpeedFloor: 4000,

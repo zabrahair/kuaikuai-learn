@@ -132,6 +132,7 @@ Page({
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
+    let ebbingClassName = options.ebbingClassName
     let lastDate = (typeof options.lastDate == 'string' && options.lastDate != '') ? options.lastDate : that.data.lastDate
     let tags = []
     if (options.filterTags) {
@@ -148,6 +149,7 @@ Page({
       tableName: tableName,
       filterTags: options.filterTags,
       lastDate: lastDate,
+      ebbingClassName: ebbingClassName,
     })
   },
   /**

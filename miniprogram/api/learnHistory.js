@@ -321,13 +321,9 @@ function getHistoryCount(where, callback){
 const EBBING_FEATURE_START_DATE = '2020/02/27'
 function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
   let perPageCount = 20
-  let nowTime = new Date().getTime()
+  let now = new Date().getTime()
   let where = {
     answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
-    answerTime: _.and(
-      _.lt(nowTime - ebbingClass.to)
-    ),
-    ebbingTags: _.nin([ebbingClass.name])
   }
   Object.assign(where, pWhere)
   debugLog('ebbinghauseCount.where', where)
@@ -338,29 +334,68 @@ function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
   db.collection(TABLE)
     .aggregate()
     .match(where)
+    .project({
+      _id: 1,
+      table: 1,
+      answerTime: 1,
+      question: 1,
+      ebbingFrom: $.literal(ebbingClass.from),
+      ebbingTo: $.literal(ebbingClass.from + ebbingClass.to),
+    })
     .group({
       _id: {
-        table: '$table',
         question_id: '$question._id',
+        table: '$table'
       },
-      lastDate: $.max('$answerTime'),
-      lastDateStr: $.max('$answerTimeStr'),
+      // question: $.first('$question'),
+      answerTimeArr: $.push('$answerTime'),
+      earliestAnswerTime: $.min('$answerTime'),
+      ebbingFrom: $.first('$ebbingFrom'),
+      ebbingTo: $.first('$ebbingTo'),
     })
-    .group(
-      {
-        _id: {
-          table: '$_id.table',
-        },
-        count: $.sum(1),
-      }      
-    )
-    .project(project)
+    .project({
+      _id: 1,
+      answerTimeArr: 1,
+      // question: 1,
+      earliestAnswerTime: 1,
+      qEbbingFrom: $.add(['$earliestAnswerTime', '$ebbingFrom']),
+      qEbbingTo: $.add(['$earliestAnswerTime', '$ebbingTo']),   
+    })
+    .project({
+      _id: 1,
+      answerTimeArr: $.filter({
+        input: '$answerTimeArr',
+        as: 'answerTime',
+        cond: $.and([
+                $.gt(['$$answerTime', '$qEbbingFrom'])
+              // , $.lte(['$$answerTime', '$qEbbingTo'])
+              ]),
+      }),
+      // question: 1,
+      earliestAnswerTime: 1,
+      qEbbingFrom: 1,
+      qEbbingTo: 1,  
+    })
+    .match({
+      qEbbingFrom: _.lt(now),
+      answerTimeArr: _.size(0),
+    })
+    .group({
+      _id: {
+        table: '$_id.table',
+      },
+      table: $.first('$_id.table'),
+      earliestAnswerTime: $.first('$earliestAnswerTime'),
+      qEbbingFrom: $.first('$qEbbingFrom'),
+      qEbbingTo: $.first('$qEbbingTo'),   
+      count: $.sum(1),  
+    })
     .skip(pageIdx * perPageCount)
     .limit(perPageCount)
     .end()
     .then
     ((res, e) => {
-      // debugLog('getHistoryCount.res', res)
+      debugLog('getHistoryQuestions[' + ebbingClass.name +'].res', res)
       // debugLog('questCorrectStat.res', res.list)
       // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {
@@ -379,38 +414,78 @@ function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
  */
 function ebbinghauseQuestions(pWhere, ebbingClass, pageIdx=0, callback) {
   let perPageCount = 20
-  let nowTime = new Date().getTime()
+  let now = new Date().getTime()
   let where = {
     answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
-    answerTime: _.and(
-      _.lt(nowTime - ebbingClass.to)
-    ),
-    ebbingTags: _.nin([ebbingClass.name])
   }
   Object.assign(where, pWhere)
-  debugLog('ebbinghauseCount.where', where)
-  let project = {
-    _id: 1,
-    count: 1,
-    question: 1,
-  }
+  debugLog('ebbinghauseQuestions.where', where)
+  debugLog('ebbinghauseQuestions.ebbingClass', ebbingClass)
   db.collection(TABLE)
     .aggregate()
     .match(where)
-    .group({
-      _id: '$question._id',
-      count: $.sum(1),
-      question: $.first('$question'),
-      // lastDate: $.max('$answerTime'),
-      // lastDateStr: $.max('$answerTimeStr'),
+    .project({
+      _id: 1,
+      table: 1,
+      answerTime: 1,
+      question: 1,
+      ebbingFrom: $.literal(ebbingClass.from),
+      ebbingTo: $.literal(ebbingClass.from + ebbingClass.to),
     })
-    .project(project)
+    .group({
+      _id: {
+        question_id: '$question._id',
+        table: '$table'
+      },
+      question: $.first('$question'),
+      answerTimeArr: $.push('$answerTime'),
+      earliestAnswerTime: $.min('$answerTime'),
+      ebbingFrom: $.first('$ebbingFrom'),
+      ebbingTo: $.first('$ebbingTo'),
+    })
+    .project({
+      _id: 1,
+      answerTimeArr: 1,
+      question: 1,
+      earliestAnswerTime: 1,
+      qEbbingFrom: $.add(['$earliestAnswerTime', '$ebbingFrom']),
+      qEbbingTo: $.add(['$earliestAnswerTime', '$ebbingTo']),
+    })    
+    .project({
+      _id: 1,
+      answerTimeArr: $.filter({
+        input: '$answerTimeArr',
+        as: 'answerTime',
+        cond: $.and([
+          $.gt(['$$answerTime', '$qEbbingFrom'])
+          // , $.lte(['$$answerTime', '$qEbbingTo'])
+        ]),
+      }),
+      question: 1,
+      earliestAnswerTime: 1,
+      qEbbingFrom: 1,
+      qEbbingTo: 1,
+    })
+    .match({
+      qEbbingFrom: _.lt(now),
+      answerTimeArr: _.size(0),
+    })
+    .group({
+      _id: {
+        question_id: '$question._id',
+      },
+      table: $.first('$_id.table'),
+      question: $.first('$question'),
+      earliestAnswerTime: $.first('$earliestAnswerTime'),
+      qEbbingFrom: $.first('$qEbbingFrom'),
+      qEbbingTo: $.first('$qEbbingTo'),
+    })
     .skip(pageIdx * perPageCount)
     .limit(perPageCount)
     .end()
     .then
     ((res, e) => {
-      // debugLog('getHistoryCount.res', res)
+      debugLog('ebbinghauseQuestions[' + ebbingClass.name+'].res', res)
       // debugLog('questCorrectStat.res', res.list)
       // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {

@@ -37,7 +37,9 @@ Component({
     gConst: gConst,
     statistics: [
     ],
-    lastDate: utils.formatDate(new Date(), '/')
+    lastDate: utils.formatDate(new Date(), '/'),
+    ebbingStats: [],
+    TABS_MAP: TABLES.MAP
   },
   lifetimes: {
     attached: function () {
@@ -66,6 +68,7 @@ Component({
       let that = this
       if (isShown == true) {
         that.refreshStatistic(that)
+        that.loadEbbingStatistics(that)
       }
     },
   },
@@ -113,6 +116,50 @@ Component({
         lastDate: lastDate
       }, res=>{
         that.refreshStatistic(that)
+      })
+    },
+
+    /**
+     * 获得艾宾浩斯遗忘统计
+     */
+    loadEbbingStatistics: function(that){
+      utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+      let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+      let ebbingStats = that.data.ebbingStats
+      for (let ebbingIdx in ebbingClasses) {
+        let ebbingClass = ebbingClasses[ebbingIdx]
+        // debugLog('ebbingClasses', ebbingClasses)
+        learnHistoryApi.ebbinghauseCount({
+          question: {
+            tags: gConst.ANSWER_TYPES.MANUAL_CHECK
+          },
+        }
+          , ebbingClass
+          , 0
+          , countList => {
+            // debugLog('ebbinghauseCount.countList', countList)
+            ebbingStats[ebbingIdx] = {
+              class: ebbingClasses[ebbingIdx],
+              list: countList,
+            }
+            that.setData({
+              ebbingStats: ebbingStats
+            })
+            // debugLog('loadEbbingStatistics', ebbingStats)
+          })
+      }    
+    },
+
+    onTapEbbingCard: function(e){
+      let that = this
+      let dataset = utils.getEventDataset(e)
+      let url = '/pages/gamesRoom/words/words?gameMode=' + gConst.GAME_MODE.EBBINGHAUSE 
+        + '&tableValue=' + dataset.tableValue 
+        + '&tableName=' + TABLES.MAP[dataset.tableValue] 
+        + '&filterTags=' + dataset.ebbingClassName 
+        + "&ebbingClassName=" + dataset.ebbingClassName;
+      wx.navigateTo({
+        url: url,
       })
     }
   }

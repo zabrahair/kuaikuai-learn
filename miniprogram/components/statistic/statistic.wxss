@@ -73,6 +73,21 @@
   box-shadow: 2px 2px 2px 1px rgba(13, 24, 77, 0.822);
 }
 
+.stat-vertical {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  align-items: center;
+
+  margin: 1vw;
+  width: 27vw;
+  /* border: 4px solid black; */
+  border-radius: 3vw;
+  opacity: 1;
+  box-shadow: 2px 2px 2px 1px rgba(13, 24, 77, 0.822);
+}
+
 .title {
   display: flex;
   flex-direction: row;

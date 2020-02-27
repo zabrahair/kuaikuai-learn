@@ -86,8 +86,16 @@ function resetQuestionStatus(that, e, scoreTimer) {
 function recordHistory(that, question, answer) {
   let historyRecord = {};
   historyRecord['table'] = that.data.tableValue
+  // 艾宾浩斯遗忘曲线做过的Tags
+  if (that.data.gameMode == gConst.GAME_MODE.EBBINGHAUSE 
+      && that.data.ebbingClassName 
+      && that.data.ebbingClassName.length > 0){
+    let ebbingTags = question.ebbingTags ? question.ebbingTags : []
+    question['ebbingTags'] = ebbingTags.concat([that.data.ebbingClassName])
+  }
   historyRecord['question'] = question
   historyRecord['answerType'] = that.data.titleSubfix
+
   // delete question._id
   // Object.assign(historyRecord, question)
   Object.assign(historyRecord, answer)
@@ -611,6 +619,71 @@ function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
   }, utils.getDataLoadInterval())
 }
 
+/**
+ * 获得艾宾浩斯遗忘曲线题目
+ */
+function getEbbingQuestions(that, mode, dataLoadTimer, callback) {
+  let ebbingClassName = that.data.ebbingClassName
+  let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+  // debugLog('ebbingClasses', ebbingClasses)
+  let ebbingClassesMap = utils.array2Object(ebbingClasses, 'name')
+  let curEbbingClass = ebbingClassesMap[ebbingClassName]
+  that.setData({
+    curEbbingClass: curEbbingClass
+  })
+  debugLog('ebbingClassName', ebbingClassName)
+  debugLog('curEbbingClass', curEbbingClass)
+  let tableValue = that.data.tableValue
+  let allQuest = []
+  utils.loadPagesData((pageIdx, loadTimer) => {
+    learnHistoryApi.ebbinghauseQuestions({
+      table: tableValue,
+      question: {
+        // tags: '默写卡'
+      },
+    }
+      , curEbbingClass
+      , pageIdx
+      , list => {
+        debugLog('list', list)
+        try {
+          if (list.length && list.length > 0) {
+            let questions = []
+            for (let i in list) {
+              questions.push(list[i].question)
+            }
+            questions = that.data.questions.concat(questions)
+            that.setData({
+              questions: questions,
+            }, function () {
+              if (pageIdx == 0) {
+                // 生成下一道题目
+                // debugLog('生成第一道题目', questions[0])
+                onClickNextQuestion(that, null, null, 0)
+              }
+            })
+          } else {
+            clearInterval(loadTimer)
+            // when finish questions load
+            writeQuestionsCorrectStat(that, dataLoadTimer, res => {
+              clearInterval(dataLoadTimer)
+              if (typeof callback == 'function') {
+                callback(that)
+              }
+            })
+          }
+        } catch (e) {
+          clearInterval(loadTimer)
+          wx.showToast({
+            image: gConst.ERROR_ICON,
+            title: MSG.SOME_EXCEPTION,
+            duration: 1000,
+          })
+        }
+      })
+  }, utils.getDataLoadInterval())
+}
+
 /** 选择题状态保存模版和选择状态 */
 const OPTION_STATE = {
   SELECTED: 'selected',
@@ -749,6 +822,11 @@ function getQuestions(that, gameMode, dataLoadTimer, callback) {
       title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
     })
     getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer, callback);
+  } else if (gameMode == gConst.GAME_MODE.EBBINGHAUSE) {
+    wx.setNavigationBarTitle({
+      title: that.data.tableName + gConst.GAME_MODE.EBBINGHAUSE + that.data.titleSubfix
+    })
+    getEbbingQuestions(that, gConst.GAME_MODE.EBBINGHAUSE, dataLoadTimer, callback);
   }
 }
 
@@ -1417,6 +1495,7 @@ module.exports = {
   getNormalQuestions: getNormalQuestions,
   getFavoritesQuestions: getFavoritesQuestions,
   getHistoryQuestions: getHistoryQuestions,
+  getEbbingQuestions: getEbbingQuestions,
   onClickNextQuestion: onClickNextQuestion,
   recordHistory: recordHistory,
   processWordsIntoCards: processWordsIntoCards,
