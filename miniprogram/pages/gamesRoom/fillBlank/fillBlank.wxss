@@ -53,6 +53,19 @@
   width: 100vw;
 }
 
+.input_answer {
+  height: 20vw;
+  color: whitesmoke;
+  font-size: 10vw;
+  margin: 10px;
+}
+
+.input_answer_ph{
+  color: darkgrey;
+  text-shadow:    1px 2px 3px rgba(100, 100, 100, 0.90);    
+  font-size: 6vw;
+}
+
 .sperator_title {
   display: flex;
   flex-direction: row;

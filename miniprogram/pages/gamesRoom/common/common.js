@@ -402,20 +402,24 @@ function finishScoreApprove(that, params) {
       thinkSeconds: that.data.thinkSeconds - that.data.timerInterval,
     })
   
-  let curScore = parseFloat(that.data.curScore) + parseFloat(recQuest.score)
-  let totalScore = parseFloat(that.data.totalScore) + recQuest.score
-  try{
-    curScore = curScore.toFixed(1)
-    totalScore = totalScore.toFixed(1)
-  }catch(e){}
-  // debugLog('closePrecQuestointLayer.curScore', curScore)
-  // debugLog('closePrecQuestointLayer.totalScore', totalScore)
-  that.setData({
-    curScore: curScore,
-    totalScore: totalScore,
-  }, function (res) {
-    wx.setStorageSync(storeKeys.totalScore, parseFloat(that.data.totalScore))
-  })    
+  // 正确的时候加分
+  if (params.detail.isCorrect){
+    let curScore = parseFloat(that.data.curScore) + parseFloat(recQuest.score)
+    let totalScore = parseFloat(that.data.totalScore) + recQuest.score
+    try {
+      curScore = curScore.toFixed(1)
+      totalScore = totalScore.toFixed(1)
+    } catch (e) { }
+    // debugLog('closePrecQuestointLayer.curScore', curScore)
+    // debugLog('closePrecQuestointLayer.totalScore', totalScore)
+    that.setData({
+      curScore: curScore,
+      totalScore: totalScore,
+    }, function (res) {
+      wx.setStorageSync(storeKeys.totalScore, parseFloat(that.data.totalScore))
+    })    
+  }
+
   that.setData({
     isShowPointLayer: false,
   }, res => {

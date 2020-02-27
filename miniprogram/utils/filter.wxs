@@ -1,3 +1,5 @@
+// const utils = require('./util.js');
+
 function randInteger(to, from=1){
   return from + Math.floor(Math.random()*(to-from+1))
 }
@@ -41,9 +43,36 @@ function formatTime(pDateStr, format = "时分秒") {
   return dateString
 }
 
+function formatDateTime(pDateTime){
+  var dateTime = pDateTime.split(' ')
+  var dateStr = dateTime[0]
+  var timeStr = dateTime[1]
+  var dateProcessed = formatDate(dateStr)
+  var timeProcessed = formatTime(timeStr)
+  return dateProcessed + " " + timeProcessed
+}
+
+// function mergeDateTime(pDateStr, pTimeStr) {
+//   var dateStr = pDateStr.replace("/", '-')
+//   dateStr = pDateStr.replace("/", '-')
+//   var date = new Date(dateStr + 'T' + pTimeStr + ':00Z');
+//   // 因为中国处于东八区
+//   date.setHours(date.getHours() - 8)
+//   return date;
+// }
+
+function intervalTime(pDateStr, pTimeStr){
+  // var previousTime = mergeDateTime(pDateStr, pTimeStr);
+  // var now = new Date()
+  // var intervalTime = now.getTime() - previousTime.getTime()
+
+}
+
 // 导出对外暴露的属性
 module.exports = {
   randInteger: randInteger,
+  formatDateTime: formatDateTime,
   formatDate: formatDate,
   formatTime: formatTime,
+  intervalTime: intervalTime,
 }

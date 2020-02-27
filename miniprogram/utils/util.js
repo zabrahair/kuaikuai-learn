@@ -525,6 +525,22 @@ function runCallback(callback){
   }
 }
 
+/**
+ * 一次性循环加载多页
+ * pTimeout默认是500
+ */
+function loadPagesData(callback, timeout=500) {
+  let pageIdx = 0
+  let loadTimer = setInterval(() => {
+    if (pageIdx < 100) {
+      runCallback(callback)(pageIdx, loadTimer)
+      pageIdx++
+    } else {
+      clearInterval(loadTimer)
+    }
+  }, timeout)
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -534,6 +550,7 @@ module.exports = {
 
   array2Object: array2Object,
   runCallback: runCallback,
+  loadPagesData: loadPagesData,
 
   /* -- 时间相关 -- */
   formatOnlyTime: formatOnlyTime,

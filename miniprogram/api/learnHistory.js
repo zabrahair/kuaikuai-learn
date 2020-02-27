@@ -314,6 +314,115 @@ function getHistoryCount(where, callback){
     .catch(err => console.error(err)) 
 }
 
+/**
+ * 更具艾宾浩斯遗忘曲线统计需要回忆的各级题目数。
+ * 传入的pWhere 包含题型，Ebbinghause区间
+ */
+const EBBING_FEATURE_START_DATE = '2020/02/27'
+function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
+  let perPageCount = 20
+  let nowTime = new Date().getTime()
+  let where = {
+    answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
+    answerTime: _.and(
+      _.lt(nowTime - ebbingClass.to)
+    ),
+    ebbingTags: _.nin([ebbingClass.name])
+  }
+  Object.assign(where, pWhere)
+  debugLog('ebbinghauseCount.where', where)
+  let project = {
+    _id: 1,
+    count: 1,
+  }
+  db.collection(TABLE)
+    .aggregate()
+    .match(where)
+    .group({
+      _id: {
+        table: '$table',
+        question_id: '$question._id',
+      },
+      lastDate: $.max('$answerTime'),
+      lastDateStr: $.max('$answerTimeStr'),
+    })
+    .group(
+      {
+        _id: {
+          table: '$_id.table',
+        },
+        count: $.sum(1),
+      }      
+    )
+    .project(project)
+    .skip(pageIdx * perPageCount)
+    .limit(perPageCount)
+    .end()
+    .then
+    ((res, e) => {
+      // debugLog('getHistoryCount.res', res)
+      // debugLog('questCorrectStat.res', res.list)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        utils.runCallback(callback)(res.list)
+        return
+      } else {
+        utils.runCallback(callback)([])
+      }
+    })
+    .catch(err => errorLog('err', err.stack)) 
+}
+
+/**
+ * 更具艾宾浩斯遗忘曲线统计需要回忆的各级题目数。
+ * 传入的pWhere 包含题型，Ebbinghause区间
+ */
+function ebbinghauseQuestions(pWhere, ebbingClass, pageIdx=0, callback) {
+  let perPageCount = 20
+  let nowTime = new Date().getTime()
+  let where = {
+    answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
+    answerTime: _.and(
+      _.lt(nowTime - ebbingClass.to)
+    ),
+    ebbingTags: _.nin([ebbingClass.name])
+  }
+  Object.assign(where, pWhere)
+  debugLog('ebbinghauseCount.where', where)
+  let project = {
+    _id: 1,
+    count: 1,
+    question: 1,
+  }
+  db.collection(TABLE)
+    .aggregate()
+    .match(where)
+    .group({
+      _id: '$question._id',
+      count: $.sum(1),
+      question: $.first('$question'),
+      // lastDate: $.max('$answerTime'),
+      // lastDateStr: $.max('$answerTimeStr'),
+    })
+    .project(project)
+    .skip(pageIdx * perPageCount)
+    .limit(perPageCount)
+    .end()
+    .then
+    ((res, e) => {
+      // debugLog('getHistoryCount.res', res)
+      // debugLog('questCorrectStat.res', res.list)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        utils.runCallback(callback)(res.list)
+        return
+      } else {
+        utils.runCallback(callback)([])
+      }
+    })
+    .catch(err => errorLog('err', err.stack))
+}
+
 module.exports = {
   answerTypeStatsitic: answerTypeStatsitic,
   getHistoryCount: getHistoryCount,
@@ -323,4 +432,6 @@ module.exports = {
   questCorrectStat: questCorrectStat,
   getTags: getTags,
   create: create,
+  ebbinghauseCount: ebbinghauseCount,
+  ebbinghauseQuestions: ebbinghauseQuestions,
 }

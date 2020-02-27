@@ -57,9 +57,15 @@ App({
       // Get Configs
       utils.refreshUserRoleConfigs(that.globalData)
       const configsApi = require('./api/configs.js')
+      // 回答类型
       utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
+      // 系统设置
       utils.refreshConfigs(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
+      // 加成类型
       utils.refreshConfigs(gConst.CONFIG_TAGS.COMBO_TYPE)
+      // 艾宾浩斯遗忘曲线设置
+      utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+      
       this.login();
       utils.getUserConfigs(true)
 

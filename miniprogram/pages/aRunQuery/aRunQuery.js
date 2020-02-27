@@ -8,6 +8,10 @@ const gConst = require('../../const/global.js');
 const storeKeys = require('../../const/global.js').storageKeys;
 const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
+
+//Api
+const learnHistoryApi = require('../../api/learnHistory.js')
+
 const db = wx.cloud.database()
 const $ = db.command.aggregate
 const _ = db.command
@@ -94,31 +98,83 @@ Page({
   },
 
   submitAnswer: function(e){
-    // debugLog('submitAnswer.e',e)
-    let form = utils.getEventDetailValue(e)
-    debugLog('submitAnswer.form', form)
-    let where = JSON.parse(form.where)
-    let update = JSON.parse(form.update)
-    debugLog('submitAnswer.form.functionName', form.functionName)
-    debugLog('submitAnswer.where', where)
-    debugLog('submitAnswer.update', update)
-    wx.cloud.callFunction({
-      // name: form.functionName,
-      name: 'Aggregate',
-      data: {
-        table: 'aaaa',
-        where: {a:1},
-        update: { a: 1 },
-        pageIdx: 0
-      },
-      success: res => {
-        debugLog(form.functionName+'.res', res.result.list)
-        debugLog(form.functionName + '.res.length', res.result.list.length)
-      },
-      fail: err => {
-        console.error('[云函数] ['+form.functionName+'] 调用失败', err)
+    /* test start */
+    utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+    let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+    let ebbingReciteCount = {}
+    let i = 0
+    for (let i in ebbingClasses){
+      let ebbingClass = ebbingClasses[i]
+      // debugLog('ebbingClasses', ebbingClasses)
+      learnHistoryApi.ebbinghauseCount({
+        question: {
+          // tags: '默写卡'
+        },
       }
+      , ebbingClass
+      , 0
+      , countList => {
+        // debugLog('ebbinghauseCount.countList', countList)
+        let curList = ebbingReciteCount[ebbingClass.name] ? ebbingReciteCount[iebbingClass.name]: []
+        ebbingReciteCount[ebbingClass.name] = curList.concat(countList)
+        debugLog('ebbingReciteCount', ebbingReciteCount)
+      })
+    }
+
+    let ebbing20min = ebbingClasses[0]
+    debugLog('ebbing20min', ebbing20min)
+    let allQuest = []
+    utils.loadPagesData((pageIdx, loadTimer)=>{
+      learnHistoryApi.ebbinghauseQuestions({
+        table: 'chinese-words',
+        question: {
+          // tags: '默写卡'
+        },
+      }
+        , ebbing20min
+        , pageIdx
+        , questions => {
+          if (questions.length > 0){
+            debugLog('questions.length', questions.length)
+            allQuest = allQuest.concat(questions)
+          }else{
+            clearInterval(loadTimer)
+            debugLog('ebbinghauseQuestions.allQuest', allQuest)
+          }
+          
+        })
     })
+
+   
+
+
+    /* test start */
+    // // debugLog('submitAnswer.e',e)
+    // let form = utils.getEventDetailValue(e)
+    // debugLog('submitAnswer.form', form)
+    // let where = JSON.parse(form.where)
+    // let update = JSON.parse(form.update)
+    // debugLog('submitAnswer.form.functionName', form.functionName)
+    // debugLog('submitAnswer.where', where)
+    // debugLog('submitAnswer.update', update)
+    // wx.cloud.callFunction({
+    //   // name: form.functionName,
+    //   name: 'Aggregate',
+    //   data: {
+    //     table: 'aaaa',
+    //     where: {a:1},
+    //     update: { a: 1 },
+    //     pageIdx: 0
+    //   },
+    //   success: res => {
+    //     debugLog(form.functionName+'.res', res.result.list)
+    //     debugLog(form.functionName + '.res.length', res.result.list.length)
+    //   },
+    //   fail: err => {
+    //     console.error('[云函数] ['+form.functionName+'] 调用失败', err)
+    //   }
+    // })
+    /* test start */
     // db.collection("learn-history").where({
     //   question:{
     //     tags: _.in(["3 Hits"])
@@ -146,6 +202,7 @@ Page({
     // //   }
     // // })
   },
+
   resetAnswer: function(e){
     
   },
