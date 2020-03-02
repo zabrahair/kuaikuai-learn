@@ -32,7 +32,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    debugLog('onLoad')
+    // debugLog('onLoad')
     let that = this
     common.initDataBodyInTagRoom(that, {
       tagsLocation: gConst.TAGS_LOCATION.NORMAL,
@@ -40,7 +40,8 @@ Page({
     }, res=>{
       if (options.tagsLocation) {
         that.setData({
-          tagsLocation: options.tagsLocation
+          tagsLocation: options.tagsLocation,
+          options: options,
         })
       }
       if (options.answerType) {
@@ -138,7 +139,6 @@ Page({
   tapTable: function (e) {
     let that = this
     common.tapFilterTable(that, e, dataLoadTimer, res=>{
-
     })
   },
 

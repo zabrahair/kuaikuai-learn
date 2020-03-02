@@ -326,7 +326,7 @@ function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
     answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
   }
   Object.assign(where, pWhere)
-  debugLog('ebbinghauseCount.where', where)
+  // debugLog('ebbinghauseCount.where', where)
   let project = {
     _id: 1,
     count: 1,
@@ -395,7 +395,7 @@ function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
     .end()
     .then
     ((res, e) => {
-      debugLog('getHistoryQuestions[' + ebbingClass.name +'].res', res)
+      // debugLog('getHistoryQuestions[' + ebbingClass.name +'].res', res)
       // debugLog('questCorrectStat.res', res.list)
       // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {

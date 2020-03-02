@@ -68,17 +68,6 @@
             {{spellCard.letter}}
           </view>
         </view>
-        <!-- <view class="{{filter.isPunctuation(spellCard.letter)?'punctuation':'alphabet_card'}} {{filter.isPunctuation(spellCard.letter)?'':spellCard.cardState}}"
-        style="width:{{cardFontSize*1.2}}vw;  height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
-        wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
-        wx:for-index='idx' wx:key="id" 
-        data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
-        bindtap="onTapReciteCard" 
-        bindlongpress="openDictDialog"
-        >
-        <image wx:if="{{(spellCard.cardState=='card_used'&&!filter.isPunctuation(spellCard.letter))?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>
-        {{spellCard.letter}}
-        </view> -->
       </view>        
     </movable-area>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
@@ -102,7 +91,7 @@
           data-card-idx="{{idx}}" data-question='{{question}}'
           bindtap="onClickDoneCard"           
         >
-          {{question.word}}
+          {{question.topic}}
         </view> 
         <view class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
           wx:for-items='{{questions}}' wx:for-item='question' 

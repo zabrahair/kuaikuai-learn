@@ -28,10 +28,6 @@
           <text>{{answerType.name}}</text>
           <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
       </view>
-      <!-- <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickTagsRoom">
-        <text>题库</text>
-        <image class="goto_icon icon" src="{{gConst.GOTO_HOVER_ICON}}"/>
-      </view>   -->
       <view class='game_item bg_color_{{filter.randInteger(24)}}' bindtap="onClickFavorites">
         <view wx:if="{{favoritesCount > 0}}"
         class="count_point">

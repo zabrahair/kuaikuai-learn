@@ -133,8 +133,32 @@ Page({
     let that = this
     let dataset = utils.getEventDataset(e)
     let answerType = dataset.answerType
+    let url = '/pages/TagsRoom/TagsRoom?answerType=' + answerType + '&gameMode =' + gConst.GAME_MODE.NORMAL
+
+    switch (answerType){
+      case gConst.ANSWER_TYPES.RICITE_ARTICLE: 
+        url += '&tableValue=' + TABLES.MAP['chinese-article'].value + '&tableName=' + TABLES.MAP['chinese-article'].name
+        break;
+      case gConst.ANSWER_TYPES.FILL_BLANK: 
+        url += '&tableValue=' + TABLES.MAP['math-divide'].value + '&tableName=' + TABLES.MAP['math-divide'].name
+        break;
+      case gConst.ANSWER_TYPES.OPTIONS_SELECT:
+        url += '&tableValue=' + TABLES.MAP['chinese-knowledge'].value + '&tableName=' + TABLES.MAP['chinese-knowledge'].name
+        break;
+      case gConst.ANSWER_TYPES.SELF_RECITE:
+        url += '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name
+        break;
+      case gConst.ANSWER_TYPES.MANUAL_CHECK:
+        url += '&tableValue=' + TABLES.MAP['chinese-words'].value + '&tableName=' + TABLES.MAP['chinese-words'].name
+        break;
+      case gConst.ANSWER_TYPES.SPELLING:
+        url += '&tableValue=' + TABLES.MAP['english-words'].value + '&tableName=' + TABLES.MAP['english-words'].name
+        break;
+      default:
+    }
+
     wx.navigateTo({
-      url: '/pages/TagsRoom/TagsRoom?answerType=' + answerType + '&gameMode =' + gConst.GAME_MODE.NORMAL,
+      url: url,
     })
   },
 

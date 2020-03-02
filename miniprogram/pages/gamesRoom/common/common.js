@@ -1260,22 +1260,32 @@ function tapFilterTable(that, e, dataLoadTimer, callback) {
 function initFilterTables(that, dataLoadTimer, callback){
   let tables = TABLES.LIST
   let isSet = false
+  let selectedTable = tables[0]
+  
   tables.find(table => { 
+    if(that.options.tableValue){
+      if (table.value == that.options.tableValue){
+        table['css'] = SELECTED_CSS
+      }else{
+        table['css'] = ''
+      }
+    }
     if (table['css'] == SELECTED_CSS){
+      selectedTable = table
       isSet |= true
     }
   })
+
   if (!isSet){
     tables[0]['css'] = SELECTED_CSS
   }
-  // debugLog('tables', tables)
+
   that.setData({
     tables: tables,
-    selectedTable: tables[0],
+    selectedTable: selectedTable,
     selectedTags: [],
   }, res => {
     getTags(that, that.data.selectedTable.value, dataLoadTimer)
-    // that.getTags(that.data.selectedTable.value);
   })
 }
 
