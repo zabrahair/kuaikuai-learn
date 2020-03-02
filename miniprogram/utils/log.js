@@ -1,4 +1,4 @@
-const debug = function (message, object, tabs) {
+function debug (message, object, tabs) {
   if (tabs == undefined) {
     tabs = 4
   }
@@ -9,7 +9,7 @@ const debug = function (message, object, tabs) {
   console.log(message + ':' + JSON.stringify(object, {}, tabs))
 }
 
-const error = function (message, object, tabs) {
+function error(message, object, tabs) {
   if (tabs == undefined) {
     tabs = 4
   }

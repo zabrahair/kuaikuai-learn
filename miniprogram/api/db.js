@@ -186,7 +186,7 @@ function getTags(tableName, pWhere, pageIdx, callback) {
   // debugLog('where', where)
   db.collection(tableName)
     .aggregate()
-    .match(pWhere)
+    .match(where)
     .unwind('$tags')
     .group({
       _id: '$tags',

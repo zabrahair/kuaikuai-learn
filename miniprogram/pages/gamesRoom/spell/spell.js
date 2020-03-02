@@ -7,6 +7,7 @@ const errorLog = require('../../../utils/log.js').error;
 const gConst = require('../../../const/global.js');
 const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
+const userInfoUtils = require('../../../utils/userInfo.js')
 const animation = require('../../../utils/animation.js');
 const TABLES = require('../../../const/collections.js')
 const common = require('../common/common.js')
@@ -94,7 +95,7 @@ Page({
     curScore: 0,
     totalScore: 0,
     historyRecord: {},
-    userConfigs: utils.getUserConfigs(),
+    userConfigs: userInfoUtils.getUserConfigs(),
 
     // 得分效果和历史记录用的
     hitsCount: 0,
@@ -114,7 +115,7 @@ Page({
 
     // filters
     tags: ['拼写'],
-    lastDate: utils.getUserConfigs().filterQuesLastDate,
+    lastDate: userInfoUtils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
     filterTags: '',
 

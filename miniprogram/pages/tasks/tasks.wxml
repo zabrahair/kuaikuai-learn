@@ -2,7 +2,8 @@
 <view class='container'>
   <view class='header bg_color_{{filter.randInteger(24)}}'>
   </view>
-  <scroll-view class='content' scroll-y='true'>
+  <scroll-view class='content' scroll-y='true'
+    bindscrolltolower="onScrollTouchBottom" lower-threshold="50">
       <view class='record_list'>
         <view class='record'
           wx:for-items='{{tasks}}' wx:key="_id" 

@@ -22,23 +22,25 @@
       </picker>
       <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
     </view>
-    <!-- style="height: {{cardFontSize*6}}vw;" -->
-    <movable-area class='question' style="height: {{cardFontSize*7}}vw;"
+    <!--  -->
+    <movable-area class='question' 
+      style="height: {{cardFontSize * 3.5 * curSpellCards.length / 8 }}vw;"
       animation="{{fadeInOutQuestionBlock}}">
       <image class="favorite" data-question-id="{{curQuestion._id}}"
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
       bindtap="clickFavoriteSwitch"/>
-      <text class="meaning_text">{{curQuestion.meaning}}</text>
+      <text class="title topic">{{curQuestion.topic}}</text>
+      <text wx:if="{{curQuestion.author&&curQuestion.time}}" class="title author">——{{curQuestion.author}}【{{curQuestion.time}}】</text>
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
-      <movable-view direction='all' x='300' y='30'>
+      <!-- <movable-view direction='all' x='300' y='30'>
         <image class="dict" src="{{gConst.DICT_ICON}}" bindtap="openDictDialog"/>
-      </movable-view>
-      <movable-view class="play-sound" direction='all' x='160' y='40'>
+      </movable-view> -->
+      <movable-view class="play-sound" direction='all' x='10' y='40'>
         <image src="{{gConst.SOUND_ICON}}" bindtap="playCardText"/>
       </movable-view>
-      <movable-view class="btn_answer_switch" direction='all' x='320' y='70'>
+      <movable-view class="btn_answer_switch" direction='all' x='295' y='30'>
         <image class="btn_answer_switch" bindtap='switchAnswerVisibility' src="{{isAnswerVisible?gConst.VISIBILITY_ICON:gConst.INVISIBILITY_ICON}}"/>
       </movable-view>
       <view class='current_question_index'>
@@ -48,20 +50,36 @@
         {{filterTags}}
       </view>   
         
-      <view class="alphabet_cards">
-        <view class='alphabet_card {{spellCard.cardState}}'
-        style="width: {{cardFontSize*1.2}}vw; height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
+      <view class="alphabet_cards {{curQuestion.type == '诗歌'?'poem':''}}">
+        <view class="sentence {{curQuestion.type == '诗歌'?'poem':''}}" 
+          style="height: {{cardFontSize*2}}vw;"
+          wx:for-items='{{curSentences}}' wx:for-item='sentence' 
+          wx:for-index='sIdx'
+        >
+          <view class="{{filter.isPunctuation(spellCard.letter)?'punctuation':'alphabet_card'}} {{filter.isPunctuation(spellCard.letter)?'':spellCard.cardState}}"
+        style="width:{{cardFontSize*1.2}}vw;  height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
+        wx:for-items='{{sentence}}' wx:for-item='spellCard' 
+        wx:for-index='idx' wx:key="id" 
+        data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
+        bindtap="onTapReciteCard" 
+        bindlongpress="openDictDialog"
+        >
+          <image wx:if="{{(spellCard.cardState=='card_used'&&!filter.isPunctuation(spellCard.letter))?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>
+            {{spellCard.letter}}
+          </view>
+        </view>
+        <!-- <view class="{{filter.isPunctuation(spellCard.letter)?'punctuation':'alphabet_card'}} {{filter.isPunctuation(spellCard.letter)?'':spellCard.cardState}}"
+        style="width:{{cardFontSize*1.2}}vw;  height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
         wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
         bindtap="onTapReciteCard" 
         bindlongpress="openDictDialog"
         >
-        <image wx:if="{{(spellCard.cardState=='card_used')?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>
+        <image wx:if="{{(spellCard.cardState=='card_used'&&!filter.isPunctuation(spellCard.letter))?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>
         {{spellCard.letter}}
-        </view>
-      </view>
-
+        </view> -->
+      </view>        
     </movable-area>
     <form class="answer_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
       <view class='buttons' animation="{{fadeInOutQuestion}}">
@@ -99,10 +117,8 @@
           style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
           {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
           </view>
-          <text wx:if='{{isAnswerVisible}}'>{{question.word}}</text>
-          <text wx:if='{{!isAnswerVisible}}'>. . . . </text>
+          <text>{{question.topic}}</text>
         </view>
-       
       </view>
     </scroll-view>
   </view>

@@ -5,29 +5,27 @@ const storeKeys = require('../const/global.js').storageKeys;
 const utils = require('../utils/util.js');
 const TABLES = require('../const/collections.js');
 const TABLE = TABLES.USERS
-
-
-
-const queryUser = function (filters, callback) {
+utils.formatDate(new Date())
+function queryUser(filters, callback) {
   const db = wx.cloud.database()
   // 根据条件查询所有用户
   db.collection(TABLES.USERS).where(filters).get({
     success: res => {
       let result = res.data;
       // debugLog('user', result);
-      callback(result)
+      utils.runCallback(callback)(result)
     },
     fail: err => {
       wx.showToast({
         icon: 'none',
         title: '查询记录失败'
       })
-      errorLog('[数据库USER] [查询记录] 失败：', err)
+      errorLog('[数据库USER] [查询记录] 失败：', err.stack)
     }
   })
 }
 
-const createUser = function (insertData, callback) {
+function createUser(insertData, callback) {
   const db = wx.cloud.database()
   // debugLog('insertData1', insertData)
   insertData = Object.assign(insertData, {
@@ -47,19 +45,19 @@ const createUser = function (insertData, callback) {
     success: res => {
       let result = res;
       debugLog('【插入结果】user', result);
-      callback(result)
+      utils.runCallback(callback)(result)
     },
     fail: err => {
       wx.showToast({
         icon: 'none',
         title: '插入记录失败'
       })
-      debugLog('[数据库USER] [插入记录] 失败：', err)
+      debugLog('[数据库USER] [插入记录] 失败：', err.stack)
     }
   })
 }
 
-const updateUser = function (id, updateObj, callback) {
+function updateUser(id, updateObj, callback) {
   const db = wx.cloud.database()
   let now = new Date();
   let nowTimeString = now.toString();
@@ -77,21 +75,21 @@ const updateUser = function (id, updateObj, callback) {
     success: res => {
       let result = res;
       // debugLog('user', result);
-      callback(result)
+      utils.runCallback(callback)(result)
     },
     fail: err => {
       wx.showToast({
         icon: 'none',
         title: '更新记录失败'
       })
-      errorLog('[数据库USER] [更新记录] 失败：', err)
+      errorLog('[数据库USER] [更新记录] 失败：', err.stack)
     }
   })
 }
 
-function getUserConfigs(openid, callback){
+function getUserConfigs(openid, callback) {
   const db = wx.cloud.database()
-  if(!openid){
+  if (!openid) {
     return
   }
   // 根据条件查询所有用户
@@ -101,10 +99,10 @@ function getUserConfigs(openid, callback){
     success: res => {
       let result = res.data;
       // debugLog('getUserCofigs', result);
-      if(result.length > 0){
-        callback(result[0].userConfigs)
-      }else{
-        callback(undefined)
+      if (result.length > 0) {
+        utils.runCallback(callback)(result[0].userConfigs)
+      } else {
+        utils.runCallback(callback)(undefined)
       }
 
     },
@@ -113,12 +111,12 @@ function getUserConfigs(openid, callback){
         icon: 'none',
         title: '查询记录失败'
       })
-      errorLog('[数据库USER] [查询记录] 失败：', err)
+      errorLog('[数据库USER] [查询记录] 失败：', err.stack)
     }
   })
 }
 
-function updateUserConfigs(openid, userConfigs, callback){
+function updateUserConfigs(openid, userConfigs, callback) {
   const db = wx.cloud.database()
   let now = new Date();
   let nowTimeString = now.toString();
@@ -137,63 +135,63 @@ function updateUserConfigs(openid, userConfigs, callback){
     success: res => {
       let result = res;
       // debugLog('user', result);
-      callback(result)
+      utils.runCallback(callback)(result)
     },
     fail: err => {
       wx.showToast({
         icon: 'none',
         title: '更新记录失败'
       })
-      callback(null)
-      errorLog('[数据库USER] [更新记录] 失败：', err)
+      utils.runCallback(callback)(null)
+      errorLog('[数据库USER] [更新记录] 失败：', err.stack)
     }
   })
 }
 
-function getChildren(callback){
+function getChildren(callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
   const _ = db.command
-
   let userInfo = wx.getStorageSync('userInfo')
   let openid;
-  if(userInfo && userInfo._openid){
+
+  if (userInfo && userInfo._openid) {
     openid = userInfo._openid
     // 根据条件查询所有用户
     db.collection(TABLE)
-      .where({ _id: openid})
+      .where({ _id: openid })
       .field({
         _id: true,
         children: true,
       })
       .get({
-      success: res => {
-        let result = res.data;
-        if(result.length > 0){
-          debugLog('children', result[0]);
-          callback(result[0])
-        }else{
+        success: res => {
+          let result = res.data;
+          if (result.length > 0) {
+            // debugLog('children', result[0]);
+            utils.runCallback(callback)(result[0])
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: '查询记录失败'
+            })
+            utils.runCallback(callback)(null)
+          }
+
+        },
+        fail: err => {
           wx.showToast({
             icon: 'none',
             title: '查询记录失败'
           })
           callback(null)
+          errorLog('[数据库] [查询记录] 失败：', err)
         }
-
-      },
-      fail: err => {
-        wx.showToast({
-          icon: 'none',
-          title: '查询记录失败'
-        })
-        callback(null)
-        errorLog('[数据库] [查询记录] 失败：', err)
-      }
-    })
+      })
   }
 }
 
-function getParents(){
+function getParents(callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
   const _ = db.command
@@ -213,14 +211,14 @@ function getParents(){
         success: res => {
           let result = res.data;
           if (result.length > 0) {
-            debugLog('parent', result[0]);
-            callback(result[0])
+            // debugLog('parents', result[0]);
+            utils.runCallback(callback)(result[0])
           } else {
             wx.showToast({
               icon: 'none',
               title: '查询记录失败'
             })
-            callback(null)
+            utils.runCallback(callback)(null)
           }
         },
         fail: err => {

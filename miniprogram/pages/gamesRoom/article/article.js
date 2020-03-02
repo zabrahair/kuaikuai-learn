@@ -43,7 +43,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    titleSubfix: '自助默写',
+    titleSubfix: '自助背诵',
     // Question Related
     ANSWER_TYPES: gConst.ANSWER_TYPES.SELF_RECITE,
     questions: [],
@@ -99,9 +99,9 @@ Page({
 
     // page show
     questionViewWidth: 50,
-    cardFontSize: 13.5,
-    maxCardFontSize: 15,
-    minCardFontSize: 8,
+    cardFontSize: 10,
+    maxCardFontSize: 12,
+    minCardFontSize: 7,
 
     // filters
     tags: [],
@@ -122,7 +122,7 @@ Page({
     that.whenPageOnShow(that)
   },
 
-  initOnLoad: function(that, options){
+  initOnLoad: function (that, options) {
     // debugLog('initOnLoad.options', options)
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
@@ -163,7 +163,7 @@ Page({
 
   },
 
-  whenPageOnShow: function(that){
+  whenPageOnShow: function (that) {
     let userInfo = that.data.userInfo
     let gameMode = that.data.gameMode
     utils.getTotalScore(userInfo, userScore => {
@@ -178,7 +178,7 @@ Page({
     animation.playFade(that, animation.MAP.FADE_IN_CONTINUE_BTN.name)
 
     // 将单词卡反过来
-    if (that.data.isAnswerVisible){
+    if (that.data.isAnswerVisible) {
       // animation.playFade(that, animation.MAP.TURN_OVER_SPELL_CARD.name)
     }
   },
@@ -221,8 +221,30 @@ Page({
   /**
    * 对当前题目进行处理
    */
-  processCurrentQuestion: function (that, nextQuestion) {
-    common.processWordsIntoCards(that, nextQuestion)
+  processCurrentQuestion: function (that, nextQuestion, callback) {
+    common.processWordsIntoCards(that, nextQuestion, pThat=>{
+      let curSpellCards = pThat.data.curSpellCards
+      let curSentences = []
+      let sentence = []
+      for(let i in curSpellCards){
+        let curChar = curSpellCards[i]
+        if (!utils.isPunctuation(curChar.letter)){
+          // 如果不是标点
+          sentence.push(curChar)
+        }else{
+          // 如果是标点
+          sentence.push(curChar)
+          curSentences.push(sentence)
+          sentence = []
+        }
+      }
+      debugLog('curSentences', curSentences)
+      pThat.setData({
+        curSentences: curSentences
+      },()=>{
+        // utils.runCallback(callback)(pThat)
+      })
+    })
   },
 
   /**
@@ -298,15 +320,15 @@ Page({
     }
 
     that.setData({
-      curAnswer: answer?answer:null,
+      curAnswer: answer ? answer : null,
       curIsCorrect: isCorrect,
     })
 
-    common.scoreApprove(that, curQuestion, isCorrect, ()=>{
+    common.scoreApprove(that, curQuestion, isCorrect, () => {
       that.setData({
         curAnswer: '',
         thinkSeconds: 0,
-      },res=>{
+      }, res => {
       })
     })
     // }catch(e){
@@ -317,7 +339,7 @@ Page({
   /**
    * 关闭显示得分层
    */
-  finishScoreApprove: function(e){
+  finishScoreApprove: function (e) {
     let that = this
     common.finishScoreApprove(that, e)
   },
@@ -388,10 +410,10 @@ Page({
       })
 
       animation.playFade(that, animation.MAP.FADE_IN_QUESTION_BLOCK.name,
-      null,
-      res=>{
-        animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
-      })
+        null,
+        res => {
+          animation.playFade(that, animation.MAP.FADE_OUT_CONTINUE_BTN.name)
+        })
     }
   },
 
@@ -444,20 +466,20 @@ Page({
     // debugLog('onTapReciteCard.e', e)
 
     common.onTapReciteCard(that, e,
-    (thats, curSpellCards, cardIdx)=>{
-      // 当卡反过来的时候
+      (thats, curSpellCards, cardIdx) => {
+        // 当卡反过来的时候
 
-    },
-    (thats, curSpellCards, cardIdx) => {
-      // 反一次卡，扣分1/n
-      // let curQuestion = that.data.curQuestion
-      // curQuestion.score = parseFloat((curQuestion.score - curQuestion.discount).toFixed(1))
-      // // debugLog('onTapReciteCard', curQuestion)
-      // that.setData({
-      //   curQuestion: curQuestion
-      // })
-      // 当卡没反过来的时候
-          })
+      },
+      (thats, curSpellCards, cardIdx) => {
+        // 反一次卡，扣分1/n
+        // let curQuestion = that.data.curQuestion
+        // curQuestion.score = parseFloat((curQuestion.score - curQuestion.discount).toFixed(1))
+        // // debugLog('onTapReciteCard', curQuestion)
+        // that.setData({
+        //   curQuestion: curQuestion
+        // })
+        // 当卡没反过来的时候
+      })
   },
 
   /**
@@ -490,56 +512,56 @@ Page({
   playCardText: function (e) {
     let that = this
     // 中英文间隔读
-    that.playSwitch(that, (pThat, readContent, readLang)=>{
+    that.playSwitch(that, (pThat, readContent, readLang) => {
       common.readCurrentWord(pThat, readContent, readLang)
     })
 
   },
 
   /** 读一次英文，读一次中文 */
-  playSwitch: function(that, callback){
+  playSwitch: function (that, callback) {
     let readContent = that.data.readContent
     let readSwitch = that.data.readSwitch
     let readLang = null
-    debugLog('readSwitch', readSwitch)
-    debugLog('readContent', readContent)
-    debugLog('that.data.tableValue.search(chinese)', that.data.tableValue.search('chinese'))
-    debugLog('!readSwitch', !readSwitch
-      || readSwitch == 'meaning'
-      || that.data.tableValue.search('chinese'))
+    // debugLog('readSwitch', readSwitch)
+    // debugLog('readContent', readContent)
+    // debugLog('that.data.tableValue.search(chinese)', that.data.tableValue.search('chinese'))
+    // debugLog('!readSwitch', !readSwitch
+    //   || readSwitch == 'meaning'
+    //   || that.data.tableValue.search('chinese'))
     if (!readSwitch
       || readSwitch == 'meaning'
-      || that.data.tableValue.search('chinese') == 0){
-      debugLog('read word')
+      || that.data.tableValue.search('chinese') == 0) {
+      // debugLog('read word')
       readContent = that.data.curQuestion.word
       readSwitch = 'word'
       readLang = null
-    }else{
+    } else {
       // debugLog('read meaning')
-      readContent = that.data.curQuestion.meaning.replace(/[a-z.\s]/gi,'')
+      readContent = that.data.curQuestion.meaning.replace(/[a-z.\s]/gi, '')
       readSwitch = 'meaning'
       readLang = gConst.LANGS.CHINESE
     }
     that.setData({
       readContent: readContent,
       readSwitch: readSwitch
-    }, ()=>{
+    }, () => {
       utils.runCallback(callback)(that, readContent, readLang)
     })
   },
 
-  switchAnswerVisibility: function(e){
+  switchAnswerVisibility: function (e) {
     let that = this
     // try{
-      that.setData({
-        isAnswerVisible: (that.data.isAnswerVisible == false) ? true : false,
-      }, res=>{
-        that.setAnswerShownState(that)
-      })
+    that.setData({
+      isAnswerVisible: (that.data.isAnswerVisible == false) ? true : false,
+    }, res => {
+      that.setAnswerShownState(that)
+    })
     // } catch (e) { errorLog('switchAnswerVisibility', switchAnswerVisibility)}
   },
 
-  setAnswerShownState: function(that){
+  setAnswerShownState: function (that) {
     let curSpellCards = that.data.curSpellCards
     for (let i in curSpellCards) {
       // that.onTapReciteCard({
@@ -550,9 +572,9 @@ Page({
       //     }
       //   }
       // })
-      if (that.data.isAnswerVisible){
+      if (that.data.isAnswerVisible) {
         curSpellCards[i].cardState = common.CARD_STATE.UNUSED
-      }else{
+      } else {
         curSpellCards[i].cardState = common.CARD_STATE.USED
       }
     }
@@ -564,10 +586,10 @@ Page({
   /**
    * 当前页面在切换题目的时候做的个性事情
    */
-  myNextQuestionActions: function (that, nextQuestion){
+  myNextQuestionActions: function (that, nextQuestion) {
     that.setData({
       isAnswerVisible: false,
-    }, res=>{
+    }, res => {
       that.setAnswerShownState(that)
     })
   },

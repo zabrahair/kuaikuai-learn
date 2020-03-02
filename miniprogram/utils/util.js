@@ -3,7 +3,6 @@ const gConst = require('../const/global.js');
 const storeKeys = require('../const/global.js').storageKeys;
 const debugLog = require('log.js').debug;
 const errorLog = require('log.js').error;
-const userApi = require('../api/user.js')
 
 const formatTime = date => {
   const year = date.getFullYear()
@@ -229,7 +228,7 @@ const getTotalScore = function(userInfo, callback){
 
 /**
  * 分类统计练习
- * 
+ *
  *  功能不可用，因为传过去的group没有起作用
  */
 const getGamingStatistics = function (userInfo, callback) {
@@ -271,43 +270,7 @@ const getGamingStatistics = function (userInfo, callback) {
   // }
 }
 
-function getUserConfigs(ifRefresh, updateConfigs){
-  let config = wx.getStorageSync('userConfigs');
-  config = config ? config : gConst.DEFAULT_USER_CONFIGS
-  let dbUserConfigs;
-  //需要去数据库刷新
-  if (ifRefresh){
-    let userInfo = wx.getStorageSync('userInfo');
-    if (userInfo.openId){
-       userApi.getUserConfigs(userInfo.openId
-        ,res=>{
-          debugLog('getUserConfigs.res', res)
-          if (!res || updateConfigs){
-            // no user configs in db
-            // create a user configs object in db
-            if (updateConfigs){
-              Object.assign(config, updateConfigs)
-            }
-            wx.setStorageSync('userConfigs', config);
-            userApi.updateUserConfigs(
-              userInfo.openId
-              , config
-              , res=>{
-                debugLog('getUserConfigs.updateUserConfigs.res', res);
-              })  
-          }else{
-            // user configs exists in db
-            dbUserConfigs = res;
-            wx.setStorageSync('userConfigs', dbUserConfigs);
-          }
-        })
-      
-    }
-  }else{
-  // 不需要从数据库刷新，从Storage取
-    return config
-  }
-}
+
 /**
  * join array with object
  */
@@ -398,8 +361,8 @@ function getArrFromObjectsArr(objects, propName){
       array.push(objects[i][propName])
     }
   }
-  
-  return array 
+
+  return array
 }
 
 /**
@@ -416,7 +379,7 @@ function array2Object(array, pKey){
       // debugLog('object[key]', object)
     }
   }
-  return object  
+  return object
 }
 
 /**
@@ -444,7 +407,7 @@ function sortByPropLenArray(array, sortProp, order){
         return 0
       }
     }
-    
+
   })
   return sortedArray
 }
@@ -504,7 +467,7 @@ function getEventDataset(e){
   }else{
     // debugLog('Object.keys(dataset1)', Object.keys(dataset1))
     return e.target.dataset
-  } 
+  }
 }
 
 function getStorage(key){
@@ -541,6 +504,30 @@ function loadPagesData(callback, timeout=500) {
   }, timeout)
 }
 
+/**
+ * 判断是不是标点
+ */
+function isPunctuation(letter) {
+  var result = false;
+  // console.log('letter:', letter)
+  switch (letter) {
+    case "，":
+      result = true
+      break;
+    case "。":
+      result = true
+      break;
+    case "？":
+      result = true
+      break;
+    case "；":
+      result = true
+      break;
+    default:
+  }
+  return result;
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -560,6 +547,7 @@ module.exports = {
   formatDateTime: formatDateTime,
   mergeDateTime: mergeDateTime,
 
+  isPunctuation: isPunctuation,
   resetStatus: resetStatus,
   cloneObj: cloneObj,
   pickerMaker: pickerMaker,
@@ -568,14 +556,13 @@ module.exports = {
   getArrFromObjectsArr: getArrFromObjectsArr,
   ORDER: ORDER,
   sortByPropLenArray: sortByPropLenArray,
-  
+
 
   /** 功能型方法 */
   refreshUserRoleConfigs: refreshUserRoleConfigs,
   refreshConfigs: refreshConfigs,
   getConfigs: getConfigs,
   getGamingStatistics: getGamingStatistics,
-  getUserConfigs: getUserConfigs,
   getUserRole: getUserRole,
   getTotalScore: getTotalScore,
   getUserInfo: getUserInfo,

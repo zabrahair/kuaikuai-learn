@@ -52,20 +52,32 @@ function formatDateTime(pDateTime){
   return dateProcessed + " " + timeProcessed
 }
 
-// function mergeDateTime(pDateStr, pTimeStr) {
-//   var dateStr = pDateStr.replace("/", '-')
-//   dateStr = pDateStr.replace("/", '-')
-//   var date = new Date(dateStr + 'T' + pTimeStr + ':00Z');
-//   // 因为中国处于东八区
-//   date.setHours(date.getHours() - 8)
-//   return date;
-// }
-
 function intervalTime(pDateStr, pTimeStr){
   // var previousTime = mergeDateTime(pDateStr, pTimeStr);
   // var now = new Date()
   // var intervalTime = now.getTime() - previousTime.getTime()
 
+}
+
+function isPunctuation(letter){
+  var result = false;
+  // console.log('letter:', letter)
+  switch (letter){
+    case "，": 
+      result = true
+      break;
+    case "。":
+      result = true
+      break;   
+    case "？":
+      result = true
+      break;
+    case "；":
+      result = true
+      break;        
+    default: 
+  }
+  return result;
 }
 
 // 导出对外暴露的属性
@@ -75,4 +87,5 @@ module.exports = {
   formatDate: formatDate,
   formatTime: formatTime,
   intervalTime: intervalTime,
+  isPunctuation: isPunctuation,
 }

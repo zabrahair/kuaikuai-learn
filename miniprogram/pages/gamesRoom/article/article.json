@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "自助背诵",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "point-layer": "../../../components/getPoint/getPoint",
+    "score-title": "../../../components/scoreTitle/scoreTitle",
+    "dict-dialog": "../../components/dictDialog/dictDialog"
+  }
+}

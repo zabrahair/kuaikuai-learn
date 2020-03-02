@@ -62,7 +62,8 @@ Page({
    * 页面相关事件处理函数--监听用户下拉动作
    */
   onPullDownRefresh: function () {
-
+    let that = this
+    taskCommon.initList(that)
   },
 
   /**
@@ -73,10 +74,19 @@ Page({
   },
 
   /**
+   * Scroll View touch bottom
+   */
+  onScrollTouchBottom: function(e){
+    let that = this
+    debugLog('when ReachBottom')
+    taskCommon.refreshTasks(that, false)
+  },
+
+  /**
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-
+    debugLog('click share')
   },
 
   /**

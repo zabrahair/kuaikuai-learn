@@ -32,7 +32,8 @@ function defaultEditorData(selfData){
     // 基本字段
     gConst: gConst,
     children: [],
-    parent: [],
+    parents: [],
+    assignees: [],
     userRole: null,
     userInfo: null,
     
@@ -63,6 +64,7 @@ function initPage(that){
   // userRole
   let userRole = userInfo.userRole
   that.setData({
+    openid: userInfo._openid,
     userInfo: userInfo,
     userRole: userRole,
     USER_ROLES: USER_ROLES,
@@ -70,62 +72,38 @@ function initPage(that){
     TASK_STATUS: TASK_STATUS,
     BONUS_CLASSES: BONUS_CLASSES,
     BONUS_CLASSES_OBJ: BONUS_CLASSES_OBJ,
-  })
-
-  // children
-  userApi.getChildren(res => {
-    // debugLog('getChildren', res)
-    if (res) {
-      if (userRole == USER_ROLES.PARENT) {
-        // debugLog('getChildren', res)
-        that.setData({
-          openid: res._id,
-          assignees: res.children,
-          children: res.children,
-        })
-      } else if (userRole == USER_ROLES.STUDENT) {
-        that.setData({
-          children: res.children,
-        })
-      } 
-    }
-  })
-
-  // parents
-  userApi.getParents(res => {
-    if (res) {
-      if (userRole == USER_ROLES.PARENT) {
-        that.setData({
-          parents: res.parents,
-        })
-      } else if (userRole == USER_ROLES.STUDENT) {
-        // debugLog('getChildren', res)
-        that.setData({
-          openid: res._id,
-          assignees: res.parents,
-          parents: res.parents,
-        })
-      } 
-    }
-  })
-
-
-  
-  if (userRole == USER_ROLES.PARENT) {
+    assignees:[]
+  }
+  ,()=>{
+    
     // children
     userApi.getChildren(res => {
       // debugLog('getChildren', res)
       if (res) {
         that.setData({
-          openid: res._id,
-          assignees: res.children,
+          assignees: that.data.assignees.concat(res.children),
           children: res.children,
+        }
+        ,()=>{
+          // debugLog('getChildren.assignees', that.data.assignees)
         })
       }
     })
-  } else if (userRole == USER_ROLES.STUDENT) {
 
-  } 
+    // parents
+    userApi.getParents(res => {
+      if (res) {
+        // debugLog('getParents', res)
+        that.setData({
+          assignees: that.data.assignees.concat(res.parents),
+          parents: res.parents
+        }, () => {
+          // debugLog('getParents.assignees', that.data.assignees)
+          // debugLog('getParents.parents', that.data.parents)
+        })
+      }
+    })
+  })
 }
 
 function initEditor(that){
@@ -197,7 +175,7 @@ function initList(that) {
   utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
   initPage(that)
   // 刷新给我的任务列表
-  refreshToMeTasks(that)
+  refreshMyTasks(that)
 }
 
 /** 
@@ -271,7 +249,7 @@ function showTaskEditor(that){
 /**
  * 发给我的任务刷新
  */
-function refreshToMeTasks(that){
+function refreshMyTasks(that){
   let openid = that.data.userInfo._openid
   let pageIdx = that.data.pageIdx
   taskApi.query({
@@ -279,10 +257,11 @@ function refreshToMeTasks(that){
       openid: openid
     }
   }, pageIdx, tasks=>{
-    debugLog('refreshToMeTasks.res', tasks)
+    debugLog('refreshMyTasks.pageIdx', pageIdx)
+    // debugLog('refreshMyTasks.tasks', tasks)
     if(tasks.length > 0){
       that.setData({
-        tasks: tasks,
+        tasks: that.data.tasks.concat(tasks),
         pageIdx: pageIdx + 1
       })
     }
@@ -354,16 +333,15 @@ function approveTask(that, callback) {
  */
 function refreshTasks(that, isReset){
   // 判断是否从头刷新
-  let pageIdx
+  let pageIdx = that.data.pageIdx
   if(isReset){
     pageIdx = 0
   }else{
-    pageIdx = pageIdx
   }
   that.setData({
-    pageIdx: 0
+    pageIdx: pageIdx
   }, ()=>{
-    refreshToMeTasks(that)
+    refreshMyTasks(that)
   })
 }
 
@@ -388,6 +366,6 @@ module.exports = {
   defaultListData: defaultListData,
   initList: initList,
   showTaskEditor: showTaskEditor,
-  refreshToMeTasks: refreshToMeTasks,
+  refreshMyTasks: refreshMyTasks,
   refreshTasks: refreshTasks,
 }

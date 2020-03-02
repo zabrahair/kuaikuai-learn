@@ -10,7 +10,6 @@ const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
 const animation = require('../../utils/animation.js');
 
-
 const dbApi = require('../../api/db.js')
 const learnHistoryApi = require('../../api/learnHistory.js')
 
@@ -131,7 +130,10 @@ Component({
         // debugLog('ebbingClasses', ebbingClasses)
         learnHistoryApi.ebbinghauseCount({
           question: {
-            tags: gConst.ANSWER_TYPES.MANUAL_CHECK
+            tags: _.or([
+                gConst.ANSWER_TYPES.MANUAL_CHECK,
+                gConst.ANSWER_TYPES.RICITE_ARTICLE,
+              ])
           },
         }
           , ebbingClass
@@ -153,9 +155,16 @@ Component({
     onTapEbbingCard: function(e){
       let that = this
       let dataset = utils.getEventDataset(e)
-      let url = '/pages/gamesRoom/words/words?gameMode=' + gConst.GAME_MODE.EBBINGHAUSE 
+      let url = ''
+      if(dataset.tableValue == TABLES.CHINESE_ARTICLE){
+        url = '/pages/gamesRoom/article/article?'
+      }else{
+        url = '/pages/gamesRoom/selfRecite/selfRecite?'
+      }
+      url = url
+        + 'gameMode=' + gConst.GAME_MODE.EBBINGHAUSE 
         + '&tableValue=' + dataset.tableValue 
-        + '&tableName=' + TABLES.MAP[dataset.tableValue] 
+        + '&tableName=' + TABLES.MAP[dataset.tableValue].name
         + '&filterTags=' + dataset.ebbingClassName 
         + "&ebbingClassName=" + dataset.ebbingClassName;
       wx.navigateTo({

@@ -17,14 +17,17 @@
     "pages/aRunQuery/aRunQuery",
     "pages/tasks/tasks",
     "pages/gamesRoom/fillBlank/fillBlank",
-    "pages/dictionary/dictionary"
+    "pages/dictionary/dictionary",
+    "pages/gamesRoom/article/article"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#F6F6F6",
     "navigationBarTitleText": "快快學習",
-    "navigationBarTextStyle": "black"
+    "navigationBarTextStyle": "black",
+    "enablePullDownRefresh": true,
+    "onReachBottomDistance": 50
   },
   "sitemapLocation": "sitemap.json",
   "style": "v2",
@@ -47,7 +50,7 @@
         "selectedIconPath": "images/dict.png",
         "iconPath": "images/dict_unselected.png",
         "text": "字词典"
-      },      
+      },
       {
         "pagePath": "pages/profile/profile",
         "selectedIconPath": "images/profile.png",

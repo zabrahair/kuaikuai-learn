@@ -197,6 +197,13 @@
 					"pathName": "pages/gamesRoom/words/words",
 					"query": "gameMode=艾宾浩斯&tableValue=english-words&tableName=英语单词&filterTags=8小时&ebbingClassName=8小时",
 					"scene": null
+				},
+				{
+					"id": 21,
+					"name": "自助背诵",
+					"pathName": "pages/gamesRoom/article/article",
+					"query": "gameMode=常规&tableValue=chinese-article&tableName=中文文章&filterTags=唐诗",
+					"scene": null
 				}
 			]
 		}

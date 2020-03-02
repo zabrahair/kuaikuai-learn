@@ -4,10 +4,8 @@ const errorLog = require('./utils/log.js').error;
 const gConst = require('./const/global.js');
 const storeKeys = require('./const/global.js').storageKeys;
 const utils = require('./utils/util.js');
+const userInfoUtils = require('./utils/userInfo.js')
 const TABLES = require('./const/collections.js')
-
-// const dbApi = require('./api/db.js')
-// const userApi = require('./api/user.js')
 
 const updateManager = wx.getUpdateManager()
 /**
@@ -45,7 +43,7 @@ App({
       console.error('请使用 2.2.3 或以上的基础库以使用云能力')
     } else {
       this.globalData = {}
-      
+
       wx.cloud.init({
         // env 参数说明：
         //   env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
@@ -65,9 +63,9 @@ App({
       utils.refreshConfigs(gConst.CONFIG_TAGS.COMBO_TYPE)
       // 艾宾浩斯遗忘曲线设置
       utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-      
+
       this.login();
-      utils.getUserConfigs(true)
+      userInfoUtils.getUserConfigs(true)
 
     }
   },

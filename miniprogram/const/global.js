@@ -133,6 +133,7 @@ module.exports = {
     SPELLING: '拼写',
     OPTIONS_SELECT: '选择题',
     FILL_BLANK: '填空题',
+    RICITE_ARTICLE: '背文章',
     CONNECT_ITEMS: '连线题',
   },
   TAGS_LOCATION: {
@@ -156,4 +157,8 @@ module.exports = {
     CHAR: 'CHAR',
   },
   TOAST_DURATION_TIME: 1000,
+  LANGS: {
+    CHINESE: 'zh_CN',
+    ENGLISH: 'en_US'
+  }
 }

@@ -4,6 +4,7 @@ module.exports = {
   MATH_DIVIDE: 'math-divide',
   ENGLISH_WORDS: 'english-words',
   CHINESE_WORDS: 'chinese-words',
+  CHINESE_ARTICLE: 'chinese-article',
   CHINESE_KNOWLEDGE: 'chinese-knowledge',
   USERS: 'users',
   SCORE_STANDARD: 'score-standard',
@@ -23,9 +24,13 @@ module.exports = {
       value: 'chinese-knowledge',
     },   
     {
+      name: '中文文章',
+      value: 'chinese-article',
+    },  
+    {
       name: '两位四则运算',
       value: 'math-divide',
-    },  
+    }, 
   ],
   MAP: {
     'english-words': {
@@ -43,6 +48,11 @@ module.exports = {
       value: 'chinese-knowledge',
       lang: 'zh_CN', 
     },
+    'chinese-article': {
+      name: '中文文章',
+      value: 'chinese-article',
+      lang: 'zh_CN',
+    },  
     'math-divide': {
       name: '两位四则运算',
       value: 'math-divide',

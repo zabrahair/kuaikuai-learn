@@ -96,27 +96,12 @@ function recordHistory(that, question, answer) {
   historyRecord['question'] = question
   historyRecord['answerType'] = that.data.titleSubfix
 
-  // delete question._id
-  // Object.assign(historyRecord, question)
   Object.assign(historyRecord, answer)
   // debugLog('historyRecord', historyRecord)
 
   learnHistoryApi.create(historyRecord, (res)=>{
     debugLog('learnHistoryCreate.success.res', res)
   })
-
-  // wx.cloud.callFunction({
-  //   name: 'learnHistoryCreate',
-  //   data: {
-  //     hisRecord: historyRecord
-  //   },
-  //   success: res => {
-  //     // debugLog('learnHistoryCreate.success.res', res)
-  //   },
-  //   fail: err => {
-  //     errorLog('[云函数] 调用失败：', err)
-  //   }
-  // })
 }
 
 /**
@@ -749,7 +734,7 @@ function processFillBlankQuestion(that) {
    * 处理当前题目的word字段，变成一张一张卡片
    * 7 cards in every line
    */
-function processWordsIntoCards(that, question) {
+function processWordsIntoCards(that, question, callback) {
   that.setData({
     curSpellCards: []
   })
@@ -788,6 +773,8 @@ function processWordsIntoCards(that, question) {
       curQuestion: question,
       curSpellCards: curSpellCards,
       cardFontSize: cardFontSize,
+    },()=>{
+      utils.runCallback(callback)(that)
     })
   }
 }
@@ -915,21 +902,30 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
     }
   })
 
+  // 朗读当前默写内容
+  if(that.data.tableValue.search('article') == -1){
+    // debugLog('nextQuestion', nextQuestion)
+    let timer = setTimeout(function () {
+      let speechText = '';
+      if (nextQuestion.word) {
+        speechText = nextQuestion.word
+        readCurrentWord(that, speechText)
+      }
+      else if (nextQuestion.questionText) {
+        speechText = nextQuestion.questionText
+      }
+      // 如果有解释，默认为中文，然后用中文朗读。
+      if (nextQuestion.meaning && nextQuestion.meaning.length > 0) {
+        setTimeout(() => {
+          let readContent = nextQuestion.meaning.replace(/[a-z.\s]/gi, '')
+          readCurrentWord(that, readContent, gConst.LANGS.CHINESE)
+        }, 1500)
+      }
+      clearTimeout(timer)
+    }, 200);
+  }
+
   // 重置变量
-  // debugLog('nextQuestion', nextQuestion)
-  let timer = setTimeout(function () { 
-    let speechText='';
-    if (nextQuestion.word){
-      speechText = nextQuestion.word
-      readCurrentWord(that, speechText)
-    }
-    else if(nextQuestion.questionText){
-      speechText = nextQuestion.questionText
-    }
-    
-    clearTimeout(timer)
-  }, 200);
-  
   that.setData({
     // 共通是用的字段
     questions: questions,
@@ -1008,7 +1004,6 @@ function initDataBodyInTagRoom(that, diffs, callback){
 function getTags(that, tableName, dataLoadTimer, callback) {
   // debugLog('getTags.tagsLocation', that.data.tagsLocation)
   if (that.data.tagsLocation == gConst.TAGS_LOCATION.NORMAL){
-
     getNormalTags(that, tableName, dataLoadTimer, callback)
   } else if (that.data.tagsLocation == gConst.TAGS_LOCATION.FAVORITES){
     getFavoriteTags(that, tableName, dataLoadTimer, callback)
@@ -1038,9 +1033,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
   }
   // debugLog('getNormalTags.userKeyword', that.data.userKeyword)
   if (that.data.userKeyword) {
-    // debugLog('getNormalTags.userKeyword2', that.data.userKeyword)
     tagsConds = tagsConds.and(new RegExp(that.data.userKeyword, "gim"))
-    // tagsConds.and(/第一课/gi)
   }
 
   if (that.data.selectedTags.length > 0) {
@@ -1054,16 +1047,13 @@ function getNormalTags(that, tableName, dataLoadTimer) {
   }
 
   if (tagsConds){
-    // where['tags'] = /第一课/gim
-    // where['tags'] = _.and(that.data.selAnswerType, new RegExp("第一课", "gim"))
     where['tags'] = tagsConds
-    // where['tags'] = _.and(that.data.selAnswerType).and(new RegExp(that.data.userKeyword, "gim"))
   }
+  // debugLog('getNormalTags.tableName', tableName)
   // debugLog('getNormalTags.where', where)
   dataLoadTimer = setInterval(function () {
     dbApi.getTags(tableName, where, pageIdx, (tags, pageIdx) => {
-      // debugLog('getTags.pageIdx', pageIdx)
-      debugLog('getTags.tags', tags)
+      // debugLog('getTags.tags', tags)
       if ((!tags.length || tags.length < 1) && pageIdx != 0) {
         // stop load
         // debugLog('getNormalTags.sort', that.data.tags)
@@ -1320,11 +1310,11 @@ function initFilterAnswerTypes(that,callback) {
 function recoverSelectedTags(that){
   let selectedTags = that.data.selectedTags
   let tags = that.data.tags
-  debugLog('selectedTags', selectedTags)
+  // debugLog('selectedTags', selectedTags)
   tags.find(tagCard=>{
     for (let i in selectedTags){
       if (selectedTags[i].text == tagCard.text) {
-        debugLog('selectedTags[i].text', selectedTags[i].text)
+        // debugLog('selectedTags[i].text', selectedTags[i].text)
         tagCard['css'] = SELECTED_CSS
         break;
       } else {
@@ -1404,6 +1394,8 @@ function onClickEnterInTagRoom(that, e) {
     url = '/pages/gamesRoom/selfRecite/selfRecite?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   } else if (that.data.selAnswerType == '填空题') {
     url = '/pages/gamesRoom/fillBlank/fillBlank?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
+  } else if (that.data.selAnswerType == '背文章') {
+    url = '/pages/gamesRoom/article/article?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   }
 
   if (that.data.gameMode == gConst.GAME_MODE.WRONG 
@@ -1436,7 +1428,7 @@ function sortTagsByLastDate(tags){
  */
 const plugin = requirePlugin("WechatSI")
 const audioCtx = wx.createInnerAudioContext()
-function readCurrentWord(that, word) {
+function readCurrentWord(that, word, pLang) {
   let lang = '';
   try {
     if (that.data.tableValue){
@@ -1444,7 +1436,9 @@ function readCurrentWord(that, word) {
     } else if (that.data.table){
       lang = TABLES.MAP[that.data.table].lang
     }
-    
+    if(pLang && typeof pLang == 'string' && pLang.length > 0){
+      lang = pLang
+    }
   } catch (e) { }
   // debugLog("lang", lang)
   plugin.textToSpeech({

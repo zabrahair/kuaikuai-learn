@@ -7,6 +7,7 @@ const errorLog = require('../../../utils/log.js').error;
 const gConst = require('../../../const/global.js');
 const storeKeys = require('../../../const/global.js').storageKeys;
 const utils = require('../../../utils/util.js');
+const userInfoUtils = require('../../../utils/userInfo.js')
 const animation = require('../../../utils/animation.js')
 const TABLES = require('../../../const/collections.js')
 // Api Handler
@@ -61,7 +62,7 @@ Page({
     curScore: 0,
     totalScore: 0,
     historyRecord: {},
-    userConfigs: utils.getUserConfigs(),
+    userConfigs: userInfoUtils.getUserConfigs(),
     // 得分效果和历史记录用的
     hitsCount: 0,
     isShowPointLayer: false,
@@ -88,7 +89,7 @@ Page({
 
     // filters
     tags: [],
-    lastDate: utils.getUserConfigs().filterQuesLastDate,
+    lastDate: userInfoUtils.getUserConfigs().filterQuesLastDate,
     lastTime: '00:00',
   },
 
@@ -240,7 +241,7 @@ Page({
       }
     } catch (e) { }
 
-    
+
     // debugLog('submitAnswer.e', e)
     let dataset;
     let answer = that.data.curAnswer
@@ -379,7 +380,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastDateChange: function (e) {
     let that = this
@@ -394,7 +395,7 @@ Page({
   },
 
   /**
-   * 
+   *
    */
   bindLastTimeChange: function (e) {
     let that = this
@@ -410,8 +411,8 @@ Page({
   },
 
   /**
-   * Search questions with filter 
-   * 
+   * Search questions with filter
+   *
    */
   onClickSearch: function (e) {
     let that = this
@@ -490,7 +491,7 @@ Page({
 
   /**
    * tap Answer Option
-   * 
+   *
    */
   tapSelectOption: function (e) {
     let that = this
@@ -513,7 +514,7 @@ Page({
     }
 
   },
-    
+
   /**
    * When Input Answer
    */
@@ -529,11 +530,11 @@ Page({
           curAnswer: answer
         })
       }catch(err){errorLog('err',err)}
-      
+
     }
   },
 
-  /** 
+  /**
    * 朗读当前卡片
    */
   playCardText: function (e) {

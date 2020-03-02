@@ -419,8 +419,8 @@ function ebbinghauseQuestions(pWhere, ebbingClass, pageIdx=0, callback) {
     answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
   }
   Object.assign(where, pWhere)
-  debugLog('ebbinghauseQuestions.where', where)
-  debugLog('ebbinghauseQuestions.ebbingClass', ebbingClass)
+  // debugLog('ebbinghauseQuestions.where', where)
+  // debugLog('ebbinghauseQuestions.ebbingClass', ebbingClass)
   db.collection(TABLE)
     .aggregate()
     .match(where)

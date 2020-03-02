@@ -13,6 +13,7 @@ const dialogCommon = require('../../common/dialog.js')
 
 /* DB API */
 const dbApi = require('../../api/db.js')
+// const userApi = require('../../api/user.js')
 const userApi = require('../../api/user.js')
 const taskCommon = require('../../common/task.js')
 
@@ -68,8 +69,8 @@ Component({
     'isShown, curStatus, curTask': function (isShown) {
       let that = this
       dialogCommon.whenIsShown(that, ()=>{
-          debugLog('children', that.data.children)
-          debugLog('observers.isShown', isShown)
+          // debugLog('children', that.data.children)
+          // debugLog('observers.isShown', isShown)
           taskCommon.whenIsShown(that)
       })
     },

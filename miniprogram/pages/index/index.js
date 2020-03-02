@@ -13,6 +13,7 @@ const dbApi = require('../../api/db.js')
 const userApi = require('../../api/user.js')
 const learnHistoryApi = require('../../api/learnHistory.js')
 const favoritesApi = require('../../api/favorites.js')
+
 Page({
 
   /**

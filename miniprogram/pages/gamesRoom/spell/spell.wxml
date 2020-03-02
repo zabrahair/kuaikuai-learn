@@ -32,7 +32,7 @@
       <movable-view class="btn_answer_switch" direction='all' x='0' y='40'>
         <image class="btn_answer_switch" bindtap='showOneMoreAnswer' src="{{isAnswerVisible?gConst.VISIBILITY_ICON:gConst.INVISIBILITY_ICON}}"/>
       </movable-view>
-      <movable-view class="dict" direction='all' x='320' y='30'>
+      <movable-view class="dict" direction='all' x='300' y='30'>
         <image src="{{gConst.DICT_ICON}}" bindtap="openDictDialog"/>
       </movable-view>
       <text class="meaning_text">{{curQuestion.meaning}}</text>
