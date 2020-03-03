@@ -523,6 +523,9 @@ function isPunctuation(letter) {
     case "；":
       result = true
       break;
+    case "！":
+      result = true
+      break;
     default:
   }
   return result;

@@ -23,12 +23,8 @@ Page({
   data: {
     funcName: 'Query',
     table: 'chinese-words',
-    where: JSON.stringify({
-
-    },null,4),
-    update: JSON.stringify({
-
-    }, null, 4),
+    where: '',
+    update: "人物描写，《作文工具书》",
     result: '',
     // Chinese Meaning
     isShownChineseMeaning: false,
@@ -98,52 +94,92 @@ Page({
   },
 
   submitAnswer: function(e){
-    /* test start */
-    utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-    let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-    let ebbingReciteCount = {}
-    let i = 0
-    for (let i in ebbingClasses){
-      let ebbingClass = ebbingClasses[i]
-      // debugLog('ebbingClasses', ebbingClasses)
-      learnHistoryApi.ebbinghauseCount({
-        question: {
-          // tags: '默写卡'
-        },
-      }
-      , ebbingClass
-      , 0
-      , countList => {
-        // debugLog('ebbinghauseCount.countList', countList)
-        let curList = ebbingReciteCount[ebbingClass.name] ? ebbingReciteCount[iebbingClass.name]: []
-        ebbingReciteCount[ebbingClass.name] = curList.concat(countList)
-        debugLog('ebbingReciteCount', ebbingReciteCount)
-      })
+    let detail = utils.getEventDetailValue(e)
+    // debugLog('detail', detail)
+    
+    /* test add chinese batch */
+    let wordsAll = detail.where
+    let wordsArray = wordsAll.split('\n')
+    // debugLog('wordsArray', wordsArray)
+    let tags = detail.update
+    // let insertTimer
+    for (let i in wordsArray){
+      // debugLog('i',i)
+      setTimeout(()=>{
+        wx.cloud.callFunction({
+          // name: form.functionName,
+          name: 'appendBatchWords',
+          data: {
+            table: 'chinese-words',
+            words: wordsArray[i],
+            tags: tags,//姐姐妹妹，人物描写，《作文工具书》
+            otherSegs: {
+              "注音": "",
+              "meaning": "",
+              "反义词": [],
+              "近义词": [],
+              "量词": "",
+              "score": 1.0,
+              "minFinishTime": 20000.0,
+            }
+          },
+          success: res => {
+            debugLog('appendBatchWords.res', res)
+          },
+          fail: err => {
+            console.error('【云函数】【appendBatchWords】调用失败', err)
+          }
+        })
+      }, 300*i)
     }
 
-    let ebbing20min = ebbingClasses[0]
-    debugLog('ebbing20min', ebbing20min)
-    let allQuest = []
-    utils.loadPagesData((pageIdx, loadTimer)=>{
-      learnHistoryApi.ebbinghauseQuestions({
-        table: 'chinese-words',
-        question: {
-          // tags: '默写卡'
-        },
-      }
-        , ebbing20min
-        , pageIdx
-        , questions => {
-          if (questions.length > 0){
-            debugLog('questions.length', questions.length)
-            allQuest = allQuest.concat(questions)
-          }else{
-            clearInterval(loadTimer)
-            debugLog('ebbinghauseQuestions.allQuest', allQuest)
-          }
+
+    // /* test start */
+    // utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+    // let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+    // let ebbingReciteCount = {}
+    // let i = 0
+    // for (let i in ebbingClasses){
+    //   let ebbingClass = ebbingClasses[i]
+    //   // debugLog('ebbingClasses', ebbingClasses)
+    //   learnHistoryApi.ebbinghauseCount({
+    //     question: {
+    //       // tags: '默写卡'
+    //     },
+    //   }
+    //   , ebbingClass
+    //   , 0
+    //   , countList => {
+    //     // debugLog('ebbinghauseCount.countList', countList)
+    //     let curList = ebbingReciteCount[ebbingClass.name] ? ebbingReciteCount[iebbingClass.name]: []
+    //     ebbingReciteCount[ebbingClass.name] = curList.concat(countList)
+    //     debugLog('ebbingReciteCount', ebbingReciteCount)
+    //   })
+    // }
+
+    // let ebbing20min = ebbingClasses[0]
+    // debugLog('ebbing20min', ebbing20min)
+    // let allQuest = []
+    // utils.loadPagesData((pageIdx, loadTimer)=>{
+    //   learnHistoryApi.ebbinghauseQuestions({
+    //     table: 'chinese-words',
+    //     question: {
+    //       // tags: '默写卡'
+    //     },
+    //   }
+    //     , ebbing20min
+    //     , pageIdx
+    //     , questions => {
+    //       if (questions.length > 0){
+    //         debugLog('questions.length', questions.length)
+    //         allQuest = allQuest.concat(questions)
+    //       }else{
+    //         clearInterval(loadTimer)
+    //         debugLog('ebbinghauseQuestions.allQuest', allQuest)
+    //       }
           
-        })
-    })
+    //     })
+    // })
 
    
 

@@ -149,9 +149,9 @@ function clickFavoriteSwitch(that, e) {
 /**
  * 默写卡点击字卡片
  */
-function onTapReciteCard(that, e, unusedCallback, usedCallback) {
+function onTapReciteCard(that, e, unusedCallback, usedCallback, callback) {
   let dataset = utils.getEventDataset(e)
-  // debugLog('onTapAnswerCard.dataset', dataset)
+  debugLog('onTapAnswerCard.dataset', dataset)
   let curSpellCards = that.data.curSpellCards;
   let cardIdx = parseInt(dataset.cardIdx)
   let curCard = curSpellCards[cardIdx];
@@ -170,12 +170,13 @@ function onTapReciteCard(that, e, unusedCallback, usedCallback) {
   let selectedCard = dataset.spellCard
 
   if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED) {
+    debugLog('when equal unused', curSpellCards[cardIdx].cardState)
     // selectedCard.tempCardIdx = cardIdx
     curCard.cardState = CARD_STATE.USED
     try { unusedCallback(that, curSpellCards[cardIdx])}catch(e){}
   } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED) {
     curCard.cardState = CARD_STATE.UNUSED
-    // debugLog('onTapReciteCard', that.data.curQuestion)
+    debugLog('when equal used', curSpellCards[cardIdx].cardState)
     try { usedCallback(that, curSpellCards[cardIdx])}catch (e) { }
     if (typeof curCard.usedBlankIdx == 'number') {
       // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
@@ -185,12 +186,13 @@ function onTapReciteCard(that, e, unusedCallback, usedCallback) {
     }
     selectedCard = false
   }
-  // debugLog('selectCard', selectedCard)
+  debugLog('selectCard', selectedCard)
+  debugLog('onTapAnswerCard.curSpellCards', curSpellCards)
   that.setData({
     curSpellCards: curSpellCards,
     selectedCard: selectedCard,
   })
-  if (typeof callback == 'function') callback()
+  utils.runCallback(callback)(that)
 }
 
 /**

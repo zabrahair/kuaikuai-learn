@@ -101,7 +101,7 @@ Page({
     questionViewWidth: 50,
     cardFontSize: 10,
     maxCardFontSize: 12,
-    minCardFontSize: 7,
+    minCardFontSize: 6,
 
     // filters
     tags: [],
@@ -238,7 +238,7 @@ Page({
           sentence = []
         }
       }
-      debugLog('curSentences', curSentences)
+      // debugLog('curSentences', curSentences)
       pThat.setData({
         curSentences: curSentences
       },()=>{
@@ -471,14 +471,13 @@ Page({
 
       },
       (thats, curSpellCards, cardIdx) => {
-        // 反一次卡，扣分1/n
-        // let curQuestion = that.data.curQuestion
-        // curQuestion.score = parseFloat((curQuestion.score - curQuestion.discount).toFixed(1))
-        // // debugLog('onTapReciteCard', curQuestion)
-        // that.setData({
-        //   curQuestion: curQuestion
-        // })
         // 当卡没反过来的时候
+      }
+      ,pThat=>{
+        debugLog('curSentences', pThat.data.curSentences)
+        pThat.setData({
+          curSentences: pThat.data.curSentences
+        })
       })
   },
 
@@ -556,22 +555,18 @@ Page({
     that.setData({
       isAnswerVisible: (that.data.isAnswerVisible == false) ? true : false,
     }, res => {
-      that.setAnswerShownState(that)
+      that.setAnswerShownState(that, pThat => {
+        pThat.setData({
+          curSentences: pThat.data.curSentences, //刷新一遍由curSpellCards变化的句子。
+        })
+      })
     })
     // } catch (e) { errorLog('switchAnswerVisibility', switchAnswerVisibility)}
   },
 
-  setAnswerShownState: function (that) {
+  setAnswerShownState: function (that, callback) {
     let curSpellCards = that.data.curSpellCards
     for (let i in curSpellCards) {
-      // that.onTapReciteCard({
-      //   target: {
-      //     dataset:{
-      //       spellCard: curSpellCards,
-      //       cardIdx: i,
-      //     }
-      //   }
-      // })
       if (that.data.isAnswerVisible) {
         curSpellCards[i].cardState = common.CARD_STATE.UNUSED
       } else {
@@ -580,6 +575,8 @@ Page({
     }
     that.setData({
       curSpellCards: curSpellCards
+    },()=>{
+      utils.runCallback(callback)(that)
     })
   },
 
@@ -590,7 +587,11 @@ Page({
     that.setData({
       isAnswerVisible: false,
     }, res => {
-      that.setAnswerShownState(that)
+      that.setAnswerShownState(that, pThat=>{
+        pThat.setData({
+          curSentences: pThat.data.curSentences, //刷新一遍由curSpellCards变化的句子。
+        })
+      })
     })
   },
 
@@ -638,12 +639,37 @@ Page({
     let that = this
     let dictMode = gConst.DICT_SEARCH_MODE.WORD
     let dictSearchChar = null
+    // debugLog('dataset', e)
+    // 点击个字
     try {
       let dataset = utils.getEventDataset(e)
-      debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
       if (dataset.spellCard.letter.length > 0) {
         dictMode = gConst.DICT_SEARCH_MODE.CHAR
         dictSearchChar = dataset.spellCard.letter
+      }
+    } catch (e) { }
+    // 点击作者
+    try {
+      let dataset = utils.getEventDataset(e)
+      if (dataset.author.length > 0) {
+        dictMode = gConst.DICT_SEARCH_MODE.CHAR
+        dictSearchChar = dataset.author
+      }
+    } catch (e) { }
+    // 点击题目
+    try {
+      let dataset = utils.getEventDataset(e)
+      if (dataset.topic.length > 0) {
+        dictMode = gConst.DICT_SEARCH_MODE.CHAR
+        dictSearchChar = dataset.topic
+      }
+    } catch (e) { }
+    // 点击时代
+    try {
+      let dataset = utils.getEventDataset(e)
+      if (dataset.time.length > 0) {
+        dictMode = gConst.DICT_SEARCH_MODE.CHAR
+        dictSearchChar = dataset.time
       }
     } catch (e) { }
     if (that.data.tableValue.includes('chinese')) {

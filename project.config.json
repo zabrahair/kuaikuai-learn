@@ -202,7 +202,7 @@
 					"id": 21,
 					"name": "自助背诵",
 					"pathName": "pages/gamesRoom/article/article",
-					"query": "gameMode=常规&tableValue=chinese-article&tableName=中文文章&filterTags=唐诗",
+					"query": "gameMode=常规&tableValue=chinese-article&tableName=中文文章&filterTags=诗歌",
 					"scene": null
 				}
 			]

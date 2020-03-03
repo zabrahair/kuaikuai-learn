@@ -283,6 +283,10 @@ Page({
       that.setData({
         isShownStatisticDialog: true
       })
+    } else if (featureName == 'questions') {
+      wx.navigateTo({
+        url: '/pages/contentList/contentList',
+      })
     }
   }
 })

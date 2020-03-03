@@ -24,13 +24,18 @@
     </view>
     <!--  -->
     <movable-area class='question' 
-      style="height: {{cardFontSize * 3.5 * curSpellCards.length / 8 }}vw;"
+      style="height: {{(cardFontSize * 2 + 3) * (curSentences.length+2.5) }}vw;"
       animation="{{fadeInOutQuestionBlock}}">
       <image class="favorite" data-question-id="{{curQuestion._id}}"
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 
       bindtap="clickFavoriteSwitch"/>
-      <text class="title topic">{{curQuestion.topic}}</text>
-      <text wx:if="{{curQuestion.author&&curQuestion.time}}" class="title author">——{{curQuestion.author}}【{{curQuestion.time}}】</text>
+      <text class="title topic" style="font-size: {{questionViewWidth * 0.7 / curQuestion.topic.length>cardFontSize * 2?cardFontSize * 2:questionViewWidth * 0.7 / curQuestion.topic.length}}vw;" data-author="{{curQuestion.topic}}" bindlongpress="openDictDialog">{{curQuestion.topic}}</text>
+      <view wx:if="{{curQuestion.author&&curQuestion.time}}" class="title author" 
+        style="font-size: {{cardFontSize*0.7}}vw;" >
+        <text
+        data-author="{{curQuestion.author}}" bindlongpress="openDictDialog">—— {{curQuestion.author}}</text>
+        <text data-time="{{curQuestion.time}}" bindlongpress="openDictDialog">【{{curQuestion.time}}】</text>
+      </view>
       <view class='ques_wait_time'>
         {{thinkSecondsStr}}
       </view> 
@@ -54,13 +59,13 @@
         <view class="sentence {{curQuestion.type == '诗歌'?'poem':''}}" 
           style="height: {{cardFontSize*2}}vw;"
           wx:for-items='{{curSentences}}' wx:for-item='sentence' 
-          wx:for-index='sIdx'
+          wx:for-index='sIdx' wx:key="_id"
         >
           <view class="{{filter.isPunctuation(spellCard.letter)?'punctuation':'alphabet_card'}} {{filter.isPunctuation(spellCard.letter)?'':spellCard.cardState}}"
         style="width:{{cardFontSize*1.2}}vw;  height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
         wx:for-items='{{sentence}}' wx:for-item='spellCard' 
         wx:for-index='idx' wx:key="id" 
-        data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'
+        data-spell-card='{{spellCard}}' data-card-idx='{{spellCard.id}}'
         bindtap="onTapReciteCard" 
         bindlongpress="openDictDialog"
         >

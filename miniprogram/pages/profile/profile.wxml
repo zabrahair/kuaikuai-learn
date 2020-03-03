@@ -23,6 +23,9 @@
     <view wx:if="{{userInfo.userRole == '家长'}}" class='feature' bindtap="tapProfileFeature" data-feature-name='myChildren'>
     我的孩子
     </view>
+    <view class='feature' bindtap="tapProfileFeature" data-feature-name='questions'>
+    题库管理
+    </view>
     <view class='feature' bindtap="tapProfileFeature" data-feature-name='history'>
     我的历史
     </view>
