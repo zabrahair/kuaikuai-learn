@@ -127,7 +127,7 @@ Page({
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
-    let ebbingClassName = options.ebbingClassName
+    let ebbingRateName = options.ebbingRateName
     let lastDate = (typeof options.lastDate == 'string' && options.lastDate != '') ? options.lastDate : that.data.lastDate
     let tags = []
     if (options.filterTags) {
@@ -144,7 +144,8 @@ Page({
       tableName: tableName,
       filterTags: options.filterTags,
       lastDate: lastDate,
-      ebbingClassName: ebbingClassName,
+      ebbingRateName: ebbingRateName,
+      options: options,
     })
   },
 
@@ -289,7 +290,7 @@ Page({
     let dataset;
     let answer
     let curQuestion = that.data.curQuestion
-    debugLog('submitAnswer.curQuestion', curQuestion)
+    // debugLog('submitAnswer.curQuestion', curQuestion)
     let manualCheckResult
     let isCorrect = false
     try {

@@ -63,7 +63,8 @@ Page({
    */
   onPullDownRefresh: function () {
     let that = this
-    taskCommon.initList(that)
+    utils.onLoading()
+    taskCommon.refreshTasks(that, true)
   },
 
   /**
@@ -79,6 +80,7 @@ Page({
   onScrollTouchBottom: function(e){
     let that = this
     debugLog('when ReachBottom')
+    utils.onLoading()
     taskCommon.refreshTasks(that, false)
   },
 
@@ -94,8 +96,10 @@ Page({
    */
   toCreateTask: function(e){
     let that = this
+    let curTask = taskCommon.getTaskTemplate()
+    curTask.status = that.data.TASK_STATUS_OBJ.CREATE
     that.setData({
-      curStatus: that.data.TASK_STATUS_OBJ.CREATE,
+      curTask: curTask
     },()=>{
       taskCommon.showTaskEditor(that)
     })
@@ -110,7 +114,6 @@ Page({
     let dataset = utils.getEventDataset(e)
     let curTask = dataset.task
     that.setData({
-      curStatus: curTask.status,
       curTask: curTask,
     },()=>{
       taskCommon.showTaskEditor(that)
@@ -124,6 +127,34 @@ Page({
     let that = this
     // debugLog('refreshTasks')
     taskCommon.refreshTasks(that, true)
+  },
+
+  /**
+   * 过滤任务状态
+   */
+  onFilterTaskStatus: function(e){
+    let that = this
+    let statusIdx = utils.getEventDetailValue(e)
+    let status = that.data.filterTaskStatus[statusIdx]
+    that.setData({
+      curTaskStatus: status
+    },()=>{
+      taskCommon.refreshTasks(that, true)
+    })
+  },
+
+  /** 
+   * 过滤给我的任务还是我给的任务
+   */
+  onFilterTaskDirect: function(e){
+    let that = this
+    let taskDirectIdx = utils.getEventDetailValue(e)
+    let curTaskDirect = that.data.TASK_DIRECT[taskDirectIdx]
+    that.setData({
+      curTaskDirect: curTaskDirect,
+      curTaskStatus: that.data.filterTaskStatus[0]
+    }, () => {
+      taskCommon.refreshTasks(that, true)
+    })
   }
-  
 })

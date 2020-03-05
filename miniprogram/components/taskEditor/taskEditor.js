@@ -27,10 +27,6 @@ Component({
    * 组件的属性列表
    */
   properties: dialogCommon.defaultDialogProperties({
-    curStatus: {
-      type: Object,
-      value: null,
-    },
     curTask: {
       type: Object,
       value: null,
@@ -54,6 +50,7 @@ Component({
     show: function () {
       // debugLog('getPoint.lifetimes.show')
       let that = this
+      // taskCommon.initEditor(that)
     }
   },
 
@@ -66,10 +63,9 @@ Component({
   },
 
   observers: {
-    'isShown, curStatus, curTask': function (isShown) {
+    'isShown, curTask': function (isShown) {
       let that = this
       dialogCommon.whenIsShown(that, ()=>{
-          // debugLog('children', that.data.children)
           // debugLog('observers.isShown', isShown)
           taskCommon.whenIsShown(that)
       })
@@ -155,6 +151,7 @@ Component({
     bindDeadlineTimeChange: function(e){
       let that = this
       let timeStr = utils.getEventDetailValue(e)
+      let curTask = that.data.curTask
       curTask.deadline.time = timeStr
       // debugLog('selectBonus.value', value)
       that.setData({
@@ -167,7 +164,26 @@ Component({
     },
     onClickCancel: function (e) {
       let that = this
-      dialogCommon.onClose(null, that)
+      wx.showModal({
+        title: MSG.CONFIRM_UPDATE_TITLE,
+        content: MSG.CONFIRM_UPDATE_MSG,
+        success(res) {
+          if (res.confirm) {
+            taskCommon.cancelTask(that, res => {
+              debugLog('onClickCancel ')
+              wx.showToast({
+                title: that.data.curTask.status.message,
+                duration: gConst.TOAST_DURATION_TIME
+              })
+              setTimeout(() => {
+                dialogCommon.onClose(null, that)
+              }, gConst.TOAST_DURATION_TIME)
+            })
+          } else if (res.cancel) {
+            errorLog('用户点击取消')
+          }
+        }
+      })
     },    
     /**
      * 指派任务
@@ -182,7 +198,7 @@ Component({
             taskCommon.createTask(that, res => {
               debugLog('afteronClickAssign ')
               wx.showToast({
-                title: that.data.curStatus.message,
+                title: that.data.curTask.status.message,
                 duration: gConst.TOAST_DURATION_TIME
               })
               setTimeout(() => {
@@ -194,7 +210,6 @@ Component({
           }
         }
       })
-
     },
 
     /**
@@ -208,9 +223,9 @@ Component({
         success: function (res) {
           if (res.confirm) {
             taskCommon.claimTask(that, res => {
-              debugLog('onClickClaim ')
+              debugLog('onClickClaim ',res)
               wx.showToast({
-                title: that.data.curStatus.message,
+                title: that.data.curTask.status.message,
                 duration: gConst.TOAST_DURATION_TIME
               })
               setTimeout(() => {
@@ -236,7 +251,7 @@ Component({
         success: function (res) {
           if (res.confirm) {
             taskCommon.finishTask(that, res => {
-              debugLog('onClickFinish ', that.data.curStatus)
+              // debugLog('onClickFinish ', that.data.curTask.status)
               wx.showToast({
                 title: MSG.IS_UPDATED,
                 duration: gConst.TOAST_DURATION_TIME
@@ -263,7 +278,7 @@ Component({
         success: function (res) {
           if (res.confirm) {
             taskCommon.approveTask(that, res => {
-              debugLog('onClickApprove ', that.data.curStatus)
+              // debugLog('onClickApprove ', that.data.curTask.status)
               wx.showToast({
                 title: MSG.IS_UPDATED,
                 duration: gConst.TOAST_DURATION_TIME

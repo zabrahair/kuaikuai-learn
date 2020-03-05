@@ -37,7 +37,8 @@ Component({
     statistics: [
     ],
     lastDate: utils.formatDate(new Date(), '/'),
-    ebbingStats: [],
+    ebbingStatsInTime: [],
+    ebbingStatsTimeout: [],
     TABS_MAP: TABLES.MAP
   },
   lifetimes: {
@@ -122,13 +123,16 @@ Component({
      * 获得艾宾浩斯遗忘统计
      */
     loadEbbingStatistics: function(that){
-      utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-      let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-      let ebbingStats = that.data.ebbingStats
-      for (let ebbingIdx in ebbingClasses) {
-        let ebbingClass = ebbingClasses[ebbingIdx]
-        // debugLog('ebbingClasses', ebbingClasses)
-        learnHistoryApi.ebbinghauseCount({
+      utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+      let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+      let ebbingStatsInTime = that.data.ebbingStatsInTime
+      let ebbingStatsTimeout = that.data.ebbingStatsTimeout
+
+      for (let ebbingIdx = 0; ebbingIdx < (ebbingRates.length - 1); ebbingIdx++) {
+        let ebbingRate = ebbingRates[ebbingIdx]
+        // debugLog('ebbingRates', ebbingRates)
+        // 复习正当时时间统计
+        learnHistoryApi.countEbbinghaus({
           question: {
             tags: _.or([
                 gConst.ANSWER_TYPES.MANUAL_CHECK,
@@ -136,37 +140,68 @@ Component({
               ])
           },
         }
-          , ebbingClass
+        , ebbingRate
+        , 0
+        , countList => {
+            // debugLog('ebbinghausCount.countList', countList)
+          let nextRate = utils.nextEbbingRate(ebbingRates[ebbingIdx])
+          ebbingStatsInTime[ebbingIdx] = {
+            rate: nextRate,
+            list: countList,
+            mode: learnHistoryApi.EBBING_STAT_MODE.IN_TIME,
+          }
+          that.setData({
+            ebbingStatsInTime: ebbingStatsInTime
+          })
+            // debugLog('loadEbbingStatistics', ebbingStats)
+        }
+        , learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
+        // 复习超时时间统计
+        learnHistoryApi.countEbbinghaus({
+          question: {
+            tags: _.or([
+              gConst.ANSWER_TYPES.MANUAL_CHECK,
+              gConst.ANSWER_TYPES.RICITE_ARTICLE,
+            ])
+          },
+        }
+          , ebbingRate
           , 0
           , countList => {
-            // debugLog('ebbinghauseCount.countList', countList)
-            ebbingStats[ebbingIdx] = {
-              class: ebbingClasses[ebbingIdx],
+            // debugLog('ebbinghausCount.countList', countList)
+            let nextRate = utils.nextEbbingRate(ebbingRates[ebbingIdx])
+            ebbingStatsTimeout[ebbingIdx] = {
+              rate: nextRate,
               list: countList,
+              mode: learnHistoryApi.EBBING_STAT_MODE.TIMEOUT,
             }
             that.setData({
-              ebbingStats: ebbingStats
+              ebbingStatsTimeout: ebbingStatsTimeout
             })
-            // debugLog('loadEbbingStatistics', ebbingStats)
-          })
-      }    
+            // debugLog('ebbingStatsTimeout', that.data.ebbingStatsTimeout)
+          }
+          , learnHistoryApi.EBBING_STAT_MODE.TIMEOUT)
+      }
     },
 
     onTapEbbingCard: function(e){
       let that = this
       let dataset = utils.getEventDataset(e)
+      // debugLog('dataset', dataset)
       let url = ''
       if(dataset.tableValue == TABLES.CHINESE_ARTICLE){
         url = '/pages/gamesRoom/article/article?'
       }else{
         url = '/pages/gamesRoom/selfRecite/selfRecite?'
       }
+      let prevEbbingRate = utils.prevEbbingRate(dataset.ebbingRate)
       url = url
-        + 'gameMode=' + gConst.GAME_MODE.EBBINGHAUSE 
-        + '&tableValue=' + dataset.tableValue 
+        + 'gameMode=' + gConst.GAME_MODE.EBBINGHAUS
+        + '&tableValue=' + dataset.tableValue
         + '&tableName=' + TABLES.MAP[dataset.tableValue].name
-        + '&filterTags=' + dataset.ebbingClassName 
-        + "&ebbingClassName=" + dataset.ebbingClassName;
+        + '&filterTags=' + dataset.ebbingRate.name
+        + "&ebbingRateName=" + prevEbbingRate.name
+        + "&ebbingStatMode=" + dataset.ebbingStatMode;
       wx.navigateTo({
         url: url,
       })

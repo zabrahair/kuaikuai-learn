@@ -43,7 +43,7 @@ const create = function (pHistory, callback) {
 function dailyStatistic(userInfo, whereFilter, pageIdx, callback){
   if (typeof pageIdx != 'number') {
     pageIdx = 0
-  } 
+  }
   dbApi.groupAggregate(TABLES.LEARN_HISTORY
     , whereFilter
     , '$openid'
@@ -71,7 +71,7 @@ function dailyStatistic(userInfo, whereFilter, pageIdx, callback){
 function tagsStatistic(userInfo, whereFilter, pageIdx, callback){
   if (typeof pageIdx != 'number'){
     pageIdx = 0
-  } 
+  }
   dbApi.groupAggregate(TABLES.LEARN_HISTORY
     , whereFilter
     , '$tags'
@@ -98,7 +98,7 @@ function getHistoryQuestions(userInfo, whereFilter, pageIdx, callback){
     , whereFilter
     , '$_id'
     , {
-      _id: '$question._id', 
+      _id: '$question._id',
       question: $.first('$question'),
 
     }
@@ -214,7 +214,7 @@ function questCorrectStat(tableName, pWhere, pageIdx, callback){
         callback([], pageIdx)
       }
     })
-    .catch(err => console.error(err)) 
+    .catch(err => console.error(err))
 }
 
 /**
@@ -282,7 +282,7 @@ function answerTypeStatsitic(pWhere, pageIdx, callback){
         callback([], pageIdx)
       }
     })
-    .catch(err => console.error(err)) 
+    .catch(err => console.error(err))
 }
 
 /**
@@ -311,91 +311,120 @@ function getHistoryCount(where, callback){
         callback(0)
       }
     })
-    .catch(err => console.error(err)) 
+    .catch(err => console.error(err))
 }
 
 /**
- * 更具艾宾浩斯遗忘曲线统计需要回忆的各级题目数。
- * 传入的pWhere 包含题型，Ebbinghause区间
+ * 找到特定题目的最新历史记录
  */
-const EBBING_FEATURE_START_DATE = '2020/02/27'
-function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
-  let perPageCount = 20
-  let now = new Date().getTime()
+function findLastHistory(pQuestionTable, pQuestionId, callback){
+  let qTable = pQuestionTable
+  let qId = pQuestionId
   let where = {
-    answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
+    table: qTable,
+    question: {
+      _id: qId
+    }
   }
+  db.collection(TABLE)
+    .where(where)
+    .orderBy('answerTime', 'desc')
+    .limit(1)
+    .get()
+    .then(res => {
+      debugLog('findLastHistory', res)
+      // debugLog('findLastHistory.length', res.data.length)
+      if (res.data.length > 0) {
+        callback(res.data[0])
+        return
+      } else {
+        callback(null)
+      }
+    })
+    .catch(err => {
+      callback(null)
+    })
+
+}
+
+/**
+ * 按艾宾浩斯遗忘规律统计需要复习的题目
+ */
+const EBBING_STAT_MODE = {
+  IN_TIME: 'IN_TIME',
+  TIMEOUT: 'TIMEOUT'
+}
+function countEbbinghaus(pWhere, ebbingRate, pageIdx = 0, callback
+                          , mode = EBBING_STAT_MODE.IN_TIME){
+  let perPageCount = 20
+  let now = new Date()
+  let where = {
+    ebbStamp: _.exists(true),
+  }
+
   Object.assign(where, pWhere)
-  // debugLog('ebbinghauseCount.where', where)
-  let project = {
+  let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+  let nextRate = utils.nextEbbingRate(ebbingRate)
+  // debugLog('now.getTime() - nextRate.from', now.getTime() - nextRate.from)
+  // debugLog('now.getTime() - nextRate.to', now.getTime() - nextRate.to)
+  let ebbingFrom = now.getTime() - nextRate.from
+  let ebbingTo = now.getTime() - nextRate.to
+  let finalMatch = {
+    'ebbStamp.rate.name': ebbingRate.name,
+  }
+  // debugLog('finalMatch', finalMatch)
+  if (mode == EBBING_STAT_MODE.IN_TIME) {
+    // debugLog('mode', mode)
+    finalMatch['ebbStamp.time'] = _.and([_.lt(ebbingFrom), _.gt(ebbingTo)])
+  } else if (mode == EBBING_STAT_MODE.TIMEOUT) {
+    // debugLog('mode', mode)
+    finalMatch['ebbStamp.time'] = _.lt(ebbingTo)
+  }
+  // debugLog('ebbinghausCount.where', where)
+  // 找出每道题目
+  // 拥有EbbStamp的
+  // 最新一条
+  // 然后计算这样题目的条数
+  db.collection(TABLE)
+  .aggregate()
+  .project({
+    table: 1,
+    answerTime: 1,
+    question: 1,
+    ebbStamp: 1,
+  })
+  .match(where)
+  .sort({
+    'question._id': 1,
+    'ebbStamp.time': -1,
+  })
+  .group({
+    _id: {
+      table: '$table',
+      qid: '$question._id',
+    },
+    answerTime: $.first('$answerTime'),
+    question: $.first('$question'),
+    ebbStamp: $.first('$ebbStamp'),
+  })
+  .project({
     _id: 1,
-    count: 1,
-  }
-  db.collection(TABLE)
-    .aggregate()
-    .match(where)
-    .project({
-      _id: 1,
-      table: 1,
-      answerTime: 1,
-      question: 1,
-      ebbingFrom: $.literal(ebbingClass.from),
-      ebbingTo: $.literal(ebbingClass.from + ebbingClass.to),
-    })
-    .group({
-      _id: {
-        question_id: '$question._id',
-        table: '$table'
-      },
-      // question: $.first('$question'),
-      answerTimeArr: $.push('$answerTime'),
-      earliestAnswerTime: $.min('$answerTime'),
-      ebbingFrom: $.first('$ebbingFrom'),
-      ebbingTo: $.first('$ebbingTo'),
-    })
-    .project({
-      _id: 1,
-      answerTimeArr: 1,
-      // question: 1,
-      earliestAnswerTime: 1,
-      qEbbingFrom: $.add(['$earliestAnswerTime', '$ebbingFrom']),
-      qEbbingTo: $.add(['$earliestAnswerTime', '$ebbingTo']),   
-    })
-    .project({
-      _id: 1,
-      answerTimeArr: $.filter({
-        input: '$answerTimeArr',
-        as: 'answerTime',
-        cond: $.and([
-                $.gt(['$$answerTime', '$qEbbingFrom'])
-              // , $.lte(['$$answerTime', '$qEbbingTo'])
-              ]),
-      }),
-      // question: 1,
-      earliestAnswerTime: 1,
-      qEbbingFrom: 1,
-      qEbbingTo: 1,  
-    })
-    .match({
-      qEbbingFrom: _.lt(now),
-      answerTimeArr: _.size(0),
-    })
-    .group({
-      _id: {
-        table: '$_id.table',
-      },
-      table: $.first('$_id.table'),
-      earliestAnswerTime: $.first('$earliestAnswerTime'),
-      qEbbingFrom: $.first('$qEbbingFrom'),
-      qEbbingTo: $.first('$qEbbingTo'),   
-      count: $.sum(1),  
-    })
-    .skip(pageIdx * perPageCount)
-    .limit(perPageCount)
-    .end()
-    .then
-    ((res, e) => {
-      // debugLog('getHistoryQuestions[' + ebbingClass.name +'].res', res)
+    answerTime: 1,
+    question: 1,
+    ebbStamp: 1,
+    ebbingFrom: $.literal(now.getTime() - nextRate.from),
+    ebbingTo: $.literal(now.getTime() - nextRate.to),
+  })
+  .match(finalMatch)
+  .group({
+    _id: {
+      table: '$_id.table',
+    },
+    count: $.sum(1)
+  })
+  .end()
+  .then(res => {
+    // debugLog('countEbbinghaus[' + ebbingRate.name + "-" + mode + '].res', res)
       // debugLog('questCorrectStat.res', res.list)
       // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {
@@ -404,88 +433,85 @@ function ebbinghauseCount(pWhere, ebbingClass, pageIdx=0, callback){
       } else {
         utils.runCallback(callback)([])
       }
-    })
-    .catch(err => errorLog('err', err.stack)) 
+  })
+  .catch(err=>{
+    utils.runCallback(callback)(null)
+  })
 }
 
 /**
- * 更具艾宾浩斯遗忘曲线统计需要回忆的各级题目数。
- * 传入的pWhere 包含题型，Ebbinghause区间
+ * 按艾宾浩斯遗忘规律获取需要复习的题目
  */
-function ebbinghauseQuestions(pWhere, ebbingClass, pageIdx=0, callback) {
+function getEbbinghausQuestions(pWhere, ebbingRate, pageIdx = 0, callback
+                                , mode = EBBING_STAT_MOD.IN_TIME) {
   let perPageCount = 20
-  let now = new Date().getTime()
+  let now = new Date()
   let where = {
-    answerTimeStr: _.gte(EBBING_FEATURE_START_DATE),
+    ebbStamp: _.exists(true),
   }
   Object.assign(where, pWhere)
-  // debugLog('ebbinghauseQuestions.where', where)
-  // debugLog('ebbinghauseQuestions.ebbingClass', ebbingClass)
+  let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+  let nextRate = utils.nextEbbingRate(ebbingRate)
+  // debugLog('now.getTime() - nextRate.from', now.getTime() - nextRate.from)
+  // debugLog('now.getTime() - nextRate.to', now.getTime() - nextRate.to)
+  let ebbingFrom = now.getTime() - nextRate.from
+  let ebbingTo = now.getTime() - nextRate.to
+  let finalMatch = {
+    'ebbStamp.rate.name': ebbingRate.name,
+  }
+  // debugLog('finalMatch', finalMatch)
+  if (mode == EBBING_STAT_MODE.IN_TIME) {
+    // debugLog('mode', mode)
+    finalMatch['ebbStamp.time'] = _.and([_.lt(ebbingFrom), _.gt(ebbingTo)])
+  } else if (mode == EBBING_STAT_MODE.TIMEOUT) {
+    // debugLog('mode', mode)
+    finalMatch['ebbStamp.time'] = _.lt(ebbingTo)
+  }
+  // debugLog('ebbinghausCount.where', where)
+  // 找出每道题目
+  // 拥有EbbStamp的
+  // 最新一条
+  // 然后计算这样题目的条数
   db.collection(TABLE)
     .aggregate()
-    .match(where)
     .project({
-      _id: 1,
       table: 1,
       answerTime: 1,
       question: 1,
-      ebbingFrom: $.literal(ebbingClass.from),
-      ebbingTo: $.literal(ebbingClass.from + ebbingClass.to),
+      ebbStamp: 1,
+    })
+    .match(where)
+    .sort({
+      'question._id': 1,
+      'ebbStamp.time': -1,
     })
     .group({
       _id: {
-        question_id: '$question._id',
-        table: '$table'
+        table: '$table',
+        qid: '$question._id',
       },
+      answerTime: $.first('$answerTime'),
       question: $.first('$question'),
-      answerTimeArr: $.push('$answerTime'),
-      earliestAnswerTime: $.min('$answerTime'),
-      ebbingFrom: $.first('$ebbingFrom'),
-      ebbingTo: $.first('$ebbingTo'),
+      ebbStamp: $.first('$ebbStamp'),
     })
     .project({
       _id: 1,
-      answerTimeArr: 1,
+      answerTime: 1,
       question: 1,
-      earliestAnswerTime: 1,
-      qEbbingFrom: $.add(['$earliestAnswerTime', '$ebbingFrom']),
-      qEbbingTo: $.add(['$earliestAnswerTime', '$ebbingTo']),
-    })    
+      ebbStamp: 1,
+    })
+    .match(finalMatch)
     .project({
       _id: 1,
-      answerTimeArr: $.filter({
-        input: '$answerTimeArr',
-        as: 'answerTime',
-        cond: $.and([
-          $.gt(['$$answerTime', '$qEbbingFrom'])
-          // , $.lte(['$$answerTime', '$qEbbingTo'])
-        ]),
-      }),
+      answerTime: 1,
       question: 1,
-      earliestAnswerTime: 1,
-      qEbbingFrom: 1,
-      qEbbingTo: 1,
+      ebbStamp: 1,
     })
-    .match({
-      qEbbingFrom: _.lt(now),
-      answerTimeArr: _.size(0),
-    })
-    .group({
-      _id: {
-        question_id: '$question._id',
-      },
-      table: $.first('$_id.table'),
-      question: $.first('$question'),
-      earliestAnswerTime: $.first('$earliestAnswerTime'),
-      qEbbingFrom: $.first('$qEbbingFrom'),
-      qEbbingTo: $.first('$qEbbingTo'),
-    })
-    .skip(pageIdx * perPageCount)
     .limit(perPageCount)
+    .skip(perPageCount*pageIdx)
     .end()
-    .then
-    ((res, e) => {
-      debugLog('ebbinghauseQuestions[' + ebbingClass.name+'].res', res)
+    .then(res => {
+      // debugLog('getEbbinghausQuestions[' + ebbingRate.name + "-" + mode + '].res', res)
       // debugLog('questCorrectStat.res', res.list)
       // debugLog('getTags.length', res.list.length)
       if (res.list.length > 0) {
@@ -495,10 +521,13 @@ function ebbinghauseQuestions(pWhere, ebbingClass, pageIdx=0, callback) {
         utils.runCallback(callback)([])
       }
     })
-    .catch(err => errorLog('err', err.stack))
+    .catch(err => {
+      utils.runCallback(callback)(null)
+    })
 }
 
 module.exports = {
+  EBBING_STAT_MODE: EBBING_STAT_MODE,
   answerTypeStatsitic: answerTypeStatsitic,
   getHistoryCount: getHistoryCount,
   dailyStatistic: dailyStatistic,
@@ -507,6 +536,7 @@ module.exports = {
   questCorrectStat: questCorrectStat,
   getTags: getTags,
   create: create,
-  ebbinghauseCount: ebbinghauseCount,
-  ebbinghauseQuestions: ebbinghauseQuestions,
+  findLastHistory: findLastHistory,
+  countEbbinghaus: countEbbinghaus,
+  getEbbinghausQuestions: getEbbinghausQuestions,
 }

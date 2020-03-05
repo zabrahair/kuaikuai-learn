@@ -3,6 +3,7 @@ const gConst = require('../const/global.js');
 const storeKeys = require('../const/global.js').storageKeys;
 const debugLog = require('log.js').debug;
 const errorLog = require('log.js').error;
+const MSG = require('../const/message.js')
 
 const formatTime = date => {
   const year = date.getFullYear()
@@ -531,6 +532,62 @@ function isPunctuation(letter) {
   return result;
 }
 
+/**
+ * 根据当前Ebbinghaus Rate 获得下一级的Ebbinghaus Rate
+ * 如果不传参数返回第一个
+ */
+function nextEbbingRate(pEbbRate) {
+  let ebbingRates = getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+  if (!pEbbRate) {
+    return ebbingRates[0]
+  }
+  for (let i in ebbingRates) {
+    if ((pEbbRate.orderIdx + 1) == ebbingRates[i].orderIdx) {
+      return ebbingRates[i]
+    }
+  }
+  // 如果找不到就返回本身
+  return pEbbRate
+}
+
+/**
+ * 根据当前Ebbinghaus Rate 获得上一级的Ebbinghaus Rate
+ * 如果不传参数返回第一个
+ */
+function prevEbbingRate(pEbbRate) {
+  let ebbingRates = getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+  if (!pEbbRate) {
+    return ebbingRates[0]
+  }
+  for (let i in ebbingRates) {
+    if ((pEbbRate.orderIdx - 1) == ebbingRates[i].orderIdx) {
+      return ebbingRates[i]
+    }
+  }
+  // 如果找不到就返回本身
+  return pEbbRate
+}
+
+/**
+ * 显示On loading
+ */
+function onLoading(){
+  wx.showLoading({
+    title: MSG.ON_LOADING,
+  })
+  setTimeout(() => {
+    wx.hideLoading()
+  }, 10000)
+}
+
+/**
+ * 停止加载时候调用
+ */
+function stopLoading(){
+  wx.hideLoading()
+  wx.stopPullDownRefresh()
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -562,6 +619,8 @@ module.exports = {
 
 
   /** 功能型方法 */
+  nextEbbingRate: nextEbbingRate,
+  prevEbbingRate: prevEbbingRate,
   refreshUserRoleConfigs: refreshUserRoleConfigs,
   refreshConfigs: refreshConfigs,
   getConfigs: getConfigs,
@@ -573,4 +632,6 @@ module.exports = {
   getDataLoadInterval: getDataLoadInterval,
   initStorage: initStorage,
   getStorage: getStorage,
+  onLoading: onLoading,
+  stopLoading, stopLoading,
 }

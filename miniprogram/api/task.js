@@ -19,12 +19,32 @@ function create(pInsertBody, callback) {
 
 function query(pWhere, pageIdx, callback) {
   const db = wx.cloud.database()
-  // debugLog('pWhere', pWhere)
+  const $ = db.command.aggregate
+  const _ = db.command
   let where = pWhere
+  let perPageCount = 20
+  // debugLog('tableName', tableName)
   // debugLog('where', where)
-  dbApi.queryPages(TABLE, where, pageIdx, list=>{
-    callback(list, pageIdx)
-  })
+  db.collection(TABLE)
+    .where(pWhere)
+    .skip(pageIdx * perPageCount)
+    .limit(perPageCount)
+    .orderBy('updateTime', 'desc')
+    .orderBy('createTime', 'desc')
+    .get()
+    .then(res => {
+      // debugLog('queryPages', res)
+      // debugLog('queryPages.length', res.data.length)
+      if (res.data.length > 0) {
+        utils.runCallback(callback)(res.data, pageIdx)
+        return
+      } else {
+        utils.runCallback(callback)([], pageIdx)
+      }
+    })
+    .catch(err => {
+      utils.runCallback(callback)(null, pageIdx)
+    })
 }
 
 function update(id, pUpdateObj, callback) {

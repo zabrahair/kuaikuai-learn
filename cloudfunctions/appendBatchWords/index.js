@@ -56,8 +56,7 @@ exports.main = async (event, context) => {
       //     tags: _.addToSet({ each: tags })
       //   }
       // })
-      upsertResults.push(upResult)
-
+      // upsertResults.push(upResult)
       if (upResult.stats.updated < 1) {
         // 不存在就添加
         let insertObj = Object.assign({}, otherSegs)

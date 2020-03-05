@@ -17,18 +17,38 @@
       <view class='incorrect'>错误:{{stat.incorrect}}</view>
     </view>
   </view>
+  <text>艾宾浩斯及时复习</text>
   <view class='component-content' >
     <view wx:if="{{ebbingStat.list.length>0}}" class="stat-vertical"
-    wx:for-items='{{ebbingStats}}' wx:for-item='ebbingStat' 
-    wx:for-index='idx' >
-    <view class="stat-card bg_color_{{filter.randInteger(24)}}"
-        wx:for-items='{{ebbingStat.list}}' wx:for-item='ebbingCard' 
-        wx:for-index='idx'
-        data-table-value="{{ebbingCard._id.table}}" data-ebbing-class-name="{{ebbingStat.class.name}}" data-table-name="{{TABS_MAP[ebbingCard._id.table].name}}" 
-        bindtap="onTapEbbingCard">
-      <view class='title' >{{TABS_MAP[ebbingCard._id.table].name}}</view>
-      <view class='correct'>{{ebbingStat.class.name}}:{{ebbingCard.count}}</view>
-    </view>   
-  </view> 
+    wx:for-items='{{ebbingStatsInTime}}' wx:for-item='ebbingStat' 
+    wx:for-index='idx' wx:key='idx'>
+      <view class="stat-card bg_color_{{filter.randInteger(24)}}"
+          wx:for-items='{{ebbingStat.list}}' wx:for-item='ebbingCard' 
+          wx:for-index='idx' wx:key='idx'
+          data-table-value="{{ebbingCard._id.table}}" data-ebbing-rate="{{ebbingStat.rate}}" 
+          data-table-name="{{TABS_MAP[ebbingCard._id.table].name}}" 
+          data-ebbing-stat-mode="{{ebbingStat.mode}}"
+          bindtap="onTapEbbingCard">
+        <view class='title' >{{TABS_MAP[ebbingCard._id.table].name}}</view>
+        <view class='correct'>{{ebbingStat.rate.name}}:{{ebbingCard.count}}</view>
+      </view>   
+    </view> 
+  </view>
+  <text>艾宾浩斯超时复习</text>
+  <view class='component-content' >
+    <view wx:if="{{ebbingStat.list.length>0}}" class="stat-vertical"
+    wx:for-items='{{ebbingStatsTimeout}}' wx:for-item='ebbingStat' 
+    wx:for-index='idx' wx:key='idx'>
+      <view class="stat-card bg_color_{{filter.randInteger(24)}}"
+          wx:for-items='{{ebbingStat.list}}' wx:for-item='ebbingCard' 
+          wx:for-index='idx' wx:key='idx'
+          data-table-value="{{ebbingCard._id.table}}" data-ebbing-rate="{{ebbingStat.rate}}" 
+          data-table-name="{{TABS_MAP[ebbingCard._id.table].name}}" 
+          data-ebbing-stat-mode="{{ebbingStat.mode}}"
+          bindtap="onTapEbbingCard">
+        <view class='title' >{{TABS_MAP[ebbingCard._id.table].name}}</view>
+        <view class='correct'>{{ebbingStat.rate.name}}:{{ebbingCard.count}}</view>
+      </view>   
+    </view> 
   </view>
 </view>

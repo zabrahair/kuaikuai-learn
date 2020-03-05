@@ -3,7 +3,7 @@
 <slider class="days" bindchange="onDateRangeChange" min='1' max='100' step="-1" show-value/>
 <form class="query_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
   <text>方法名</text>
-  <input class="" name='funcitonName' value="{{funcName}}"></input>
+  <input class="" name='functionName' value="{{funcName}}"></input>
   <text>数据库名</text>
   <input class="" name='tablerName' value="{{table}}"></input>
   <text>Where Body</text>

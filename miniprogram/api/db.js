@@ -61,7 +61,6 @@ function create(table, insertData, callback) {
   const _ = db.command
   let now = new Date();
   let nowTimeString = utils.formatTime(now);
-
   Object.assign(insertData, {
     createTimestamp: now.getTime(),
     createLocalTime: nowTimeString

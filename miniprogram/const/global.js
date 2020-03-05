@@ -15,7 +15,7 @@ const userInfoObj = {
 }
 
 const pageParams = {
-  
+
 }
 
 const orderStatus = {
@@ -117,7 +117,7 @@ module.exports = {
     SLOW: '慢速',
     WRONG_SLOW: '错而慢',
     FAVORITES: '收藏',
-    EBBINGHAUSE: '艾宾浩斯',
+    EBBINGHAUS: '艾宾浩斯',
   },
   DEFAULT_USER_CONFIGS: {
     divideSpeedFloor: 4000,
@@ -151,6 +151,7 @@ module.exports = {
     TASK_STATUS: 'TASK_STATUS',
     BONUS_CLASSES: 'BONUS_CLASSES',
     EBBINGHAUS_CLASSES: 'EBBINGHAUS_CLASSES',
+    EBBINGHAUS_RATES: 'EBBINGHAUS_RATES',
   },
   DICT_SEARCH_MODE: {
     WORD: 'WORD',

@@ -1,12 +1,58 @@
-function isDisabled(curTask, curStatus){
-  if(curStatus.value == TASK_STATUS_OBJ.CREATE.value || curStatus.value == TASK_STATUS_OBJ.SAVED.value){
+function isDisabled(curTask, TASK_STATUS_OBJ){
+  if (curTask.status.value == TASK_STATUS_OBJ.CREATE.value || curTask.status.value == TASK_STATUS_OBJ.SAVED.value){
     return false;
   }else{
     return true;
   }
 }
 
+function isButtonShown(curTask, nextTaskValue, curOpenid, TASK_STATUS_OBJ){
+  switch (nextTaskValue){
+    case 'ASSIGNED':
+      if (curTask.status.value == TASK_STATUS_OBJ.CREATE.value || curTask.status.value == TASK_STATUS_OBJ.SAVED.value){
+        return true
+      } else {
+        return false
+      }
+      break;
+    case 'CLAIMED':
+      if ((curTask.status.value == TASK_STATUS_OBJ.ASSIGNED.value || curTask.status.value == TASK_STATUS_OBJ.RECEIVED.value) && curTask.toWho.openid == curOpenid ){
+        return true
+      }else{
+        return false
+      }
+      break;
+    case 'FINISHED':
+      if ((curTask.status.value == TASK_STATUS_OBJ.CLAIMED.value || curTask.status.value == TASK_STATUS_OBJ.IMPLEMENTING.value) && curTask.toWho.openid == curOpenid) {
+        return true
+      } else {
+        return false
+      }
+      break;
+    case 'APPROVED':
+      if (curTask.status.value == TASK_STATUS_OBJ.FINISHED.value && curTask.fromWho.openid == curOpenid) {
+        return true
+      } else {
+        return false
+      }
+      break;
+    case 'CANCELED':
+      if ((curTask.status.value == TASK_STATUS_OBJ.CREATE.value 
+      || curTask.status.value == TASK_STATUS_OBJ.SAVED.value 
+      || curTask.status.value == TASK_STATUS_OBJ.ASSIGNED.value 
+      || curTask.status.value == TASK_STATUS_OBJ.RECEIVED.value) 
+      && curTask.fromWho.openid == curOpenid) {
+        return true
+      } else {
+        return false
+      }
+      break;
+    default:
+  }
+}
+
 // 导出对外暴露的属性
 module.exports = {
   isDisabled: isDisabled,
+  isButtonShown: isButtonShown
 }

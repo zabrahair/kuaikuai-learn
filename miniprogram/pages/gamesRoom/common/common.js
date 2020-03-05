@@ -81,26 +81,113 @@ function resetQuestionStatus(that, e, scoreTimer) {
 }
 
 /**
+ * 给历史打EBBINGHAUS_STAMP,记录当前是第几次复习
+ */
+function makeEbbingStamp(that, pHistoryRecord, callback){
+  let id = pHistoryRecord.question._id
+  let table = pHistoryRecord.table
+  let curEbbStamp = {
+    rate: null,
+    time: null,
+    timeStr: null,
+  }
+  // 找到最近的一个历史记录的
+  learnHistoryApi.findLastHistory(table, id, lastHistory=>{
+    pHistoryRecord['ebbStamp'] = null
+    let now = new Date()
+    if (lastHistory){
+      //  如果有
+      //    判断是否有EBBINGHAUES_STAMP
+      if (lastHistory.ebbStamp){
+      //      如果有
+        let lastEbbStamp = lastHistory.ebbStamp
+        let lastEbbRate = lastEbbStamp.rate
+        let nextEbbRate = utils.nextEbbingRate(lastEbbRate)
+        // 从最近一次到现在的时间
+        let timeSpanFromLast = now.getTime() - lastEbbStamp.time
+        debugLog('从最近一次到现在的时间', utils.formatDeciTimer(timeSpanFromLast))
+        if (timeSpanFromLast >= nextEbbRate.from
+          && timeSpanFromLast <= nextEbbRate.to){
+      //        判断当前时间是否在下一级标签的区间
+      //          如果在
+      //            创建本题的EBBINGHAUS_STAMP ：{rate:{下一级EBBINGHAUS_RATE}, time: 毫秒, timeStr: 时间}
+          curEbbStamp.rate = nextEbbRate
+          curEbbStamp.time = now.getTime()
+          curEbbStamp.timeStr = utils.formatTime(now)
+          pHistoryRecord.ebbStamp = curEbbStamp
+
+        }else{
+      //          如果不再
+      //            创建本题的EBBINGHAUS_STAMP ：{rate:{还是最近历史记录的EBBINGHAUS_RATE}, time: 毫秒, timeStr: 时间}
+          //  为了避免反复做当前一级的题目
+          if (timeSpanFromLast < nextEbbRate.from){
+            //  如果还没到下一级别的开始时间
+            //  还是当前级别，但是时间用上一个的时间，这样复习时间不会往后延迟
+            curEbbStamp.rate = lastEbbStamp.rate
+            curEbbStamp.time = lastEbbStamp.time
+            curEbbStamp.timeStr = utils.formatTime(new Date(curEbbStamp.time))
+            pHistoryRecord.ebbStamp = curEbbStamp
+          } else if(timeSpanFromLast > nextEbbRate.to){
+            //  如果超过了下一级别的开始时间
+            //    晋升到下一级
+            curEbbStamp.rate = nextEbbRate
+            curEbbStamp.time = now.getTime()
+            curEbbStamp.timeStr = utils.formatTime(new Date(curEbbStamp.time))
+            pHistoryRecord.ebbStamp = curEbbStamp
+          }
+          
+          
+          //  将标签时间设到下一级别的from临界时间上
+
+        }
+      }else{
+      //      如果没有
+      //      打第一级标签
+        let ebbStamp = utils.nextEbbingRate()
+        curEbbStamp.rate = ebbStamp
+        curEbbStamp.time = now.getTime()
+        curEbbStamp.timeStr = utils.formatTime(now)
+        pHistoryRecord.ebbStamp = curEbbStamp
+      }
+      debugLog('有历史记录', pHistoryRecord)
+      utils.runCallback(callback)(pHistoryRecord)
+    }else{
+      //  如果没有
+      //  打第一级标签
+      let ebbStamp = utils.nextEbbingRate()
+      curEbbStamp.rate = ebbStamp
+      curEbbStamp.time = now.getTime()
+      curEbbStamp.timeStr = utils.formatTime(now)
+      pHistoryRecord.ebbStamp = curEbbStamp
+      debugLog('没有历史记录', pHistoryRecord)
+      utils.runCallback(callback)(pHistoryRecord)
+    }
+  })
+
+}
+
+/**
  * 提交做题记录
  */
 function recordHistory(that, question, answer) {
   let historyRecord = {};
   historyRecord['table'] = that.data.tableValue
   // 艾宾浩斯遗忘曲线做过的Tags
-  if (that.data.gameMode == gConst.GAME_MODE.EBBINGHAUSE 
-      && that.data.ebbingClassName 
-      && that.data.ebbingClassName.length > 0){
+  if (that.data.gameMode == gConst.GAME_MODE.EBBINGHAUS
+      && that.data.ebbingRateName
+      && that.data.ebbingRateName.length > 0){
     let ebbingTags = question.ebbingTags ? question.ebbingTags : []
-    question['ebbingTags'] = ebbingTags.concat([that.data.ebbingClassName])
+    question['ebbingTags'] = ebbingTags.concat([that.data.ebbingRateName])
   }
   historyRecord['question'] = question
   historyRecord['answerType'] = that.data.titleSubfix
 
   Object.assign(historyRecord, answer)
   // debugLog('historyRecord', historyRecord)
-
-  learnHistoryApi.create(historyRecord, (res)=>{
-    debugLog('learnHistoryCreate.success.res', res)
+  makeEbbingStamp(that, historyRecord, pHistoryRecord=>{
+    learnHistoryApi.create(pHistoryRecord, (res) => {
+      debugLog('learnHistoryCreate.success.res', res)
+    })
   })
 }
 
@@ -274,7 +361,7 @@ function getNormalQuestions(that, dataLoadTimer, callback) {
             clearInterval(dataLoadTimer)
             if (typeof callback == 'function') {
               callback(that)
-            } 
+            }
           })
         }
       })
@@ -290,8 +377,8 @@ function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
   clearInterval(dataLoadTimer)
   // debugLog('writeQuestionsCorrectStat.questions', that.data.questions)
   dataLoadTimer = setInterval(function () {
-    learnHistoryApi.questCorrectStat(that.data.tableValue, 
-      { tags: _.all(that.data.tags) }, pageIdx, 
+    learnHistoryApi.questCorrectStat(that.data.tableValue,
+      { tags: _.all(that.data.tags) }, pageIdx,
       (list, pageIdx) => {
         // debugLog('questionStatistic.pageIdx', pageIdx)
         // debugLog('questi/onStatistic.list', list)
@@ -301,7 +388,7 @@ function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
           for (let i in list){
             delete list[i].question
             try{
-              let foundInQuests = questions.find(quest => quest._id == list[i]._id)  
+              let foundInQuests = questions.find(quest => quest._id == list[i]._id)
 
               Object.assign(foundInQuests, list[i])
             }catch(e){}
@@ -322,7 +409,7 @@ function writeQuestionsCorrectStat(that, dataLoadTimer, callback){
           clearInterval(dataLoadTimer)
           callback()
         }
-      
+
     })
     pageIdx++
   }, utils.getDataLoadInterval())
@@ -396,7 +483,7 @@ function finishScoreApprove(that, params) {
       // 减去一个计时间隔，作为操作时间
       thinkSeconds: that.data.thinkSeconds - that.data.timerInterval,
     })
-  
+
   // 正确的时候加分
   if (params.detail.isCorrect){
     let curScore = parseFloat(that.data.curScore) + parseFloat(recQuest.score)
@@ -412,7 +499,7 @@ function finishScoreApprove(that, params) {
       totalScore: totalScore,
     }, function (res) {
       wx.setStorageSync(storeKeys.totalScore, parseFloat(that.data.totalScore))
-    })    
+    })
   }
 
   that.setData({
@@ -426,7 +513,7 @@ function finishScoreApprove(that, params) {
 
 /**
  * tap Select Option
- * 
+ *
  */
 function tapSelectOption(that, e) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
@@ -510,7 +597,7 @@ function getFavoritesQuestions(that, mode, dataLoadTimer, callback) {
             clearInterval(dataLoadTimer)
             if (typeof callback == 'function') {
               callback(that)
-            } 
+            }
           })
         }
       })
@@ -591,7 +678,7 @@ function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
               clearInterval(dataLoadTimer)
               if (typeof callback == 'function') {
                 callback(that)
-              } 
+              }
             })
           }
         } catch (e) {
@@ -610,64 +697,67 @@ function getHistoryQuestions(that, mode, dataLoadTimer, callback) {
  * 获得艾宾浩斯遗忘曲线题目
  */
 function getEbbingQuestions(that, mode, dataLoadTimer, callback) {
-  let ebbingClassName = that.data.ebbingClassName
-  let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-  // debugLog('ebbingClasses', ebbingClasses)
-  let ebbingClassesMap = utils.array2Object(ebbingClasses, 'name')
-  let curEbbingClass = ebbingClassesMap[ebbingClassName]
+  let ebbingRateName = that.data.ebbingRateName
+  let ebbingStatMode = that.data.options.ebbingStatMode
+  let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+  // debugLog('ebbingRates', ebbingRates)
+  let ebbingRatesMap = utils.array2Object(ebbingRates, 'name')
+  let curEbbingRate = ebbingRatesMap[ebbingRateName]
   that.setData({
-    curEbbingClass: curEbbingClass
+    curEbbingRate: curEbbingRate
   })
-  debugLog('ebbingClassName', ebbingClassName)
-  debugLog('curEbbingClass', curEbbingClass)
+  debugLog('ebbingRateName', ebbingRateName)
+  debugLog('ebbingStatMode', ebbingStatMode)
+  debugLog('curEbbingRate', curEbbingRate)
   let tableValue = that.data.tableValue
   let allQuest = []
   utils.loadPagesData((pageIdx, loadTimer) => {
-    learnHistoryApi.ebbinghauseQuestions({
+    learnHistoryApi.getEbbinghausQuestions({
       table: tableValue,
       question: {
         // tags: '默写卡'
       },
     }
-      , curEbbingClass
-      , pageIdx
-      , list => {
-        debugLog('list', list)
-        try {
-          if (list.length && list.length > 0) {
-            let questions = []
-            for (let i in list) {
-              questions.push(list[i].question)
-            }
-            questions = that.data.questions.concat(questions)
-            that.setData({
-              questions: questions,
-            }, function () {
-              if (pageIdx == 0) {
-                // 生成下一道题目
-                // debugLog('生成第一道题目', questions[0])
-                onClickNextQuestion(that, null, null, 0)
-              }
-            })
-          } else {
-            clearInterval(loadTimer)
-            // when finish questions load
-            writeQuestionsCorrectStat(that, dataLoadTimer, res => {
-              clearInterval(dataLoadTimer)
-              if (typeof callback == 'function') {
-                callback(that)
-              }
-            })
+    , curEbbingRate
+    , pageIdx
+    , list => {
+      debugLog('list', list)
+      try {
+        if (list.length && list.length > 0) {
+          let questions = []
+          for (let i in list) {
+            questions.push(list[i].question)
           }
-        } catch (e) {
+          questions = that.data.questions.concat(questions)
+          that.setData({
+            questions: questions,
+          }, function () {
+            if (pageIdx == 0) {
+              // 生成下一道题目
+              // debugLog('生成第一道题目', questions[0])
+              onClickNextQuestion(that, null, null, 0)
+            }
+          })
+        } else {
           clearInterval(loadTimer)
-          wx.showToast({
-            image: gConst.ERROR_ICON,
-            title: MSG.SOME_EXCEPTION,
-            duration: 1000,
+          // when finish questions load
+          writeQuestionsCorrectStat(that, dataLoadTimer, res => {
+            clearInterval(dataLoadTimer)
+            if (typeof callback == 'function') {
+              callback(that)
+            }
           })
         }
-      })
+      } catch (e) {
+        clearInterval(loadTimer)
+        wx.showToast({
+          image: gConst.ERROR_ICON,
+          title: MSG.SOME_EXCEPTION,
+          duration: 1000,
+        })
+      }
+    },
+    ebbingStatMode)
   }, utils.getDataLoadInterval())
 }
 
@@ -811,11 +901,11 @@ function getQuestions(that, gameMode, dataLoadTimer, callback) {
       title: that.data.tableName + gConst.GAME_MODE.FAVORITES + that.data.titleSubfix
     })
     getFavoritesQuestions(that, gConst.GAME_MODE.FAVORITES, dataLoadTimer, callback);
-  } else if (gameMode == gConst.GAME_MODE.EBBINGHAUSE) {
+  } else if (gameMode == gConst.GAME_MODE.EBBINGHAUS) {
     wx.setNavigationBarTitle({
-      title: that.data.tableName + gConst.GAME_MODE.EBBINGHAUSE + that.data.titleSubfix
+      title: that.data.tableName + gConst.GAME_MODE.EBBINGHAUS + that.data.titleSubfix
     })
-    getEbbingQuestions(that, gConst.GAME_MODE.EBBINGHAUSE, dataLoadTimer, callback);
+    getEbbingQuestions(that, gConst.GAME_MODE.EBBINGHAUS, dataLoadTimer, callback);
   }
 }
 
@@ -860,7 +950,7 @@ function onClickNextQuestion(that, e, isCorrect, idxOffset, callback) {
     nextQuestionIndex = Math.abs((curQuestionIndex + idxOffset)) % questions.length
   }
   let nextQuestion = questions[nextQuestionIndex]
-  
+
   // 如果上一题正确，把它放到已经完成的里面
   if (isCorrect) {
     questionsDone.push(question)
@@ -1132,7 +1222,7 @@ function getFavoriteTags(that, tableName, dataLoadTimer) {
         }, () => {
           // 恢复已经选择的Tags
           recoverSelectedTags(that)
-        })        
+        })
         clearInterval(dataLoadTimer)
       }
       // 新数据空就清空原来的数据。从新装载。
@@ -1205,10 +1295,10 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
         let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
         that.setData({
           tags: sortTags
-        }) 
+        })
         clearInterval(dataLoadTimer)
       }
-      // 
+      //
       that.setData({
         tags: that.data.tags.concat(tags)
       })
@@ -1263,8 +1353,8 @@ function initFilterTables(that, dataLoadTimer, callback){
   let tables = TABLES.LIST
   let isSet = false
   let selectedTable = tables[0]
-  
-  tables.find(table => { 
+
+  tables.find(table => {
     if(that.options.tableValue){
       if (table.value == that.options.tableValue){
         table['css'] = SELECTED_CSS
@@ -1338,7 +1428,7 @@ function recoverSelectedTags(that){
 
 /**
  * tap Tag
- * 
+ *
  */
 function tapTagInTagRoom(that, e, callback) {
   // debugLog('tapTag.e.target.dataset', e.target.dataset)
@@ -1410,7 +1500,7 @@ function onClickEnterInTagRoom(that, e) {
     url = '/pages/gamesRoom/article/article?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   }
 
-  if (that.data.gameMode == gConst.GAME_MODE.WRONG 
+  if (that.data.gameMode == gConst.GAME_MODE.WRONG
   || that.data.gameMode == gConst.GAME_MODE.HISTORY){
     url += '&lastDate=' + that.data.lastDate
   }
@@ -1492,7 +1582,7 @@ function onKeywordSearch(that, e, dataLoadTimer){
     }, res => {
       getTags(that, that.data.selectedTable.value, dataLoadTimer)
     })
-  }) 
+  })
 }
 
 module.exports = {
@@ -1504,6 +1594,7 @@ module.exports = {
   getEbbingQuestions: getEbbingQuestions,
   onClickNextQuestion: onClickNextQuestion,
   recordHistory: recordHistory,
+  makeEbbingStamp: makeEbbingStamp,
   processWordsIntoCards: processWordsIntoCards,
   processSelectOptions: processSelectOptions,
   processFillBlankQuestion: processFillBlankQuestion,

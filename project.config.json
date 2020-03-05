@@ -195,7 +195,7 @@
 					"id": -1,
 					"name": "艾宾浩斯",
 					"pathName": "pages/gamesRoom/words/words",
-					"query": "gameMode=艾宾浩斯&tableValue=english-words&tableName=英语单词&filterTags=8小时&ebbingClassName=8小时",
+					"query": "gameMode=艾宾浩斯&tableValue=english-words&tableName=英语单词&filterTags=8小时&ebbingRateName=8小时",
 					"scene": null
 				},
 				{

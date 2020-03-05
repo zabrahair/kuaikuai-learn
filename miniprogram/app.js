@@ -64,6 +64,7 @@ App({
       utils.refreshConfigs(gConst.CONFIG_TAGS.COMBO_TYPE)
       // 艾宾浩斯遗忘曲线设置
       utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
+      utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
 
       this.login();
       userInfoUtils.getUserConfigs(true)

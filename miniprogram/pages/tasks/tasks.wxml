@@ -1,6 +1,23 @@
 <wxs module="filter" src="../../utils/filter.wxs"></wxs>
 <view class='container'>
   <view class='header bg_color_{{filter.randInteger(24)}}'>
+    <picker 
+      name="curTaskStatus" class='form_item' 
+      bindchange="onFilterTaskStatus" value="{{curTaskStatus.orderIdx}}" 
+      range="{{filterTaskStatus}}" range-key="name">
+      <view class="picker  filter_picker">
+      {{curTaskStatus.name}}
+      </view>
+    </picker>  
+    <text class="filter_seperator">|</text>
+    <picker
+      name="curTaskDirect" class='form_item' 
+      bindchange="onFilterTaskDirect" value="{{curTaskDirect.orderIdx}}" 
+      range="{{TASK_DIRECT}}" range-key="name">
+      <view class="picker last_filter">
+      {{curTaskDirect.name}}
+      </view>
+    </picker>  
   </view>
   <scroll-view class='content' scroll-y='true'
     bindscrolltolower="onScrollTouchBottom" lower-threshold="50">
@@ -15,13 +32,16 @@
           </view>
           <view class="middle">
             <view class="task_status">
-            {{task.status.name}}
+            【{{task.status.name}}】
             </view>
             <view class="task_deadline">
             在{{filter.formatDate(task.deadline.date)}}
             </view>
             <view class='task_deadline'>
             {{filter.formatTime(task.deadline.time)}}前完成
+            </view>
+            <view class='task_deadline'>
+            {{task.fromWho.name}} 委派给 {{task.toWho.name}}
             </view>
           </view>
           <view class='right'>
@@ -35,11 +55,11 @@
   <view class="footer bg_color_{{filter.randInteger(24)}}">
     <view class='buttons'> 
       <button class="button" bindtap="toCreateTask" type='primary'>新建任务</button>
+      <button class="button" bindtap="onPullDownRefresh" type='warn' size='mini'>刷新</button>
     </view>
   </view>
   <task-editor
     isShown="{{isShownTaskEditor}}"
-    curStatus="{{curStatus}}"
     curTask="{{curTask}}"
     bindrefresh="refreshTasks"
   />

@@ -21,10 +21,10 @@ Page({
    * 页面的初始数据
    */
   data: {
-    funcName: 'Query',
+    funcName: 'EbbingQuestions',
     table: 'chinese-words',
     where: '',
-    update: "人物描写，《作文工具书》",
+    update: "小学三年级下，自助默写，默写卡，拼写",
     result: '',
     // Chinese Meaning
     isShownChineseMeaning: false,
@@ -95,93 +95,145 @@ Page({
 
   submitAnswer: function(e){
     let detail = utils.getEventDetailValue(e)
-    // debugLog('detail', detail)
-    
-    /* test add chinese batch */
-    let wordsAll = detail.where
-    let wordsArray = wordsAll.split('\n')
-    // debugLog('wordsArray', wordsArray)
-    let tags = detail.update
-    // let insertTimer
-    for (let i in wordsArray){
-      // debugLog('i',i)
-      setTimeout(()=>{
+    let functionName = detail.functionName
+    let tablerName = detail.tablerName
+    let pWhere = detail.where
+    let pUpdate = detail.update
+    // debugLog('detail', detail)d
+    let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+    switch (functionName){
+      case 'appendBatchWords':
+        /* test add chinese batch */
+        let wordsAll = detail.where
+        let wordsArray = wordsAll.split('\n')
+        // debugLog('wordsArray', wordsArray)
+        let tags = detail.update
+        // let insertTimer
+        for (let i in wordsArray) {
+          // debugLog('i',i)
+          setTimeout(() => {
+            wx.cloud.callFunction({
+              // name: form.functionName,
+              name: functionName,
+              data: {
+                table: tablerName,
+                words: wordsArray[i],
+                tags: tags,//姐姐妹妹，人物描写，《作文工具书》
+                otherSegs: {
+                  "注音": "",
+                  "meaning": "",
+                  "反义词": [],
+                  "近义词": [],
+                  "量词": "",
+                  "score": 1.0,
+                  "minFinishTime": 20000.0,
+                }
+              },
+              success: res => {
+                debugLog('appendBatchWords.res', res)
+              },
+              fail: err => {
+                console.error('【云函数】【appendBatchWords】调用失败', err)
+              }
+            })
+          }, 300 * i)
+        }
+        break;
+
+      case 'Update':
         wx.cloud.callFunction({
-          // name: form.functionName,
-          name: 'appendBatchWords',
+          name: functionName,
           data: {
-            table: 'chinese-words',
-            words: wordsArray[i],
-            tags: tags,//姐姐妹妹，人物描写，《作文工具书》
-            otherSegs: {
-              "注音": "",
-              "meaning": "",
-              "反义词": [],
-              "近义词": [],
-              "量词": "",
-              "score": 1.0,
-              "minFinishTime": 20000.0,
+            table: tablerName,
+            where: {
+              tags: _.all(['第二课 小燕子', '老师划', '小学三年级下', '自助默写', '默写卡', '拼写']),
+            },
+            update: {
+              tags: _.pull('第二课 小燕子')
             }
           },
           success: res => {
-            debugLog('appendBatchWords.res', res)
+            debugLog('Update.res', res)
           },
           fail: err => {
-            console.error('【云函数】【appendBatchWords】调用失败', err)
+            console.error('【云函数】【 Update 】调用失败', err)
           }
         })
-      }, 300*i)
-    }
+        break;
 
-
-    // /* test start */
-    // utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-    // let ebbingClasses = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_CLASSES)
-    // let ebbingReciteCount = {}
-    // let i = 0
-    // for (let i in ebbingClasses){
-    //   let ebbingClass = ebbingClasses[i]
-    //   // debugLog('ebbingClasses', ebbingClasses)
-    //   learnHistoryApi.ebbinghauseCount({
-    //     question: {
-    //       // tags: '默写卡'
-    //     },
-    //   }
-    //   , ebbingClass
-    //   , 0
-    //   , countList => {
-    //     // debugLog('ebbinghauseCount.countList', countList)
-    //     let curList = ebbingReciteCount[ebbingClass.name] ? ebbingReciteCount[iebbingClass.name]: []
-    //     ebbingReciteCount[ebbingClass.name] = curList.concat(countList)
-    //     debugLog('ebbingReciteCount', ebbingReciteCount)
-    //   })
-    // }
-
-    // let ebbing20min = ebbingClasses[0]
-    // debugLog('ebbing20min', ebbing20min)
-    // let allQuest = []
-    // utils.loadPagesData((pageIdx, loadTimer)=>{
-    //   learnHistoryApi.ebbinghauseQuestions({
-    //     table: 'chinese-words',
-    //     question: {
-    //       // tags: '默写卡'
-    //     },
-    //   }
-    //     , ebbing20min
-    //     , pageIdx
-    //     , questions => {
-    //       if (questions.length > 0){
-    //         debugLog('questions.length', questions.length)
-    //         allQuest = allQuest.concat(questions)
-    //       }else{
-    //         clearInterval(loadTimer)
-    //         debugLog('ebbinghauseQuestions.allQuest', allQuest)
-    //       }
-          
-    //     })
-    // })
-
-   
+      case 'FindRepeated': 
+        wx.cloud.callFunction({
+          name: 'CountRepeated',
+          data: {
+            table: tablerName,
+            limit: 20,
+            pageIdx: 0
+          },
+          success: res => {
+            debugLog('FindRepeated.list.length', res.result.list.length)
+            debugLog('FindRepeated.list', res.result.list)
+          },
+          fail: err => {
+            console.error('【云函数】【 Update 】调用失败', err)
+          }
+        }) 
+        for (let i=0; i < 1; i++){
+          setTimeout(() => {
+            wx.cloud.callFunction({
+              name: functionName,
+              data: {
+                table: tablerName,
+                limit: 20,
+                pageIdx: 0
+              },
+              success: res => {
+                debugLog('FindRepeated.list.length', res.result.list.length)
+                // debugLog('FindRepeated.list', res.result.list)
+                // debugLog('FindRepeated.updateResults', res.result.updateResults)
+                debugLog('FindRepeated.updateResults.length', res.result.updateResults.length)
+                // debugLog('FindRepeated.removeResults', res.result.removeResults)
+                debugLog('FindRepeated.removeResults.length', res.result.removeResults.length)
+              },
+              fail: err => {
+                console.error('【云函数】【 Update 】调用失败', err)
+              }
+            }) 
+          }, 3000 * i )
+        }
+        wx.cloud.callFunction({
+          name: 'CountRepeated',
+          data: {
+            table: tablerName,
+            limit: 20,
+            pageIdx: 0
+          },
+          success: res => {
+            debugLog('FindRepeated.list.length', res.result.list.length)
+            debugLog('FindRepeated.list', res.result.list)
+          },
+          fail: err => {
+            console.error('【云函数】【 Update 】调用失败', err)
+          }
+        }) 
+        break;
+      case 'EbbingCount':
+        learnHistoryApi.countEbbinghaus({}, ebbingRates[0], 0, res=>{
+          debugLog('countEbbinghaus.intime.res', res)
+        }, learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
+        learnHistoryApi.countEbbinghaus({}, ebbingRates[0], 0, res => {
+          debugLog('countEbbinghaus.timeout.res', res)
+        }, learnHistoryApi.EBBING_STAT_MODE.TIMEOUT)
+        break;
+      case 'EbbingQuestions':
+        learnHistoryApi.getEbbinghausQuestions({}, ebbingRates[0], 0, res => {
+          debugLog('countEbbinghaus.intime.res', res)
+        }, learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
+        learnHistoryApi.getEbbinghausQuestions({}, ebbingRates[0], 0, res => {
+          debugLog('countEbbinghaus.timeout.res', res)
+        }, learnHistoryApi.EBBING_STAT_MODE.TIMEOUT)
+        break;      
+      default:
+    }   
 
 
     /* test start */

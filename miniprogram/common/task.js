@@ -21,6 +21,11 @@ var TASK_STATUS
 var TASK_STATUS_OBJ 
 var BONUS_CLASSES
 var BONUS_CLASSES_OBJ
+const FILTER_ALL = { name: "所有任务", value: "ALL", orderIdx: 0}
+const TASK_DIRECT = [
+  { name: '我的任务', value: 'toWho', orderIdx: 0 }
+  , { name: '我委派的任务', value: 'fromWho', orderIdx: 1 }
+]
 
 // DB Related
 const db = wx.cloud.database()
@@ -50,8 +55,13 @@ function defaultEditorData(selfData){
   return finalData
 }
 
-function initPage(that){
-  // debugLog('getPoint.lifetimes.attached', this.properties)
+/**
+ * 初始化页面
+ */
+function initPage(that, callback){
+  // fetch configs
+  utils.refreshConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
+  utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
   // TASK STATUS
   TASK_STATUS = utils.getConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
   TASK_STATUS_OBJ = utils.array2Object(TASK_STATUS, 'value');
@@ -72,14 +82,14 @@ function initPage(that){
     TASK_STATUS: TASK_STATUS,
     BONUS_CLASSES: BONUS_CLASSES,
     BONUS_CLASSES_OBJ: BONUS_CLASSES_OBJ,
+    curTaskStatus: FILTER_ALL,
     assignees:[]
   }
   ,()=>{
-    
     // children
     userApi.getChildren(res => {
-      // debugLog('getChildren', res)
-      if (res) {
+      debugLog('getChildren', res)
+      if (res.children) {
         that.setData({
           assignees: that.data.assignees.concat(res.children),
           children: res.children,
@@ -92,7 +102,7 @@ function initPage(that){
 
     // parents
     userApi.getParents(res => {
-      if (res) {
+      if (res.parents) {
         // debugLog('getParents', res)
         that.setData({
           assignees: that.data.assignees.concat(res.parents),
@@ -103,6 +113,9 @@ function initPage(that){
         })
       }
     })
+
+    // 设置完成后回调
+    utils.runCallback(callback)()
   })
 }
 
@@ -117,18 +130,15 @@ function getTaskTemplate(){
         value: '',
       },
       fromWho: {
-        openid: 'AAAA',
-        name: '王祖权',
+        openid: null,
+        name: null,
       },
       toWho: {
-        openid: 'BBB',
-        name: '悠悠',
+        openid: null,
+        name: null,
       },
-      content: 'ABCD',
-      bonus: {
-        name: '司令',
-        value: 50,
-      },
+      content: null,
+      bonus:  {name: '新兵', value: 1},
       deadline: {
         date: '2020/02/20',
         time: '00:12'
@@ -159,9 +169,9 @@ function getTaskTemplate(){
 function defaultListData(selfData) {
   let curTask = getTaskTemplate()
   let defaultData = {
+    filterTaskStatus: [FILTER_ALL],
     isShownTaskEditor: false,
     curTask: curTask,
-    curStatus: {},
     tasks: [],
     pageIdx: 0,
   }
@@ -171,11 +181,17 @@ function defaultListData(selfData) {
 }
 
 function initList(that) {
-  utils.refreshConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
-  utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
-  initPage(that)
-  // 刷新给我的任务列表
-  refreshMyTasks(that)
+  initPage(that, ()=>{
+    that.setData({
+      TASK_DIRECT: TASK_DIRECT,
+      filterTaskStatus: that.data.filterTaskStatus.concat(TASK_STATUS),
+      curTaskDirect: TASK_DIRECT[0],
+    })
+    // 刷新给我的任务列表
+    refreshTasks(that, true)
+  })
+
+
 }
 
 /** 
@@ -201,14 +217,14 @@ function createTask(that, callback){
  * 当对话框打开时
  */
 function whenIsShown(that){
-  let curStatus = that.data.curStatus
+  let curTask = that.data.curTask
+  // debugLog('whenIsShown.curTask-1', curTask)
   let userInfo = that.data.userInfo
-  // debugLog('whenIsShown.curStatus', curStatus)
   try{
-    switch (curStatus.value) {
+    switch (curTask.status.value) {
       case TASK_STATUS_OBJ.CREATE.value:
         // debugLog('In CASE', TASK_STATUS_OBJ.CREATE.value)
-        let curTask = getTaskTemplate()
+        // let curTask = getTaskTemplate()
         curTask.fromWho = {
           name: userInfo.contactName,
           openid: userInfo._openid,
@@ -221,19 +237,19 @@ function whenIsShown(that){
           date: utils.formatDate(now),
           time: utils.formatOnlyTime(now)
         }
-        let children = userInfo.children
-        if(children && children.length>0){
+        let assignees = that.data.assignees
+        if (assignees && assignees.length>0){
           curTask.toWho = {
-            name: children[0].name,
-            openid: children[0].openid,
+            name: assignees[0].name,
+            openid: assignees[0].openid,
           }
         }
+        debugLog('whenIsShown.curTask-2', curTask)
         that.setData({
           curTask: curTask
         })
         break;
       default:
-
     }
 
   }catch(err){errorLog('err', err.stack)}
@@ -249,21 +265,48 @@ function showTaskEditor(that){
 /**
  * 发给我的任务刷新
  */
-function refreshMyTasks(that){
+function refreshMyTasks(that, isReset){
   let openid = that.data.userInfo._openid
   let pageIdx = that.data.pageIdx
-  taskApi.query({
-    toWho: {
-      openid: openid
-    }
-  }, pageIdx, tasks=>{
-    debugLog('refreshMyTasks.pageIdx', pageIdx)
+  let taskDirect = that.data.curTaskDirect.value
+  let where = {
+    isRemoved: _.or([_.exists(false), false]),
+    [taskDirect] : {
+      openid: openid,
+    },
+  }
+
+  if (that.data.curTaskStatus.value != FILTER_ALL.value){
+    Object.assign(where
+      , {
+        status: {
+          value: that.data.curTaskStatus.value
+        }
+      }
+    )
+  }
+
+  debugLog('where', where)
+  taskApi.query(where, pageIdx, tasks=>{
+    // debugLog('refreshMyTasks.pageIdx', pageIdx)
     // debugLog('refreshMyTasks.tasks', tasks)
     if(tasks.length > 0){
+      if (!isReset){
+        tasks = that.data.tasks.concat(tasks)
+      }
       that.setData({
-        tasks: that.data.tasks.concat(tasks),
+        tasks: tasks,
         pageIdx: pageIdx + 1
+      },()=>{
+        utils.stopLoading();
       })
+    }else{
+      that.setData({
+        tasks: [],
+        pageIdx: 0
+      }, () => {
+        utils.stopLoading();
+      })      
     }
   })
 }
@@ -280,10 +323,11 @@ function claimTask(that, callback){
     name: TASK_STATUS_OBJ.CLAIMED.name,
     value: TASK_STATUS_OBJ.CLAIMED.value,
   }
+  debugLog('claimTask', task)
   taskApi.cloudWhereUpdate({_id: task._id}
   , task
   , res => {
-    // debugLog('createTask', res)
+    debugLog('claimedTask', res)
     utils.runCallback(callback)(res)
   })
 }
@@ -300,10 +344,11 @@ function finishTask(that, callback) {
     name: TASK_STATUS_OBJ.FINISHED.name,
     value: TASK_STATUS_OBJ.FINISHED.value,
   }
+  debugLog('finish Task', task)
   taskApi.cloudWhereUpdate({_id: task._id }
     , task
     , res => {
-      // debugLog('createTask', res)
+      debugLog('created Task', res)
       utils.runCallback(callback)(res)
   })
 }
@@ -329,6 +374,27 @@ function approveTask(that, callback) {
 }
 
 /**
+ * 复核任务
+ */
+function cancelTask(that, callback) {
+  let task = Object.assign({}, that.data.curTask)
+  let now = new Date()
+  task.cancelTime = now.getTime();
+  task.cancelTimeStr = utils.formatDateTime(now);
+  task.status = {
+    name: TASK_STATUS_OBJ.CANCELED.name,
+    value: TASK_STATUS_OBJ.CANCELED.value,
+  }
+  taskApi.cloudWhereUpdate({ _id: task._id }
+    , task
+    , res => {
+      // debugLog('cancelTask', res)
+      utils.runCallback(callback)(res)
+    })
+}
+
+
+/**
  * 刷新页面，在刷新中可切换
  */
 function refreshTasks(that, isReset){
@@ -341,7 +407,7 @@ function refreshTasks(that, isReset){
   that.setData({
     pageIdx: pageIdx
   }, ()=>{
-    refreshMyTasks(that)
+    refreshMyTasks(that, isReset)
   })
 }
 
@@ -359,6 +425,7 @@ module.exports = {
   claimTask: claimTask,
   finishTask: finishTask,
   approveTask: approveTask,
+  cancelTask: cancelTask,
   whenIsShown: whenIsShown,
 
 
