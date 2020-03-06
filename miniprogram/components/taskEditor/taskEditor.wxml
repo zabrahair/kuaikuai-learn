@@ -2,7 +2,7 @@
 <wxs module="task" src="./taskEditor.wxs"></wxs>
 <view wx:if="{{isShown}}" animation='{{switchDialogStatus}}' class='component-container'>
   <view class='component-content view_shadow' scroll-y="true" scroll-x="true">
-    <scroll-view class="scroll-content">
+    <scroll-view class="scroll-content" scroll-y="true">
       <view class='current_status'>
         {{curTask.status.name}}
       </view>
@@ -33,7 +33,7 @@
           </view>
         </picker> 
         <!-- 完成时间        -->
-        <view name="deadlineDate" class='form_item' class="form_item">
+        <view name="deadlineDate" class='form_item'>
           <picker disabled="{{task.isDisabled(curTask, TASK_STATUS_OBJ)}}" 
            mode="date" value="{{deadlineDate}}" 
            start="{{deadlineDate}}" end="2099-12-31" 
@@ -50,34 +50,63 @@
             </view>
           </picker>
         </view>
+        <view wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.FINISHED.value,openid,TASK_STATUS_OBJ)}}"  
+          class="finish_images" >
+          <text class="images_list_title">任务完成截图</text>
+          <view class="add_image" bindtap='addFinishImage'>
+            +
+          </view>  
+          <image class="image_item" mode='aspectFill' 
+            src="{{finishImage.path}}" onTap="onTapReviewImage"
+            data-finish-image="{{finishImage}}"
+            wx:for-items='{{finishImages}}' wx:key="id" 
+            wx:for-item='finishImage' wx:for-index='id'/>
+        </view>
       </form>
     </scroll-view>
     <view class="actions bg_color_{{filter.randInteger(24)}}">
       <!-- <button class="button" bindtap="onClickSave" type='default' size="mini">保存</button> -->
       <button 
       wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.ASSIGNED.value,openid,TASK_STATUS_OBJ)}}" 
-      class="button" bindtap="onClickAssign" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.ASSIGNED}}"
       type='default' size="mini">委派</button>
 
       <button 
       wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.CANCELED.value,openid,TASK_STATUS_OBJ)}}" 
-      class="button" bindtap="onClickCancel" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.CANCELED}}"
       type='default' size="mini">取消任务</button> 
 
       <button 
       wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.CLAIMED.value,openid,TASK_STATUS_OBJ)}}" 
-      class="button" bindtap="onClickClaim" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.CLAIMED}}"
       type='default' size="mini">认领</button>
 
       <button 
       wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.FINISHED.value,openid,TASK_STATUS_OBJ)}}" 
-      class="button" bindtap="onClickFinish" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.FINISHED}}"
       type='default' size="mini">完成</button>
 
       <button 
       wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.APPROVED.value,openid,TASK_STATUS_OBJ)}}" 
-      class="button" bindtap="onClickApprove" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.APPROVED}}"
       type='default' size="mini">确认</button>
+
+      <button 
+      wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.DELETED.value,openid,TASK_STATUS_OBJ)}}" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.DELETED}}"
+      type='default' size="mini">删除</button>
+
+      <button 
+      wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.REJECTED.value,openid,TASK_STATUS_OBJ)}}" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.REJECTED}}"
+      type='default'  size="mini">拒绝</button>            
     </view>
   </view>
   <view class='close_line'></view>

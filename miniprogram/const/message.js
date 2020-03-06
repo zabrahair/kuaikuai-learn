@@ -16,4 +16,7 @@ module.exports = {
   IS_UPDATED: '已更新！',
   CONFIRM_UPDATE_TITLE: '更新确认',
   CONFIRM_UPDATE_MSG: '确定要更新吗？',
+  UPLOAD_FAILED: '上传失败',
+  UPLAODING: '上传中',
+  PROCESSING: '处理中',
 }

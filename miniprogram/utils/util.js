@@ -450,6 +450,18 @@ function getEventDetailValue(e){
   return value
 }
 /**
+ * 获取Event事件的Detail
+ */
+function getEventDetail(e) {
+  let detail = ''
+  try {
+    detail = e.detail
+  } catch (e) {
+    // value = ''
+  }
+  return detail
+}
+/**
  * 获得Event事件的Dataset
  */
 function getEventDataset(e){
@@ -571,9 +583,13 @@ function prevEbbingRate(pEbbRate) {
 /**
  * 显示On loading
  */
-function onLoading(){
+function onLoading(pMsg){
+  let msg = MSG.ON_LOADING
+  if(msg && typeof msg == 'string'){
+    msg = pMsg
+  }
   wx.showLoading({
-    title: MSG.ON_LOADING,
+    title: msg,
   })
   setTimeout(() => {
     wx.hideLoading()
@@ -588,12 +604,33 @@ function stopLoading(){
   wx.stopPullDownRefresh()
 }
 
+/**
+ * 从path中获取文件名
+ */
+function getFilename(path){
+  let res = /[^\/\\]+$/gi.exec(path)
+  if(res && res.length > 0){
+    return res[0]
+  }
+}
+
+/**
+ * 从path中获取文件扩展名
+ */
+function getFileExtension(path) {
+  let res = /[^.]+$/gi.exec(path)
+  if (res && res.length > 0) {
+    return res[0]
+  }
+}
+
 module.exports = {
   /** 工具型方法 */
 
   /* -- Event 方法 -- */
   getEventDataset: getEventDataset,
   getEventDetailValue: getEventDetailValue,
+  getEventDetail: getEventDetail,
 
   array2Object: array2Object,
   runCallback: runCallback,
@@ -607,6 +644,8 @@ module.exports = {
   formatDateTime: formatDateTime,
   mergeDateTime: mergeDateTime,
 
+  getFilename: getFilename,
+  getFileExtension: getFileExtension,
   isPunctuation: isPunctuation,
   resetStatus: resetStatus,
   cloneObj: cloneObj,

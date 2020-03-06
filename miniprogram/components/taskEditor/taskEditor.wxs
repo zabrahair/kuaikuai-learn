@@ -37,16 +37,38 @@ function isButtonShown(curTask, nextTaskValue, curOpenid, TASK_STATUS_OBJ){
       }
       break;
     case 'CANCELED':
-      if ((curTask.status.value == TASK_STATUS_OBJ.CREATE.value 
-      || curTask.status.value == TASK_STATUS_OBJ.SAVED.value 
+      if ((curTask.status.value == TASK_STATUS_OBJ.SAVED.value 
       || curTask.status.value == TASK_STATUS_OBJ.ASSIGNED.value 
-      || curTask.status.value == TASK_STATUS_OBJ.RECEIVED.value) 
+      || curTask.status.value == TASK_STATUS_OBJ.RECEIVED.value
+      || curTask.status.value == TASK_STATUS_OBJ.REJECTED.value) 
       && curTask.fromWho.openid == curOpenid) {
         return true
       } else {
         return false
       }
       break;
+    case 'DELETED':
+      if ((curTask.status.value == TASK_STATUS_OBJ.SAVED.value
+        || curTask.status.value == TASK_STATUS_OBJ.ASSIGNED.value
+        || curTask.status.value == TASK_STATUS_OBJ.RECEIVED.value
+        || curTask.status.value == TASK_STATUS_OBJ.REJECTED.value
+        || curTask.status.value == TASK_STATUS_OBJ.APPROVED.value
+        || curTask.status.value == TASK_STATUS_OBJ.CANCELED.value)
+        && curTask.fromWho.openid == curOpenid) {
+        return true
+      } else {
+        return false
+      }
+      break;
+    case 'REJECTED':
+      if ((curTask.status.value == TASK_STATUS_OBJ.ASSIGNED.value
+        || curTask.status.value == TASK_STATUS_OBJ.RECEIVED.value)
+        && curTask.toWho.openid == curOpenid) {
+        return true
+      } else {
+        return false
+      }
+      break;            
     default:
   }
 }

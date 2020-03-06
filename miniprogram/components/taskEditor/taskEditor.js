@@ -7,6 +7,7 @@ const errorLog = require('../../utils/log.js').error;
 const gConst = require('../../const/global.js');
 const storeKeys = require('../../const/global.js').storageKeys;
 const utils = require('../../utils/util.js');
+const media = require('../../utils/media.js');
 const TABLES = require('../../const/collections.js')
 const animation = require('../../utils/animation.js');
 const dialogCommon = require('../../common/dialog.js')
@@ -48,9 +49,8 @@ Component({
     },
 
     show: function () {
-      // debugLog('getPoint.lifetimes.show')
       let that = this
-      // taskCommon.initEditor(that)
+      taskCommon.initEditor(that)
     }
   },
 
@@ -67,6 +67,8 @@ Component({
       let that = this
       dialogCommon.whenIsShown(that, ()=>{
           // debugLog('observers.isShown', isShown)
+          // debugLog('curTask', that.data.curTask)
+          // debugLog('TASK_STATUS_OBJ', that.data.TASK_STATUS_OBJ)
           taskCommon.whenIsShown(that)
       })
     },
@@ -137,6 +139,7 @@ Component({
     bindDeadlineDateChange: function(e){
       let that = this
       let dateStr = utils.getEventDetailValue(e)
+      let curTask = that.data.curTask
       dateStr = dateStr.replace(/-/ig, '/')
       curTask.deadline.date = dateStr
       // debugLog('selectBonus.value', value)
@@ -159,140 +162,117 @@ Component({
       })
     },
 
-    onClickSave: function(e){
-
-    },
-    onClickCancel: function (e) {
+    onTapTaskActions: function(e){
       let that = this
+      let dataset = utils.getEventDataset(e)
+      debugLog('dataset', dataset)
+      let toUpdateStatus = dataset.toUpdateStatus
+      let TASK_STATUS_OBJ = that.data.TASK_STATUS_OBJ
+      let processFunc = null
+      let isDone = false
+      switch (toUpdateStatus.value){
+        case 'ASSIGNED':
+          processFunc = taskCommon.createTask
+          break;
+        case 'CLAIMED':
+          processFunc = taskCommon.claimTask
+          break;
+        case 'FINISHED':
+          isDone = true
+          wx.showModal({
+            title: MSG.CONFIRM_UPDATE_TITLE,
+            content: MSG.CONFIRM_UPDATE_MSG,
+            success(res) {
+              if (res.confirm) {
+                utils.onLoading(MSG.PROCESSING)
+                processFunc = taskCommon.finishTask
+                media.whenAllUploaded(that.data.finishImages
+                  , (filesPath) => {
+                    let curTask = that.data.curTask
+                    
+                    curTask['finishImages'] = filesPath
+                    that.setData({
+                      curTask: curTask
+                    }, () => {
+                      debugLog('finishImages', that.data.curTask.finishImages)
+                      processFunc(that, result => {
+                        wx.showToast({
+                          title: that.data.curTask.status.message,
+                          duration: gConst.TOAST_DURATION_TIME
+                        })
+                        setTimeout(() => {
+                          that.triggerEvent('refresh', { upTask: result.task })
+                          dialogCommon.onClose(null, that)
+                          utils.stopLoading()
+                        }, gConst.TOAST_DURATION_TIME / 2)
+                        return;
+                      })
+                    })
+                  }) 
+              } else if (res.cancel) {
+                errorLog('用户点击取消')
+              }
+            }
+          })         
+          break;
+        case 'APPROVED':
+          processFunc = taskCommon.approveTask
+          break;
+        case 'CANCELED':
+          processFunc = taskCommon.cancelTask
+          break;
+        case 'DELETED':
+          processFunc = taskCommon.deleteTask
+          break;
+        case 'REJECTED':
+          processFunc = taskCommon.rejectTask
+          break;
+        default:
+      }
+      if(isDone){
+        return;
+      }
       wx.showModal({
         title: MSG.CONFIRM_UPDATE_TITLE,
         content: MSG.CONFIRM_UPDATE_MSG,
         success(res) {
           if (res.confirm) {
-            taskCommon.cancelTask(that, res => {
-              debugLog('onClickCancel ')
+            processFunc(that, result => {
               wx.showToast({
                 title: that.data.curTask.status.message,
                 duration: gConst.TOAST_DURATION_TIME
               })
               setTimeout(() => {
+                that.triggerEvent('refresh', { upTask: result.task })
                 dialogCommon.onClose(null, that)
-              }, gConst.TOAST_DURATION_TIME)
+              }, gConst.TOAST_DURATION_TIME / 2)
             })
           } else if (res.cancel) {
             errorLog('用户点击取消')
           }
         }
       })
-    },    
-    /**
-     * 指派任务
-     */
-    onClickAssign: function (e) {
-      let that = this
-      wx.showModal({
-        title: MSG.CONFIRM_UPDATE_TITLE,
-        content: MSG.CONFIRM_UPDATE_MSG,
-        success(res) {
-          if (res.confirm) {
-            taskCommon.createTask(that, res => {
-              debugLog('afteronClickAssign ')
-              wx.showToast({
-                title: that.data.curTask.status.message,
-                duration: gConst.TOAST_DURATION_TIME
-              })
-              setTimeout(() => {
-                dialogCommon.onClose(null, that)
-              }, gConst.TOAST_DURATION_TIME)
-            })
-          } else if (res.cancel) {
-            errorLog('用户点击取消')
-          }
-        }
-      })
     },
 
     /**
-     * 认领任务
+     * 添加任务完成证据的图片
      */
-    onClickClaim: function(e){
+    addFinishImage: function(e){
       let that = this
-      wx.showModal({
-        title: MSG.CONFIRM_UPDATE_TITLE,
-        content: MSG.CONFIRM_UPDATE_MSG,
-        success: function (res) {
-          if (res.confirm) {
-            taskCommon.claimTask(that, res => {
-              debugLog('onClickClaim ',res)
-              wx.showToast({
-                title: that.data.curTask.status.message,
-                duration: gConst.TOAST_DURATION_TIME
-              })
-              setTimeout(() => {
-                that.triggerEvent('refresh')
-                dialogCommon.onClose(null, that)
-              }, gConst.TOAST_DURATION_TIME)
-            })
-          } else {
-            return;
-          }
-        }
+      media.takeOrChooseImage(that, (pThat, filesPath)=>{
+        media.makeFilesCloudPath(filesPath, [
+          'users',
+          that.data.userInfo.openId,
+          'tasks',
+          that.data.curTask._id,
+          'finish',
+          'images',])
+        that.setData({
+          finishImages: that.data.finishImages.concat(filesPath)
+        },()=>{
+            debugLog('addFinishImage.finishImages', that.data.finishImages)
+        })
       })
-    },
-
-    /**
-     * 完成任务
-     */
-    onClickFinish: function (e) {
-      let that = this
-      wx.showModal({
-        title: MSG.CONFIRM_UPDATE_TITLE,
-        content: MSG.CONFIRM_UPDATE_MSG,
-        success: function (res) {
-          if (res.confirm) {
-            taskCommon.finishTask(that, res => {
-              // debugLog('onClickFinish ', that.data.curTask.status)
-              wx.showToast({
-                title: MSG.IS_UPDATED,
-                duration: gConst.TOAST_DURATION_TIME
-              })
-              setTimeout(() => {
-                that.triggerEvent('refresh')
-                dialogCommon.onClose(null, that)
-              }, gConst.TOAST_DURATION_TIME)
-            })
-          } else {
-            return;
-          }
-        }
-      })
-    },
-    /**
-     * 审核任务
-     */
-    onClickApprove: function (e) {
-      let that = this
-      wx.showModal({
-        title: MSG.CONFIRM_UPDATE_TITLE,
-        content: MSG.CONFIRM_UPDATE_MSG,
-        success: function (res) {
-          if (res.confirm) {
-            taskCommon.approveTask(that, res => {
-              // debugLog('onClickApprove ', that.data.curTask.status)
-              wx.showToast({
-                title: MSG.IS_UPDATED,
-                duration: gConst.TOAST_DURATION_TIME
-              })
-              setTimeout(() => {
-                that.triggerEvent('refresh')
-                dialogCommon.onClose(null, that)
-              }, gConst.TOAST_DURATION_TIME)
-            })
-          } else {
-            return;
-          }
-        }
-      })
-    },
+    }
   }
 })

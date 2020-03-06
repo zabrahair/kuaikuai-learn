@@ -125,8 +125,60 @@ Page({
    */
   refreshTasks: function(e){
     let that = this
-    // debugLog('refreshTasks')
-    taskCommon.refreshTasks(that, true)
+    // 从对话框传回的值
+    let detail = utils.getEventDetail(e)
+    // debugLog('detail', detail)
+    let upTask = detail.upTask
+    
+    // 如果有编辑对话框传回的数值
+    // 就根据这个数值刷新当前页面
+    if(upTask){
+      debugLog('upTask', upTask)
+      debugLog('taskCommon.TASK_DIRECT_OBJ', taskCommon.TASK_DIRECT_OBJ)
+      let curTaskStatus = that.data.curTaskStatus;
+      let curTaskDirect = that.data.curTaskDirect
+      switch(upTask.status.value){
+        case 'ASSIGNED':
+          curTaskStatus = upTask.status
+          curTaskDirect = taskCommon.TASK_DIRECT_OBJ['委派他人']
+          break;
+        case 'CLAIMED':
+          curTaskStatus = upTask.status
+          curTaskDirect = taskCommon.TASK_DIRECT_OBJ['我的任务']
+          break;
+        case 'FINISHED':
+          curTaskStatus = upTask.status
+          curTaskDirect = taskCommon.TASK_DIRECT_OBJ['我的任务']
+          break;
+        case 'APPROVED':
+          curTaskStatus = upTask.status
+          curTaskDirect = taskCommon.TASK_DIRECT_OBJ['委派他人']
+          break;
+        case 'CANCELED':
+          curTaskStatus = upTask.status
+          curTaskDirect = taskCommon.TASK_DIRECT_OBJ['委派他人']
+          break;
+        case 'DELETED':
+          break;
+        case 'REJECTED':
+          curTaskStatus = upTask.status
+          curTaskDirect = taskCommon.TASK_DIRECT_OBJ['我的任务']
+          break;
+        default:
+      }
+      that.setData({
+        curTaskDirect: curTaskDirect,
+        curTaskStatus: curTaskStatus
+      },()=>{
+        taskCommon.refreshTasks(that, true)
+      })
+      
+    }else{
+      // 不是被编辑框调用的情况
+      // 下刷新
+      taskCommon.refreshTasks(that, true)
+    }
+    
   },
 
   /**
