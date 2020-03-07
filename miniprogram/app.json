@@ -19,7 +19,9 @@
     "pages/gamesRoom/fillBlank/fillBlank",
     "pages/dictionary/dictionary",
     "pages/gamesRoom/article/article",
-    "pages/contentList/contentList"
+    "pages/contentList/contentList",
+    "pages/lastQuestions/lastQuestions",
+    "components/questDetailStat/questDetailStat"
   ],
   "window": {
     "backgroundColor": "#F6F6F6",

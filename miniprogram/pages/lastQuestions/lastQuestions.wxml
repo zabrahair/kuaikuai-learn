@@ -1,0 +1,75 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<view class='container'>
+  <view class='header bg_color_{{filter.randInteger(24)}}'>
+    <picker 
+      name="curFilterFromDate" class='form_item' 
+      data-filter-type="fromDateOn"
+      bindchange="onFilter" value="" 
+      mode="date" start="2020-01-01" end="curFilterFromDate">
+      <view class="picker  filter_picker">
+      {{filter.formatDateShort(curFilterFromDate)}}
+      </view>
+    </picker>  
+    <text class="filter_seperator">|</text>
+    <picker
+      name="curFilterTable" class='form_item' 
+      bindchange="onFilter" value="0" 
+      range="{{filtersTable}}" range-key="name">
+      <view class="picker last_filter">
+      {{curFilterTable.name}}
+      </view>
+    </picker> 
+    <text class="filter_seperator">|</text>
+    <picker
+      name="curFilterAnswerType" class='form_item' 
+      bindchange="onFilter" value="0" 
+      range="{{filtersAnswerType}}" range-key="name">
+      <view class="picker last_filter">
+      {{curFilterAnswerType.name}}
+      </view>
+    </picker>  
+  </view>
+  <scroll-view class='content' scroll-y='true'
+    bindscrolltolower="onScrollTouchBottom" lower-threshold="50">
+      <view class='record_list'>
+        <view class='record'
+          wx:for-items='{{questions}}' wx:key="_id" 
+          wx:for-item='item' wx:for-index='idx'>
+          <view class="left">
+            <view class="task_content bg_color_{{filter.randInteger(24)}}">
+            {{item.content}}
+            </view>
+          </view>
+          <view class="middle">
+            <view class="task_status">
+            【{{item.status.name}}】
+            </view>
+            <view class="task_deadline">
+            在{{filter.formatDate(task.deadline.date)}}
+            </view>
+            <view class='task_deadline'>
+            {{filter.formatTime(task.deadline.time)}}前完成
+            </view>
+            <view class='task_deadline'>
+            {{task.fromWho.name}} 委派给 {{task.toWho.name}}
+            </view>
+          </view>
+          <view class='right'>
+            <button class="task_action" type='primary' size='mini'
+            bindtap='showCurrentTask' 
+            data-task="{{task}}">查看</button>
+          </view>
+        </view>
+      </view>
+  </scroll-view>
+  <view class="footer bg_color_{{filter.randInteger(24)}}">
+    <view class='buttons'> 
+      <button class="button" bindtap="onPullDownRefresh" type='warn' size='mini'>刷新</button>
+    </view>
+  </view>
+  <quest-detail-stat
+    isShown="{{isShownQuestDetailStat}}"
+    curQuestion="{{curQuestion}}"
+    bindrefresh="refreshList"
+  />
+</view>

@@ -287,6 +287,12 @@ Page({
       wx.navigateTo({
         url: '/pages/contentList/contentList',
       })
+    } else if (featureName == 'lastQuestions') {
+      wx.navigateTo({
+        url: '/pages/lastQuestions/lastQuestions',
+      })
     }
   }
+
+  
 })

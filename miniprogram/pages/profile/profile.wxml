@@ -32,6 +32,9 @@
     <view class='feature' bindtap="tapProfileFeature" data-feature-name='myQcode'>
     我的小程序码
     </view>    
+    <view class='feature' bindtap="tapProfileFeature" data-feature-name='lastQuestions'>
+    做过的题目
+    </view>   
     <!-- <view class='feature' bindtap="tapProfileFeature" data-feature-name='scanQcode'>
     扫描小程序码
     </view>  -->

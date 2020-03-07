@@ -526,6 +526,62 @@ function getEbbinghausQuestions(pWhere, ebbingRate, pageIdx = 0, callback
     })
 }
 
+/**
+ * 获取最新的做过的题目
+ */
+function getLastQuestions(pMatch, pageIdx=0, callback){
+  let perPageCount = 20
+  let match = {
+    ebbStamp: _.exists(true),
+  }
+  if (typeof pMatch == 'object'){
+    Object.assign(match, pMatch)
+  }
+  db.collection(TABLE).aggregate()
+    .match(match)
+    .project({
+      table: 1,
+      answerType: 1,
+      answerTime: 1,
+      question: 1,
+      ebbStamp: 1,
+    })
+    .sort({
+      'question._id': 1,
+      'answerTime.time': -1,
+    })
+    .group({
+      _id: '$question._id',
+      answerType: $.first('$answerType'),
+      answerTime: $.first('$answerTime'),
+      question: $.first('$question'),
+      ebbStamp: $.first('$ebbStamp'),
+    })
+    .project({
+      _id: 1,
+      answerTime: 1,
+      question: 1,
+      ebbStamp: 1,
+    })
+    .limit(perPageCount)
+    .skip(perPageCount * pageIdx)
+    .end()
+    .then(res => {
+      // debugLog('getEbbinghausQuestions[' + ebbingRate.name + "-" + mode + '].res', res)
+      // debugLog('questCorrectStat.res', res.list)
+      // debugLog('getTags.length', res.list.length)
+      if (res.list.length > 0) {
+        utils.runCallback(callback)(res.list)
+        return
+      } else {
+        utils.runCallback(callback)([])
+      }
+    })
+    .catch(err => {
+      utils.runCallback(callback)(null)
+    })
+}
+
 module.exports = {
   EBBING_STAT_MODE: EBBING_STAT_MODE,
   answerTypeStatsitic: answerTypeStatsitic,
@@ -539,4 +595,5 @@ module.exports = {
   findLastHistory: findLastHistory,
   countEbbinghaus: countEbbinghaus,
   getEbbinghausQuestions: getEbbinghausQuestions,
+  getLastQuestions: getLastQuestions,
 }

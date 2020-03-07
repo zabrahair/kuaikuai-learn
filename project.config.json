@@ -204,6 +204,13 @@
 					"pathName": "pages/gamesRoom/article/article",
 					"query": "gameMode=常规&tableValue=chinese-article&tableName=中文文章&filterTags=诗歌",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "最近做的题目",
+					"pathName": "pages/lastQuestions/lastQuestions",
+					"query": "",
+					"scene": null
 				}
 			]
 		}

@@ -11,6 +11,7 @@ const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
 const taskCommon = require('../../common/task.js')
+const IntervalClock = require('../../utils/clock.js').IntervalClock;
 
 
 Page({
@@ -41,7 +42,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    
   },
 
   /**

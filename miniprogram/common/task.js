@@ -7,6 +7,7 @@ const errorLog = require('../utils/log.js').error;
 const gConst = require('../const/global.js');
 const storeKeys = require('../const/global.js').storageKeys;
 const utils = require('../utils/util.js');
+const media = require('../utils/media.js');
 const TABLES = require('../const/collections.js')
 // Api Handler
 const dbApi = require('../api/db.js')
@@ -15,6 +16,9 @@ const userApi = require('../api/user.js')
 const taskApi = require('../api/task.js')
 const learnHistoryApi = require('../api/learnHistory.js')
 const configsApi = require('../api/configs.js')
+
+const dialogCommon = require('../common/dialog.js')
+
 const USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
 const USER_ROLES = wx.getStorageSync(gConst.USER_ROLES_KEY)
 var TASK_STATUS
@@ -191,8 +195,6 @@ function initList(that) {
     // 刷新给我的任务列表
     refreshTasks(that, true)
   })
-
-
 }
 
 /**
@@ -232,9 +234,6 @@ function whenIsShown(that){
         })
         break;
       default:
-        that.setData({
-          finishImages: []
-        })
     }
 
   }catch(err){errorLog('err', err.stack)}
@@ -335,13 +334,34 @@ function claimTask(that, callback){
     name: TASK_STATUS_OBJ.CLAIMED.name,
     value: TASK_STATUS_OBJ.CLAIMED.value,
   }
-  debugLog('claimTask', task)
+  // debugLog('claimTask', task)
   taskApi.cloudWhereUpdate({_id: task._id}
   , task
   , res => {
-    debugLog('claimedTask', res)
+    // debugLog('claimedTask', res)
     utils.runCallback(callback)({ task: task, res: res })
   })
+}
+
+/**
+ * 执行任务
+ */
+function implementTask(that, callback) {
+  let task = Object.assign({}, that.data.curTask)
+  let now = new Date()
+  task.implementTime = now.getTime();
+  task.implementTimeStr = utils.formatDateTime(now);
+  task.status = {
+    name: TASK_STATUS_OBJ.IMPLEMENTING.name,
+    value: TASK_STATUS_OBJ.IMPLEMENTING.value,
+  }
+  // debugLog('implementTask', task)
+  taskApi.cloudWhereUpdate({ _id: task._id }
+    , task
+    , res => {
+      // debugLog('implementTask', res)
+      utils.runCallback(callback)({ task: task, res: res })
+    })
 }
 
 /**
@@ -356,11 +376,11 @@ function finishTask(that, callback) {
     name: TASK_STATUS_OBJ.FINISHED.name,
     value: TASK_STATUS_OBJ.FINISHED.value,
   }
-  debugLog('finish Task', task)
+  // debugLog('finish Task', task)
   taskApi.cloudWhereUpdate({_id: task._id }
     , task
     , res => {
-      debugLog('created Task', res)
+      // debugLog('created Task', res)
       utils.runCallback(callback)({ task: task, res: res })
   })
 }
@@ -463,6 +483,47 @@ function refreshTasks(that, isReset){
   })
 }
 
+/**
+ * 上传完文件后再更新记录
+ */
+function uploadAndUpdateTask(that, processFunc, callback){
+  wx.showModal({
+    title: MSG.CONFIRM_UPDATE_TITLE,
+    content: MSG.CONFIRM_UPDATE_MSG,
+    success(res) {
+      if (res.confirm) {
+        utils.onLoading(MSG.PROCESSING)
+        media.whenAllUploaded(that.data.curTask.finishImages
+          , (filesPath) => {
+            let curTask = that.data.curTask
+            if (filesPath && filesPath.length > 0) {
+              curTask['finishImages'] = filesPath
+            }
+            that.setData({
+              curTask: curTask
+            }, () => {
+              // debugLog('finishImages', that.data.curTask.finishImages)
+              processFunc(that, result => {
+                wx.showToast({
+                  title: that.data.curTask.status.message,
+                  duration: gConst.TOAST_DURATION_TIME
+                })
+                setTimeout(() => {
+                  that.triggerEvent('refresh', { upTask: result.task })
+                  dialogCommon.onClose(null, that)
+                  utils.stopLoading()
+                }, gConst.TOAST_DURATION_TIME / 2)
+                return;
+              })
+            })
+          })
+      } else if (res.cancel) {
+        errorLog('用户点击取消')
+      }
+    }
+  })
+}
+
 module.exports = {
   /** 常量 */
   TASK_DIRECT_OBJ: TASK_DIRECT_OBJ,
@@ -475,10 +536,12 @@ module.exports = {
   /** Editor */
   defaultEditorData: defaultEditorData,
   initEditor: initEditor,
+  uploadAndUpdateTask: uploadAndUpdateTask,
 
   /** 任务生命周期 */
   createTask: createTask,
   claimTask: claimTask,
+  implementTask: implementTask,
   finishTask: finishTask,
   approveTask: approveTask,
   cancelTask: cancelTask,

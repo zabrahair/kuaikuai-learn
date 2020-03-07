@@ -50,7 +50,7 @@ function upLoadImage(uploadFile, callback) {
         fileList: [res.fileID]
       }).then(res => {
         let url = res.fileList[0].tempFileURL
-        debugLog('uploaded url', url)
+        // debugLog('uploaded url', url)
         utils.runCallback(callback)(url)
       }).catch(error => {
         // handle error
@@ -86,7 +86,7 @@ function makeMediaFilePath(params){
  * 批量生成CloudPath
  */
 function makeFilesCloudPath(filesPath, pParams){
-  debugLog('pParams', pParams)
+  // debugLog('pParams', pParams)
   let params = [].concat(pParams)
   for (let i in filesPath) {
     filesPath[i]['cloudPath'] = 
@@ -102,6 +102,7 @@ function whenAllUploaded(filesPath, callback){
   // debugLog('filesPath', filesPath)
   if(!filesPath 
     || filesPath.length < 1){
+    utils.runCallback(callback)(null)
     return 
   }
   let intervalSec = 1000
@@ -113,7 +114,7 @@ function whenAllUploaded(filesPath, callback){
     let filePath
     if(i < filesPath.length){
       filePath = filesPath[i]
-      debugLog('filePath', filePath)
+      // debugLog('filePath', filePath)
     }
     i++
     accuSec = intervalSec * i
@@ -127,14 +128,21 @@ function whenAllUploaded(filesPath, callback){
       clearInterval(timer)
     }
     try{
-      if(filePath){
-        upLoadImage(filePath, url => {
-          debugLog('uploaded', url)
-          filePath['url'] = url
-          debugLog('uploaded filePath', filePath)
-          uploadedCount++
-          // delete filePath.path
-        })
+      if (filePath){
+        if (!filePath.url
+          || typeof filePath.url != 'string'
+          || filePath.url.length < 1){
+            upLoadImage(filePath, url => {
+              // debugLog('uploaded', url)
+              filePath['url'] = url
+              // debugLog('uploaded filePath', filePath)
+              uploadedCount++
+              // delete filePath.path
+            })
+          }else{
+            uploadedCount++
+          }
+
       }
     }catch(err){
       errorLog('whenAllUploaded.err', err.stack)

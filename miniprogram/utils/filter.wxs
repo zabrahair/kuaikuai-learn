@@ -18,7 +18,27 @@ function formatDate(pDateStr, format="年月日") {
   }
   var dateString = ''
   for (var i = 0; i < dateParts.length; i++){
-    dateString += dateParts[i] + seperators[i]
+    dateString += dateParts[i] + (seperators[i] ? seperators[i]:'')
+  }
+  // console.log(dateString)
+  return dateString
+}
+
+function formatDateShort(pDateStr, format = "年月日") {
+  if (!pDateStr || pDateStr.trim() == '') {
+    return;
+  }
+  // console.log(pDateStr)
+  var seperators = format.split('')
+  // console.log(seperators)
+  var dateParts = pDateStr.split('/')
+  // console.log(dateParts)
+  if (dateParts == pDateStr) {
+    dateParts = pDateStr.split('-')
+  }
+  var dateString = ''
+  for (var i = 1; i < dateParts.length; i++) {
+    dateString += dateParts[i] + (seperators[i] ? seperators[i] : '')
   }
   // console.log(dateString)
   return dateString
@@ -88,6 +108,7 @@ module.exports = {
   randInteger: randInteger,
   formatDateTime: formatDateTime,
   formatDate: formatDate,
+  formatDateShort: formatDateShort,
   formatTime: formatTime,
   intervalTime: intervalTime,
   isPunctuation: isPunctuation,

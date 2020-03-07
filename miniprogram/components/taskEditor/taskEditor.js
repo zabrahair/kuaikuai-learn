@@ -177,43 +177,19 @@ Component({
         case 'CLAIMED':
           processFunc = taskCommon.claimTask
           break;
+        case 'IMPLEMENTING':
+          isDone = true
+          processFunc = taskCommon.implementTask
+          taskCommon.uploadAndUpdateTask(that, processFunc, ()=>{
+
+          }) 
+          break;
         case 'FINISHED':
           isDone = true
-          wx.showModal({
-            title: MSG.CONFIRM_UPDATE_TITLE,
-            content: MSG.CONFIRM_UPDATE_MSG,
-            success(res) {
-              if (res.confirm) {
-                utils.onLoading(MSG.PROCESSING)
-                processFunc = taskCommon.finishTask
-                media.whenAllUploaded(that.data.finishImages
-                  , (filesPath) => {
-                    let curTask = that.data.curTask
-                    
-                    curTask['finishImages'] = filesPath
-                    that.setData({
-                      curTask: curTask
-                    }, () => {
-                      debugLog('finishImages', that.data.curTask.finishImages)
-                      processFunc(that, result => {
-                        wx.showToast({
-                          title: that.data.curTask.status.message,
-                          duration: gConst.TOAST_DURATION_TIME
-                        })
-                        setTimeout(() => {
-                          that.triggerEvent('refresh', { upTask: result.task })
-                          dialogCommon.onClose(null, that)
-                          utils.stopLoading()
-                        }, gConst.TOAST_DURATION_TIME / 2)
-                        return;
-                      })
-                    })
-                  }) 
-              } else if (res.cancel) {
-                errorLog('用户点击取消')
-              }
-            }
-          })         
+          processFunc = taskCommon.finishTask
+          taskCommon.uploadAndUpdateTask(that, processFunc, ()=>{
+
+          })     
           break;
         case 'APPROVED':
           processFunc = taskCommon.approveTask
@@ -267,12 +243,43 @@ Component({
           that.data.curTask._id,
           'finish',
           'images',])
+        let curTask = that.data.curTask
+        if (curTask.finishImages){
+          curTask.finishImages = curTask.finishImages.concat(filesPath)
+        }else{
+          curTask['finishImages'] = filesPath
+        }
+        
         that.setData({
-          finishImages: that.data.finishImages.concat(filesPath)
+          curTask: curTask
         },()=>{
-            debugLog('addFinishImage.finishImages', that.data.finishImages)
+            debugLog('addFinishImage.curTask.finishImages', that.data.curTask.finishImages)
         })
       })
+    },
+
+    /**
+     * 浏览已经上传的图片
+     */
+    onTapReviewImage: function(e){
+      let that = this
+      let dataset = utils.getEventDataset(e)
+      debugLog('step ', dataset)
+      let curUrl = dataset.finishImage.url ? dataset.finishImage.url : dataset.finishImage.path
+      let finishImagesUrl = []
+      let finishImages = that.data.curTask.finishImages
+      for(let i in that.data.curTask.finishImages){
+        let url = finishImages[i].url ? finishImages[i].url : finishImages[i].path
+        finishImagesUrl.push(url)
+      }
+      wx.previewImage({
+        current: curUrl, // 当前显示图片的http链接
+        urls: finishImagesUrl // 需要预览的图片http链接列表
+      })
     }
+
+
+
+
   }
 })

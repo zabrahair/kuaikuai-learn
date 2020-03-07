@@ -50,16 +50,19 @@
             </view>
           </picker>
         </view>
-        <view wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.FINISHED.value,openid,TASK_STATUS_OBJ)}}"  
-          class="finish_images" >
+        <view 
+          class="finish_images" 
+          wx:if="{{task.isItemShown('finish_images_list', curTask, openid, TASK_STATUS_OBJ)}}" >
           <text class="images_list_title">任务完成截图</text>
-          <view class="add_image" bindtap='addFinishImage'>
+          <view class="add_image" 
+            wx:if="{{task.isItemShown('add_finish_image', curTask, openid, TASK_STATUS_OBJ)}}" 
+            bindtap='addFinishImage'>
             +
           </view>  
           <image class="image_item" mode='aspectFill' 
-            src="{{finishImage.path}}" onTap="onTapReviewImage"
+            src="{{finishImage.url?finishImage.url:finishImage.path}}" bindtap="onTapReviewImage"
             data-finish-image="{{finishImage}}"
-            wx:for-items='{{finishImages}}' wx:key="id" 
+            wx:for-items='{{curTask.finishImages}}' wx:key="id" 
             wx:for-item='finishImage' wx:for-index='id'/>
         </view>
       </form>
@@ -83,6 +86,12 @@
       class="button" bindtap="onTapTaskActions" 
       data-to-update-status = "{{TASK_STATUS_OBJ.CLAIMED}}"
       type='default' size="mini">认领</button>
+      
+      <button 
+      wx:if="{{task.isButtonShown(curTask, TASK_STATUS_OBJ.IMPLEMENTING.value, openid,TASK_STATUS_OBJ)}}" 
+      class="button" bindtap="onTapTaskActions" 
+      data-to-update-status = "{{TASK_STATUS_OBJ.IMPLEMENTING}}"
+      type='default' size="mini">执行中</button>
 
       <button 
       wx:if="{{task.isButtonShown(curTask,TASK_STATUS_OBJ.FINISHED.value,openid,TASK_STATUS_OBJ)}}" 

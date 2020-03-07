@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "quest-detail-stat": "../../components/questDetailStat/questDetailStat"
+  },
+  "navigationBarTitleText": "最近做过的题目"
+}
