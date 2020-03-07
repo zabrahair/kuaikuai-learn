@@ -1,8 +1,5 @@
 @import '../../css/list.wxss';
-
-
-
-.filter_picker,.last_filter,.filter_seperator{
+.filter_from_date,.filter_picker,.last_filter,.filter_seperator{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -12,6 +9,12 @@
   height: 7vh;
   margin-left: 0vw;
 }
+
+/* .filter_from_date:after {
+  margin-left:1vw;
+  content: '▾';
+  color: gainsboro;  
+} */
 
 .filter_picker:after {
   margin-left:1vw;
@@ -23,6 +26,27 @@
   margin-left:1vw;
   content: '▾';
   color: gainsboro;
+}
+
+.btn_from_date_switch {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1vw;
+
+}
+
+.on {
+  width: 5vw;
+  height: 9vw;  
+}
+
+.off {
+  margin-top: 3.5vw;
+  width: 9vw;
+  height: 5vw;
 }
 
 .content {
@@ -37,7 +61,7 @@
   left: 0vw;
   top: 7vh;
   width: 100vw;
-  height: 82vh;
+  height: 93vh;
   padding: 2vw;
 
 }
@@ -58,11 +82,11 @@
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
-  box-sizing: border-box;
+  box-sizing: content-box;
 
 
   width: 95vw;
-  height: 20vh;
+  min-height: 24vh;
   border-bottom: 2px solid rgba(13, 24, 77, 0.622);
 
   color: azure;
@@ -70,19 +94,17 @@
 }
 
 .record .left {
-  position: relative;
   display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
 
-  width: 30vw;
-  height: 100%;
+  width: 80vw;
+  min-height: 10vh;
 }
 
 .record .middle {
-  position: relative;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -91,8 +113,8 @@
 
   padding-top: 3vw;
   padding-left: 2vw;
-  width: 45vw;
-  height: 100%;
+  width: 0vw;
+  min-height: 10vh;
 }
 
 .record .right {
@@ -104,10 +126,10 @@
   align-items: center;
 
   width: 20vw;
-  height: 100%
+  min-height: 10vh;
 }
 
-.task_content {
+.item {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -115,10 +137,9 @@
   justify-content: center;
   align-items: center;
 
-  height: 27vw;
-  width: 27vw;
-  padding: 1vw;
-  margin: 2vw;
+  border-radius: 1vw;
+  margin: 1vw;
+  padding: 0.5vw;
   overflow: hidden;
   white-space: wrap;
   text-overflow: ellipsis
@@ -151,7 +172,7 @@
   width: 95%;
 }
 
-.task_action {
+.item_action {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -181,10 +202,14 @@
 
 .buttons {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
   align-items: center;
   width: 100%;
   padding-left: 5vw;
+}
+
+.task_action {
+  margin-bottom: 2vh;
 }

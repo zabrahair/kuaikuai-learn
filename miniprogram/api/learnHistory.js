@@ -507,8 +507,8 @@ function getEbbinghausQuestions(pWhere, ebbingRate, pageIdx = 0, callback
       question: 1,
       ebbStamp: 1,
     })
+    .skip(perPageCount * pageIdx)
     .limit(perPageCount)
-    .skip(perPageCount*pageIdx)
     .end()
     .then(res => {
       // debugLog('getEbbinghausQuestions[' + ebbingRate.name + "-" + mode + '].res', res)
@@ -529,7 +529,7 @@ function getEbbinghausQuestions(pWhere, ebbingRate, pageIdx = 0, callback
 /**
  * 获取最新的做过的题目
  */
-function getLastQuestions(pMatch, pageIdx=0, callback){
+function getLastQuestions(pMatch, pageIdx = 0, callback, isCount){
   let perPageCount = 20
   let match = {
     ebbStamp: _.exists(true),
@@ -537,51 +537,171 @@ function getLastQuestions(pMatch, pageIdx=0, callback){
   if (typeof pMatch == 'object'){
     Object.assign(match, pMatch)
   }
-  db.collection(TABLE).aggregate()
+  let now = new Date()
+  debugLog('match', match)
+  debugLog('pageIdx', pageIdx)
+  debugLog('isCount', isCount)
+  let dbAggr = db.collection(TABLE).aggregate()
     .match(match)
     .project({
       table: 1,
       answerType: 1,
       answerTime: 1,
-      question: 1,
+      answertimeStr: 1,
+      question: {
+        _id: 1,
+        word: 1,
+        topic: 1,
+        author: 1,
+        time: 1, 
+        country: 1,
+        meaning: 1,
+        tags: 1,
+      },
       ebbStamp: 1,
+      isCorrect: 1,
     })
     .sort({
       'question._id': 1,
-      'answerTime.time': -1,
+      'answerTime': -1,
     })
     .group({
       _id: '$question._id',
+      table: $.first('$table'),
       answerType: $.first('$answerType'),
       answerTime: $.first('$answerTime'),
+      answertimeStr: $.first('$answerTimeStr'),
       question: $.first('$question'),
       ebbStamp: $.first('$ebbStamp'),
+      isCorrect: $.first('$isCorrect'),
+      count: $.sum(1),
     })
     .project({
       _id: 1,
+      table: 1,
+      answerType: 1,
       answerTime: 1,
+      answertimeStr: 1,
       question: 1,
       ebbStamp: 1,
+      isCorrect: 1,
+      count: 1,
+      fromNowTime: $.subtract([now.getTime(), '$answerTime'])
     })
-    .limit(perPageCount)
-    .skip(perPageCount * pageIdx)
-    .end()
-    .then(res => {
-      // debugLog('getEbbinghausQuestions[' + ebbingRate.name + "-" + mode + '].res', res)
-      // debugLog('questCorrectStat.res', res.list)
-      // debugLog('getTags.length', res.list.length)
-      if (res.list.length > 0) {
-        utils.runCallback(callback)(res.list)
-        return
-      } else {
-        utils.runCallback(callback)([])
-      }
+    .sort({
+      'fromNowTime': -1,
     })
-    .catch(err => {
-      utils.runCallback(callback)(null)
-    })
+  // 计数和拿记录分开
+  if(isCount){
+    dbAggr
+      .count('total')
+      .end()
+      .then(res => {
+        debugLog('getLastQuestions.res', res)
+        if (res.list[0] && res.list[0].total > 0) {
+          utils.runCallback(callback)(res.list[0].total)
+          return
+        } else {
+          utils.runCallback(callback)(0)
+        }
+      })
+      .catch(err => {
+        errorLog('getLastQuestions.err', err.stack)
+        utils.runCallback(callback)(-1)
+      })    
+
+  }else{
+    dbAggr
+      .skip(perPageCount * pageIdx)
+      .limit(perPageCount)
+      .end()
+      .then(res => {
+        debugLog('getLastQuestions.res', res)
+        // debugLog('questCorrectStat.res', res.list)
+        // debugLog('getTags.length', res.list.length)
+        if (res.list.length > 0) {
+          utils.runCallback(callback)(res.list)
+          return
+        } else {
+          utils.runCallback(callback)([])
+        }
+      })
+      .catch(err => {
+        utils.runCallback(callback)(null)
+      })
+  }
+
+
 }
 
+/**
+ * 获取单个题目的所有做题历史记录
+ */
+function getAllHistory(pWhere, pageIdx, callback, pOrderBy, isCount=false){
+  let perPageCount = 20
+  let where = {
+  }
+  if (typeof pWhere == 'object') {
+    Object.assign(where, pWhere)
+  }
+
+  let dbSearch = 
+  db.collection(TABLE)
+    .where(where)
+    .field({
+      table: true,
+      answerType: true,
+      answerTime: true,
+      answerTimeStr: true,
+      question: {
+        _id: true,
+        word: true,
+        topic: true,
+        author: true,
+        time: true,
+        country: true,
+      },
+      ebbStamp: true,
+      isCorrect: true,      
+    })
+    .orderBy(pOrderBy.field, pOrderBy.direct)
+
+  if(isCount){
+    dbSearch
+      .count()
+      .then(res => {
+        // debugLog('getAllHistory.res', res)
+
+        if (res.total > 0) {
+          utils.runCallback(callback)(res.total)
+          return
+        } else {
+          utils.runCallback(callback)(0)
+        }
+      })
+      .catch(err => {
+        utils.runCallback(callback)(-1)
+      })
+  }else{
+    dbSearch
+      .skip(perPageCount * pageIdx)
+      .limit(perPageCount)
+      .get()
+      .then(res => {
+        // debugLog('getAllHistory.res', res)
+
+        if (res.data.length > 0) {
+          utils.runCallback(callback)(res.data)
+          return
+        } else {
+          utils.runCallback(callback)([])
+        }
+      })
+      .catch(err => {
+        utils.runCallback(callback)(null)
+      })
+  }
+}
 module.exports = {
   EBBING_STAT_MODE: EBBING_STAT_MODE,
   answerTypeStatsitic: answerTypeStatsitic,
@@ -596,4 +716,5 @@ module.exports = {
   countEbbinghaus: countEbbinghaus,
   getEbbinghausQuestions: getEbbinghausQuestions,
   getLastQuestions: getLastQuestions,
+  getAllHistory: getAllHistory,
 }

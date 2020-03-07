@@ -63,11 +63,11 @@ Component({
   },
 
   observers: {
-    'isShown, curTask': function (isShown) {
+    'isShown, curTask': function (isShown, curTask) {
       let that = this
       dialogCommon.whenIsShown(that, ()=>{
           // debugLog('observers.isShown', isShown)
-          // debugLog('curTask', that.data.curTask)
+          debugLog('curTask', that.data.curTask)
           // debugLog('TASK_STATUS_OBJ', that.data.TASK_STATUS_OBJ)
           taskCommon.whenIsShown(that)
       })
@@ -94,7 +94,7 @@ Component({
         name: that.data.assignees[selIdx].name,
         openid: that.data.assignees[selIdx].openid,
       }
-      // debugLog('selectAssingee.value', value)
+      debugLog('selectAssingee.value', value)
       that.setData({
         selAssigneeIdx: selIdx,
         curTask: curTask,

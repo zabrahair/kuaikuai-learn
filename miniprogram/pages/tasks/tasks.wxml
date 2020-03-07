@@ -34,12 +34,19 @@
             <view class="task_status">
             【{{task.status.name}}】
             </view>
-            <view class="task_deadline">
+            <view wx:if="{{task.leftTime}}" 
+              class="task_deadline {{(task.leftTime < 1800000 && task.leftTime > 0)?'hurry_up':''}} {{(task.leftTime < 0)?'time_over':''}}">
+              还有{{filter.formatDeciTimer(task.leftTime, 1)}}
+            </view>
+            <view wx:if="{{task.finishStatus}}" class='task_deadline'>
+              {{task.finishStatus.name}}
+            </view>            
+            <!-- <view class="task_deadline">
             在{{filter.formatDate(task.deadline.date)}}
             </view>
             <view class='task_deadline'>
             {{filter.formatTime(task.deadline.time)}}前完成
-            </view>
+            </view> -->
             <view class='task_deadline'>
             {{task.fromWho.name}} 委派给 {{task.toWho.name}}
             </view>

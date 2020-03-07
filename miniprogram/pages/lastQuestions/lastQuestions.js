@@ -11,10 +11,9 @@ const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
 const statCommon = require('../../common/statistic.js')
-
+const common = require('../gamesRoom/common/common.js')
 
 Page({
-
   /**
    * 页面的初始数据
    */
@@ -27,7 +26,12 @@ Page({
    */
   onLoad: function (options) {
     let that = this
-    statCommon.initList(that)
+    that.setData({
+      options: options
+    },()=>{
+      statCommon.initList(that)
+    })
+    
   },
 
   /**
@@ -80,6 +84,7 @@ Page({
   onScrollTouchBottom: function (e) {
     let that = this
     utils.onLoading()
+    debugLog('onScrollTouchBottom')
     statCommon.refreshList(that, false)
   },
 
@@ -107,19 +112,91 @@ Page({
     let idx = utils.getEventDetailValue(e)
     let dataset = utils.getEventDataset(e)
     let filterType = dataset.filterType
+    let setDataObject = {}
 
+    debugLog('idx', idx)
     switch(filterType){
       case 'fromDateOn':
+        let dateStr = idx
+        setDataObject['curFilterFromDate'] = dateStr
         break;
       case 'table':
+        let filterTable = that.data.filtersTable[idx]
+        setDataObject['curFilterTable'] = filterTable
         break;
       case 'answerType': 
+        let filterAnswerType = that.data.filtersAnswerType[idx]
+        setDataObject['curFilterAnswerType'] = filterAnswerType
+        break;
+      case 'ebbinghaus':
+        let filterEbbinghaus = that.data.filtersEbbinghaus[idx]
+        setDataObject['curFilterEbbinghaus'] = filterEbbinghaus
         break;
       default:
     }
+
+    // debugLog('setDataObject', setDataObject)
+    that.setData(setDataObject, () => {
+      statCommon.refreshList(that, true)
+    })
+  },
+
+  /**
+   * 显示题目详情
+   */
+  showCurrentQuestion: function (e) {
+    let that = this
+    let dataset = utils.getEventDataset(e)
+    let curItem = dataset.item
     that.setData({
-      curTaskStatus: status
+      curItem: curItem,
     }, () => {
+      statCommon.showQuestionDetail(that)
+    })
+  },
+
+  /**
+   * 重新做题
+   */
+  showQuestion: function(e){
+    let that = this
+    let dataset = utils.getEventDataset(e)
+    let curItem = dataset.item
+    that.setData({
+      selectedTags: curItem.question.tags,
+      gameMode: gConst.GAME_MODE.HISTORY,
+      selectedTable: TABLES.MAP[curItem.table],
+      lastDate: that.data.curFilterFromDate,
+      selAnswerType: curItem.answerType,
+    },
+    ()=>{
+      common.onClickEnterInTagRoom(that, e)
+    })
+
+  },
+  /**
+   * 刷新共有多少道题目被检索
+   */
+  refreshTotalCount: function(totalCount){
+    wx.setNavigationBarTitle({
+      title: '共做了' + totalCount+'道题'
+    })
+  },
+
+  /**
+   * 切换开始日期的使用
+   */
+  onTapSwitchFromDate: function(e){
+    let that = this
+    let ifUsingFromDate = that.data.ifUsingFromDate
+    if (ifUsingFromDate){
+      ifUsingFromDate = false
+    }else{
+      ifUsingFromDate = true
+    }
+    that.setData({
+      ifUsingFromDate: ifUsingFromDate
+    },()=>{
       statCommon.refreshList(that, true)
     })
   },

@@ -8,18 +8,19 @@
         </view>
       </picker>
   </view>
-  <view class='component-content' >
+  <view class='component-content in-row' >
     <view class="stat-card bg_color_{{filter.randInteger(24)}}"
         wx:for-items='{{statistics}}' wx:for-item='stat' 
-        wx:for-index='idx' wx:key="name" >
+        wx:for-index='idx' wx:key="name" 
+        data-answer-type="{{stat._id}}" bindtap="onTapAnswerTypeCard">
       <view class='title' >{{stat._id}}</view>
       <view class='correct'>正确:{{stat.correct}}</view>
       <view class='incorrect'>错误:{{stat.incorrect}}</view>
     </view>
   </view>
-  <text>艾宾浩斯及时复习</text>
-  <view class='component-content' >
-    <view wx:if="{{ebbingStat.list.length>0}}" class="stat-vertical"
+  <text wx:if="{{ebbingStatsInTime.list.length>0}}">艾宾浩斯及时复习</text>
+  <view class='component-content in-column' >
+    <view wx:if="{{ebbingStatsInTime.list.length>0}}" class="stat-horizon"
     wx:for-items='{{ebbingStatsInTime}}' wx:for-item='ebbingStat' 
     wx:for-index='idx' wx:key='idx'>
       <view class="stat-card bg_color_{{filter.randInteger(24)}}"
@@ -36,7 +37,8 @@
   </view>
   <text>艾宾浩斯超时复习</text>
   <view class='component-content' >
-    <view wx:if="{{ebbingStat.list.length>0}}" class="stat-vertical"
+    <view 
+    class="stat-horizon"
     wx:for-items='{{ebbingStatsTimeout}}' wx:for-item='ebbingStat' 
     wx:for-index='idx' wx:key='idx'>
       <view class="stat-card bg_color_{{filter.randInteger(24)}}"

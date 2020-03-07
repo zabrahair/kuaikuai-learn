@@ -63,12 +63,40 @@ function formatTime(pDateStr, format = "时分秒") {
   return dateString
 }
 
+function formatTimeShort(pDateStr, format = "时分秒") {
+  if (!pDateStr || pDateStr.trim() == '') {
+    return;
+  }
+  // console.log(pDateStr)
+  var seperators = format.split('')
+  // console.log(seperators)
+  var dateParts = pDateStr.split(':')
+  // console.log(dateParts)
+  if (dateParts == pDateStr) {
+    dateParts = pDateStr.split('-')
+  }
+  var dateString = ''
+  for (var i = 0; i < dateParts.length-1; i++) {
+    dateString += dateParts[i] + seperators[i]
+  }
+  return dateString
+}
+
 function formatDateTime(pDateTime){
   var dateTime = pDateTime.split(' ')
   var dateStr = dateTime[0]
   var timeStr = dateTime[1]
   var dateProcessed = formatDate(dateStr)
   var timeProcessed = formatTime(timeStr)
+  return dateProcessed + " " + timeProcessed
+}
+
+function formatDateTimeShort(pDateTime) {
+  var dateTime = pDateTime.split(' ')
+  var dateStr = dateTime[0]
+  var timeStr = dateTime[1]
+  var dateProcessed = formatDateShort(dateStr)
+  var timeProcessed = formatTimeShort(timeStr)
   return dateProcessed + " " + timeProcessed
 }
 
@@ -103,13 +131,100 @@ function isPunctuation(letter){
   return result;
 }
 
+/**
+ * 把毫秒数转化成可以人类阅读的格式
+ */
+var TIME_UNITS = [
+  { name: '毫秒', interval: 1000 }
+  , { name: '秒', interval: 60 }
+  , { name: '分', interval: 60 }
+  , { name: '时', interval: 24 }
+  , { name: '天', interval: 30 }
+  , { name: '月', interval: 12 }
+  , { name: '年', interval: 100 }
+]
+function formatDeciTimer (pDeciSecond, unitStartIdx) {
+  if (!unitStartIdx) {
+    unitStartIdx = 0
+  }
+  var isOverZero = ''
+  if (Math.abs(pDeciSecond) != pDeciSecond) {
+    isOverZero = '-'
+  }
+  var nextUnitValue = Math.abs(pDeciSecond)
+  var formatDeciTimerStr = ''
+  var timeUnits = TIME_UNITS
+  var timeUnitIdx = 0
+  do {
+    if (unitStartIdx <= timeUnitIdx) {
+      formatDeciTimerStr = nextUnitValue % timeUnits[timeUnitIdx].interval + timeUnits[timeUnitIdx].name + formatDeciTimerStr
+    }
+    // debugLog('timeUnits[timeUnitIdx].interval', timeUnits[timeUnitIdx].interval)
+    nextUnitValue = Math.floor(nextUnitValue / timeUnits[timeUnitIdx].interval)
+    timeUnitIdx += 1
+    // debugLog('nextUnitValue', nextUnitValue)
+  } while (nextUnitValue > 0)
+  return isOverZero + formatDeciTimerStr
+}
+
+/** 
+ * 转换布尔型
+ */
+function formatBoolean(boolValue) {
+  var rst = ''
+  if (boolValue == true) {
+    rst = '正确'
+  } else if (boolValue == false) {
+    rst = '错误'
+  }
+  return rst
+}
+
+/**
+ * 格式化日期对象
+ */
+function formatDateObj(){
+  var date = Date.now()
+  return date.parse(0)
+}
+
+/**
+ * 获取列表项目的奇偶式样.因为index从0开始，所以和从一开始的习惯正好相反
+ */
+function getListItemCSS(idx){
+  if(idx%2==0){
+    return 'list_odd_item'
+  }else{
+    return 'list_even_item'
+  }
+}
+
+/**
+ * 计算从特定时间到现在的时间
+ */
+function getTimeFromNow(pTime, now, unitStartIdx){
+  var timeSpan = 0
+  timeSpan = now - pTime
+  var timeSpanStr = formatDeciTimer(timeSpan, unitStartIdx)
+  return timeSpanStr
+}
+
 // 导出对外暴露的属性
 module.exports = {
   randInteger: randInteger,
+  /** 时间 **/
+  formatDateObj: formatDateObj,
   formatDateTime: formatDateTime,
+  formatDateTimeShort: formatDateTimeShort,
   formatDate: formatDate,
   formatDateShort: formatDateShort,
   formatTime: formatTime,
+  formatTimeShort: formatTimeShort,
+
+  formatBoolean: formatBoolean,
   intervalTime: intervalTime,
   isPunctuation: isPunctuation,
+  formatDeciTimer: formatDeciTimer,
+  getTimeFromNow: getTimeFromNow,
+  getListItemCSS: getListItemCSS,
 }

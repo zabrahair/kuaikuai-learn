@@ -100,14 +100,12 @@
           {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
           </view>
           <text wx:if='{{isAnswerVisible}}'>{{question.word}}</text>
-          <text wx:if='{{!isAnswerVisible}}'>. . . . </text>
+          <text wx:if='{{!isAnswerVisible}}'>{{(question.meaning!="")?question.meaning:'...'}}</text>
         </view>
        
       </view>
     </scroll-view>
   </view>
-  <!-- turnOverSpellCard -->
-  <!-- fadeInOutContinueBtn -->
   <button class="btn_continue {{isPause}}" 
     type="primary" size='default' data-is-continue-button='true' animation="{{fadeInOutContinueBtn}}"
     bindtap='onClickPauseSwitch'>{{pauseBtnText}}</button>

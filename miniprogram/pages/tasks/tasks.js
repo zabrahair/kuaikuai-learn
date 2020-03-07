@@ -23,12 +23,44 @@ Page({
     
   }),
 
+  timer: new IntervalClock(1000),
+
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
     let that = this
     taskCommon.initList(that)
+    that.setTimerTasks(that)
+  },
+
+  /**
+   * 设置定时任务
+   */
+  setTimerTasks: function(that){
+    that.timer.addTask('任务剩余时间', (timerTask) => {
+      let tasks = that.data.tasks
+      let now = new Date()
+      for (let i in tasks) {
+        // 以下状态才需要倒计时
+        if(tasks[i].status.value == that.data.TASK_STATUS_OBJ.ASSIGNED.value
+          || tasks[i].status.value == that.data.TASK_STATUS_OBJ.RECEIVED.value
+          || tasks[i].status.value == that.data.TASK_STATUS_OBJ.CLAIMED.value
+          || tasks[i].status.value == that.data.TASK_STATUS_OBJ.IMPLEMENTING.value){
+          let deadTime = utils.mergeDateTime(tasks[i].deadline.date, tasks[i].deadline.time)
+          let leftTime = deadTime.getTime() - now.getTime()
+          let leftTimeStr = utils.formatDeciTimer(leftTime, 1)
+          tasks[i]['leftTime'] = leftTime
+        }else{
+          tasks[i]['leftTime'] = null
+        }
+
+      }
+      that.setData({
+        tasks: tasks
+      })
+    })
+    that.timer.start()
   },
 
   /**

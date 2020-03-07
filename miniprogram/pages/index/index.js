@@ -80,11 +80,9 @@ Page({
     // 生成题型卡片
     let answerTypes = wx.getStorageSync(gConst.CONFIG_TAGS.ANSWER_TYPE)
     that.setData({
-      answerTypes: answerTypes
-    })
-    that.setData({
+      answerTypes: answerTypes,
       isRefreshStatistic: false,
-    },()=>{
+    }, () => {
       that.setData({
         isRefreshStatistic: true,
       })
@@ -124,6 +122,23 @@ Page({
    */
   onShareAppMessage: function () {
 
+  },
+
+  /**
+   * 当点击卡片
+   */
+  onClickCard: function(e){
+    let that = this
+    let dataset = utils.getEventDataset(e)
+    let cardType = dataset.cardType
+    switch(cardType){
+      case '做过的题目':
+        wx.navigateTo({
+          url: '/pages/lastQuestions/lastQuestions',
+        })
+        break;
+      default:
+    }
   },
 
   /**

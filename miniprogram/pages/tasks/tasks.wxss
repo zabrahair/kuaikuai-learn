@@ -105,6 +105,14 @@
   width: 95%;
 }
 
+.hurry_up {
+  color: orange;
+}
+
+.time_over {
+  color: red;
+}
+
 .task_action {
   position: relative;
   display: flex;

@@ -44,7 +44,7 @@ Component({
   lifetimes: {
     attached: function () {
       let that = this
-      that.refreshStatistic(that);
+      // that.refreshStatistic(that);
     },
     show: function () {
       debugLog('lifetimes.show')
@@ -93,9 +93,11 @@ Component({
      */
     refreshStatistic: function(that){
       // debugLog('refreshStatistic')
+      let lastDate = utils.getDateFromStr(that.data.lastDate)
+      let isCount = true
       learnHistoryApi.answerTypeStatsitic(
         {
-          answerTimeStr: _.gte(that.data.lastDate)
+          answerTime: _.gte(lastDate.getTime())
         },
         0,res=>{
         // debugLog('refreshStatistic.res', res)
@@ -123,10 +125,11 @@ Component({
      * 获得艾宾浩斯遗忘统计
      */
     loadEbbingStatistics: function(that){
+      debugLog('run loadEbbingStatistics')
       utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
       let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
-      let ebbingStatsInTime = that.data.ebbingStatsInTime
-      let ebbingStatsTimeout = that.data.ebbingStatsTimeout
+      let ebbingStatsInTime = []
+      let ebbingStatsTimeout = []
 
       for (let ebbingIdx = 0; ebbingIdx < (ebbingRates.length - 1); ebbingIdx++) {
         let ebbingRate = ebbingRates[ebbingIdx]
@@ -145,17 +148,18 @@ Component({
         , countList => {
             // debugLog('ebbinghausCount.countList', countList)
           let nextRate = utils.nextEbbingRate(ebbingRates[ebbingIdx])
-          ebbingStatsInTime[ebbingIdx] = {
+          ebbingStatsInTime.push({
             rate: nextRate,
             list: countList,
             mode: learnHistoryApi.EBBING_STAT_MODE.IN_TIME,
-          }
+          })
           that.setData({
             ebbingStatsInTime: ebbingStatsInTime
           })
             // debugLog('loadEbbingStatistics', ebbingStats)
         }
         , learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
+
         // 复习超时时间统计
         learnHistoryApi.countEbbinghaus({
           question: {
@@ -170,11 +174,11 @@ Component({
           , countList => {
             // debugLog('ebbinghausCount.countList', countList)
             let nextRate = utils.nextEbbingRate(ebbingRates[ebbingIdx])
-            ebbingStatsTimeout[ebbingIdx] = {
+            ebbingStatsTimeout.push({
               rate: nextRate,
               list: countList,
               mode: learnHistoryApi.EBBING_STAT_MODE.TIMEOUT,
-            }
+            })
             that.setData({
               ebbingStatsTimeout: ebbingStatsTimeout
             })
@@ -204,6 +208,18 @@ Component({
         + "&ebbingStatMode=" + dataset.ebbingStatMode;
       wx.navigateTo({
         url: url,
+      })
+    },
+
+    /**
+     * 当点选题目类型卡
+     */
+    onTapAnswerTypeCard: function(e){
+      let that = this
+      let dataset = utils.getEventDataset(e)
+      let answerType = dataset.answerType
+      wx.navigateTo({
+        url: '/pages/lastQuestions/lastQuestions?answerType=' + answerType + '&fromDate=' + that.data.lastDate.replace(/\//gi, '-'),
       })
     }
   }

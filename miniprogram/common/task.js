@@ -25,6 +25,9 @@ var TASK_STATUS
 var TASK_STATUS_OBJ 
 var BONUS_CLASSES
 var BONUS_CLASSES_OBJ
+var TASK_FINISH_STATUS
+var TASK_FINISH_STATUS_OBJ
+
 const FILTER_ALL = { name: "所有任务", value: "ALL", orderIdx: 0}
 const TASK_DIRECT = [
   { key: '我的任务', name: '我的任务', value: 'toWho', orderIdx: 0 }
@@ -74,6 +77,8 @@ function initPage(that, callback){
   // BONUS CLASSES
   BONUS_CLASSES = utils.getConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
   BONUS_CLASSES_OBJ = utils.array2Object(BONUS_CLASSES, 'value');
+  TASK_FINISH_STATUS = gConst.TASK_FINISH_STATUS
+  TASK_FINISH_STATUS_OBJ = utils.array2Object(TASK_FINISH_STATUS, 'value')
   // userInfo
   let userInfo = utils.getUserInfo(globalData)
   // userRole
@@ -87,8 +92,10 @@ function initPage(that, callback){
     TASK_STATUS: TASK_STATUS,
     BONUS_CLASSES: BONUS_CLASSES,
     BONUS_CLASSES_OBJ: BONUS_CLASSES_OBJ,
+    TASK_FINISH_STATUS: TASK_FINISH_STATUS,
+    TASK_FINISH_STATUS_OBJ: TASK_FINISH_STATUS_OBJ,
     curTaskStatus: FILTER_ALL,
-    assignees:[]
+    assignees: [{ name: '自己', openid: userInfo.openId}]
   }
   ,()=>{
     // children
@@ -375,6 +382,23 @@ function finishTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.FINISHED.name,
     value: TASK_STATUS_OBJ.FINISHED.value,
+  }
+  // 一分钟宽容度
+  if(task.leftTime){
+    if (Math.floor(
+      task.leftTime / that.data.TASK_FINISH_STATUS_OBJ.FINISHED_AHEAD.around
+        ) > 1){
+      // 提前完成
+      task['finishStatus'] = that.data.TASK_FINISH_STATUS_OBJ.FINISHED_AHEAD
+    } else if (Math.abs(Math.floor(
+      task.leftTime / that.data.TASK_FINISH_STATUS_OBJ.FINISHED_ONTIME.around
+      )) > 0){
+      // 准时完成
+      task['finishStatus'] = that.data.TASK_FINISH_STATUS_OBJ.FINISHED_ONTIME
+    } else if (task.leftTime < 0) {
+      // 延时完成
+      task['finishStatus'] = that.data.TASK_FINISH_STATUS_OBJ.FINISHED_OVER_TIME
+    }
   }
   // debugLog('finish Task', task)
   taskApi.cloudWhereUpdate({_id: task._id }

@@ -1,1 +1,107 @@
-/* miniprogram/components/questDetailStat/questDetailStat.wxss */
+@import '../../css/common.wxss';
+@import '../../css/dialog.wxss';
+@import '../../css/list.wxss';
+.component-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+  align-self: center;
+  box-sizing: content-box;
+
+  width: 86vw;
+  height: 74vh;
+  /* border: 1vw solid black; */
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 3vw;  
+}
+
+.title {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  box-sizing: content-box;
+
+  width: 82vw;
+  height: 4vh;
+  padding: 2vw;
+  color: white;
+  font-size: 6vw;
+  font-weight: 300;
+  
+  left: 0vw;
+  top: 0vw;
+
+  border-top-left-radius: 3vw;  
+  border-top-right-radius: 3vw; 
+}
+
+.scroll-content {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-sizing: border-box;
+
+  margin-top: 4vh;
+  width: 86vw;
+  height: 70vh;
+  padding: 3vw;
+  color: black;
+  font-size: 6vw;
+  font-weight: 300;
+}
+
+.all_items {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  box-sizing: content-box;
+
+  margin-top: 4vh;
+  width: 86vw;
+  min-height: 70vh;
+  padding: 0vw;
+  color: black;
+  font-size: 6vw;
+  font-weight: 300;
+}
+
+.item {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  box-sizing: content-box;
+
+  width: 95%;
+  min-height: 10vh;
+  margin-bottom: 1vh;
+  border-bottom: 0.5vw solid gainsboro;
+}
+
+.field {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+
+  border-radius: 1vw;
+  margin: 1vw;
+  padding: vw;
+  overflow: hidden;
+  white-space: wrap;
+  text-overflow: ellipsis
+}

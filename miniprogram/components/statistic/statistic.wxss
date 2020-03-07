@@ -48,12 +48,33 @@
 .component-content {
   /* position: absolute; */
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   box-sizing: content-box;
 
+  width: 100%;
+}
+
+.in-row {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.in-column {
+  flex-direction: column;
+  flex-wrap: nowrap;
+}
+
+.stat-horizon {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin: 1vw;
   width: 100%;
 }
 
@@ -73,20 +94,7 @@
   box-shadow: 2px 2px 2px 1px rgba(13, 24, 77, 0.822);
 }
 
-.stat-vertical {
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  justify-content: space-around;
-  align-items: center;
 
-  margin: 1vw;
-  width: 27vw;
-  /* border: 4px solid black; */
-  border-radius: 3vw;
-  opacity: 1;
-  box-shadow: 2px 2px 2px 1px rgba(13, 24, 77, 0.822);
-}
 
 .title {
   display: flex;

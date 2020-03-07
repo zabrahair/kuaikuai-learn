@@ -94,3 +94,15 @@
   width: 100%;
   padding-left: 5vw;
 }
+
+.list_odd_item {
+  background: linear-gradient(70deg,  rgba(0, 0, 0, 0), 15%,rgba(89, 149, 206, 0.4),
+   60%, rgba(0, 0, 0, 0));
+}
+
+.list_even_item {
+  background: linear-gradient(250deg, rgba(0, 0, 0, 0), 15%, rgba(7, 230, 92, 0.4),
+   60%, rgba(0, 0, 0, 0));
+
+}
+

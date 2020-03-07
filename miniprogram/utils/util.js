@@ -35,11 +35,9 @@ function mergeDateTime(pDateStr, pTimeStr){
   // debugLog('bindLastDateChange.dateStr', pDateStr)
   // debugLog('bindLastDateChange.timeStr', pTimeStr)
   let dateStr = pDateStr.replace(/\//ig, '-')
-  let date = new Date(dateStr + 'T' + pTimeStr + ':00Z');
-  // debugLog('bindLastDateChange.date', date)
+  let date = new Date(dateStr + 'T' + pTimeStr + ((pTimeStr.length == 5) ? ':00Z' : 'Z'));
   // 因为中国处于东八区
   date.setHours(date.getHours() - 8)
-  // debugLog('bindLastDateChange.date', date.toLocaleString())
   return date;
 }
 
@@ -63,7 +61,11 @@ const formatDeciTimer = function(pDeciSecond, unitStartIdx){
     if (!unitStartIdx){
       unitStartIdx = 0
     }
-    let nextUnitValue = pDeciSecond
+    let isOverZero = ''
+    if (Math.abs(pDeciSecond) != pDeciSecond){
+      isOverZero = '-'
+    }
+    let nextUnitValue = Math.abs(pDeciSecond)
     let formatDeciTimerStr = ''
     let timeUnits = gConst.TIME_UNITS
     let timeUnitIdx = 0
@@ -76,7 +78,7 @@ const formatDeciTimer = function(pDeciSecond, unitStartIdx){
       timeUnitIdx +=1
       // debugLog('nextUnitValue', nextUnitValue)
     } while (nextUnitValue > 0)
-    return formatDeciTimerStr
+    return isOverZero + formatDeciTimerStr
   }catch(e){
     return '00时00分00秒0毫秒'
   }
@@ -281,10 +283,18 @@ function arrayJoin(array, joinProp, seperator){
   }
   let result = ''
   for(let i in array){
-    result += array[i][joinProp]
-    if(i < array.length -1){
-      result += seperator
+    if(typeof array[i] == 'string'){
+      result += array[i]
+      if (i < array.length - 1) {
+        result += seperator
+      }
+    }else if(typeof array[i] == 'object'){
+      result += array[i][joinProp]
+      if (i < array.length - 1) {
+        result += seperator
+      }
     }
+
   }
   return result
 }
@@ -624,6 +634,27 @@ function getFileExtension(path) {
   }
 }
 
+/**
+ * 根据属性从列表中选中一个对象
+ */
+function getObjFromArray(array, key, value){
+  for(let i in array){
+    let elem = array[i]
+    if (elem[key] == value) {
+      return elem
+    }
+  }
+}
+
+/**
+ * 通过日期数组获得Date型
+ *
+ */
+function getDateFromStr(dateStr){
+  let date = mergeDateTime(dateStr, '00:00:00')
+  return date;
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -643,7 +674,9 @@ module.exports = {
   formatDeciTimer: formatDeciTimer,
   formatDateTime: formatDateTime,
   mergeDateTime: mergeDateTime,
+  getDateFromStr: getDateFromStr,
 
+  getObjFromArray: getObjFromArray,
   getFilename: getFilename,
   getFileExtension: getFileExtension,
   isPunctuation: isPunctuation,

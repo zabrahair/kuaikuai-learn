@@ -44,7 +44,6 @@ function resetQuestionStatus(that, e, scoreTimer) {
     hitsAccuScore: 0,
     curIsCorrect: false,
     curAnswer: false,
-
     questions: questions,
     questionsDone: questionsDone,
     curQuestionIndex: curQuestionIndex,
@@ -706,9 +705,9 @@ function getEbbingQuestions(that, mode, dataLoadTimer, callback) {
   that.setData({
     curEbbingRate: curEbbingRate
   })
-  debugLog('ebbingRateName', ebbingRateName)
-  debugLog('ebbingStatMode', ebbingStatMode)
-  debugLog('curEbbingRate', curEbbingRate)
+  // debugLog('ebbingRateName', ebbingRateName)
+  // debugLog('ebbingStatMode', ebbingStatMode)
+  // debugLog('curEbbingRate', curEbbingRate)
   let tableValue = that.data.tableValue
   let allQuest = []
   utils.loadPagesData((pageIdx, loadTimer) => {
@@ -721,7 +720,7 @@ function getEbbingQuestions(that, mode, dataLoadTimer, callback) {
     , curEbbingRate
     , pageIdx
     , list => {
-      debugLog('list', list)
+      // debugLog('list', list)
       try {
         if (list.length && list.length > 0) {
           let questions = []
@@ -1496,7 +1495,7 @@ function onClickEnterInTagRoom(that, e) {
     url = '/pages/gamesRoom/selfRecite/selfRecite?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   } else if (that.data.selAnswerType == '填空题') {
     url = '/pages/gamesRoom/fillBlank/fillBlank?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
-  } else if (that.data.selAnswerType == '背文章') {
+  } else if (that.data.selAnswerType == '自助背诵') {
     url = '/pages/gamesRoom/article/article?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   }
 
@@ -1504,6 +1503,7 @@ function onClickEnterInTagRoom(that, e) {
   || that.data.gameMode == gConst.GAME_MODE.HISTORY){
     url += '&lastDate=' + that.data.lastDate
   }
+  debugLog('onClickEnterInTagRoom.url', url)
   wx.navigateTo({
     url: url
   })

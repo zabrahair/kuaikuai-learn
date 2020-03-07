@@ -21,7 +21,7 @@ function IntervalClock(interval) {
       that.runningTime += that.interval
       for (let i in that.tasks) {
         if (that.tasks[i].isEnable){
-          debugLog('task name', i)
+          // debugLog('task name', i)
           that.tasks[i].runnedTimes += 1 
           utils.runCallback(that.tasks[i].func)(that.tasks[i])
         }
