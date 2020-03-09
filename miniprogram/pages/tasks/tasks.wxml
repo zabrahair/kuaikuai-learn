@@ -1,4 +1,5 @@
 <wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<wxs module="page" src="./task.wxs"></wxs>
 <view class='container'>
   <view class='header bg_color_{{filter.randInteger(24)}}'>
     <picker 
@@ -26,21 +27,27 @@
           wx:for-items='{{tasks}}' wx:key="_id" 
           wx:for-item='task' wx:for-index='idx'>
           <view class="left">
-            <view class="task_content bg_color_{{filter.randInteger(24)}}">
-            {{task.content}}
+            <view class="task_thumbnail bg_color_{{filter.randInteger(24)}}">
+              <view wx:if="{{task.leftTime}}" 
+                class="task_left_time {{(task.leftTime < 1800000 && task.leftTime > 0)?'hurry_up':''}} {{(task.leftTime < 0)?'time_over':''}}">
+                {{filter.formatDeciTimer(task.leftTime, 1)}}
+              </view>
+              <view wx:if="{{!task.finishStatus}}" class="task_status">
+                【{{task.status.name}}】
+              </view>
+              <view wx:if="{{task.finishStatus}}" class='task_status'>
+              {{task.finishStatus.name}}
+              </view>  
+              
             </view>
+            <image class="icon bonus_icon" src="{{page.switchBonusIcon(task, BONUS_CLASSES_OBJ, TASK_FINISH_STATUS_OBJ)}}"/>
           </view>
           <view class="middle">
-            <view class="task_status">
-            【{{task.status.name}}】
-            </view>
-            <view wx:if="{{task.leftTime}}" 
+            
+            <!-- <view wx:if="{{task.leftTime}}" 
               class="task_deadline {{(task.leftTime < 1800000 && task.leftTime > 0)?'hurry_up':''}} {{(task.leftTime < 0)?'time_over':''}}">
               还有{{filter.formatDeciTimer(task.leftTime, 1)}}
-            </view>
-            <view wx:if="{{task.finishStatus}}" class='task_deadline'>
-              {{task.finishStatus.name}}
-            </view>            
+            </view> -->          
             <!-- <view class="task_deadline">
             在{{filter.formatDate(task.deadline.date)}}
             </view>
@@ -50,6 +57,7 @@
             <view class='task_deadline'>
             {{task.fromWho.name}} 委派给 {{task.toWho.name}}
             </view>
+            <text class="task_content">{{task.content}}</text>
           </view>
           <view class='right'>
             <button class="task_action" type='primary' size='mini'

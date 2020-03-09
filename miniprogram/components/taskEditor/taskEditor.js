@@ -264,7 +264,7 @@ Component({
     onTapReviewImage: function(e){
       let that = this
       let dataset = utils.getEventDataset(e)
-      debugLog('step ', dataset)
+      // debugLog('step ', dataset)
       let curUrl = dataset.finishImage.url ? dataset.finishImage.url : dataset.finishImage.path
       let finishImagesUrl = []
       let finishImages = that.data.curTask.finishImages

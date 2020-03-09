@@ -76,7 +76,7 @@ function initPage(that, callback){
   // debugLog('TASK_STATUS', TASK_STATUS)
   // BONUS CLASSES
   BONUS_CLASSES = utils.getConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
-  BONUS_CLASSES_OBJ = utils.array2Object(BONUS_CLASSES, 'value');
+  BONUS_CLASSES_OBJ = utils.array2Object(BONUS_CLASSES, 'name');
   TASK_FINISH_STATUS = gConst.TASK_FINISH_STATUS
   TASK_FINISH_STATUS_OBJ = utils.array2Object(TASK_FINISH_STATUS, 'value')
   // userInfo
@@ -266,7 +266,7 @@ function refreshMyTasks(that, isReset){
       openid: openid,
     },
   }
-
+  debugLog('where', where)
   if (that.data.curTaskStatus.value != FILTER_ALL.value){
     Object.assign(where
       , {
@@ -321,6 +321,7 @@ function createTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.ASSIGNED.name,
     value: TASK_STATUS_OBJ.ASSIGNED.value,
+    orderIdx: TASK_STATUS_OBJ.ASSIGNED.orderIdx,
   }
   // debugLog('createTask.task', task)
   taskApi.create(task, res => {
@@ -340,6 +341,7 @@ function claimTask(that, callback){
   task.status = {
     name: TASK_STATUS_OBJ.CLAIMED.name,
     value: TASK_STATUS_OBJ.CLAIMED.value,
+    orderIdx: TASK_STATUS_OBJ.CLAIMED.orderIdx,
   }
   // debugLog('claimTask', task)
   taskApi.cloudWhereUpdate({_id: task._id}
@@ -361,6 +363,7 @@ function implementTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.IMPLEMENTING.name,
     value: TASK_STATUS_OBJ.IMPLEMENTING.value,
+    orderIdx: TASK_STATUS_OBJ.IMPLEMENTING.orderIdx,
   }
   // debugLog('implementTask', task)
   taskApi.cloudWhereUpdate({ _id: task._id }
@@ -382,6 +385,7 @@ function finishTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.FINISHED.name,
     value: TASK_STATUS_OBJ.FINISHED.value,
+    orderIdx: TASK_STATUS_OBJ.FINISHED.orderIdx,
   }
   // 一分钟宽容度
   if(task.leftTime){
@@ -392,7 +396,7 @@ function finishTask(that, callback) {
       task['finishStatus'] = that.data.TASK_FINISH_STATUS_OBJ.FINISHED_AHEAD
     } else if (Math.abs(Math.floor(
       task.leftTime / that.data.TASK_FINISH_STATUS_OBJ.FINISHED_ONTIME.around
-      )) > 0){
+      )) < 1){
       // 准时完成
       task['finishStatus'] = that.data.TASK_FINISH_STATUS_OBJ.FINISHED_ONTIME
     } else if (task.leftTime < 0) {
@@ -420,6 +424,7 @@ function approveTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.APPROVED.name,
     value: TASK_STATUS_OBJ.APPROVED.value,
+    orderIdx: TASK_STATUS_OBJ.APPROVED.orderIdx,
   }
   taskApi.cloudWhereUpdate({ _id: task._id }
     , task
@@ -440,6 +445,7 @@ function cancelTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.CANCELED.name,
     value: TASK_STATUS_OBJ.CANCELED.value,
+    orderIdx: TASK_STATUS_OBJ.CANCELED.orderIdx,
   }
   taskApi.cloudWhereUpdate({ _id: task._id }
     , task
@@ -460,6 +466,7 @@ function rejectTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.REJECTED.name,
     value: TASK_STATUS_OBJ.REJECTED.value,
+    orderIdx: TASK_STATUS_OBJ.REJECTED.orderIdx,
   }
   taskApi.cloudWhereUpdate({ _id: task._id }
     , task
@@ -480,6 +487,7 @@ function deleteTask(that, callback) {
   task.status = {
     name: TASK_STATUS_OBJ.DELETED.name,
     value: TASK_STATUS_OBJ.DELETED.value,
+    orderIdx: TASK_STATUS_OBJ.DELETED.orderIdx,
   }
   task['isRemoved'] = true
   taskApi.cloudWhereUpdate({ _id: task._id }

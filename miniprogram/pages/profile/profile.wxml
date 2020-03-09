@@ -20,6 +20,9 @@
     </view>
   </view>
   <scroll-view class='content' scroll-y='true'>
+    <view class='feature' bindtap="tapProfileFeature" data-feature-name='makeRelationship'>
+      建立关系
+    </view> 
     <view wx:if="{{userInfo.userRole == '家长'}}" class='feature' bindtap="tapProfileFeature" data-feature-name='myChildren'>
     我的孩子
     </view>
@@ -42,6 +45,10 @@
     <view class='feature' bindtap="tapProfileFeature" data-feature-name='myStatistic'>
     我的统计
     </view>
+
+    <view wx:if="{{userInfo.userRole == '管理员'}}" class='feature' bindtap="tapProfileFeature" data-feature-name='manageTool'>
+    管理工具
+    </view>
     <view class='buttons'>
       <button wx:if="{{isSignIn}}" class="" type='warn' bindtap='toSignOut'>
         登出
@@ -56,5 +63,9 @@
   />
   <statistic-dialog
     isShown="{{isShownStatisticDialog}}"
+  />
+  <make-relationship
+    isShown="{{isShowMakeRelationship}}"
+    options="{{options}}"
   />
 </view>

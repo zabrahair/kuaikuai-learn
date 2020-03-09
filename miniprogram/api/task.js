@@ -29,8 +29,9 @@ function query(pWhere, pageIdx, callback) {
     .where(pWhere)
     .skip(pageIdx * perPageCount)
     .limit(perPageCount)
-    .orderBy('updateTime', 'desc')
-    .orderBy('createTime', 'desc')
+    // .orderBy('status.ordIdx', 'asc')
+    .orderBy('createTimestamp', 'desc')
+    .orderBy('status.orderIdx', 'asc')
     .get()
     .then(res => {
       // debugLog('queryPages', res)

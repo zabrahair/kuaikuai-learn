@@ -1,0 +1,51 @@
+<wxs module="filter" src="../../utils/filter.wxs"></wxs>
+<view wx:if="{{isShown}}" animation='{{switchDialogStatus}}' class='component-container'>
+  <view class='component-content view_shadow'>
+    <view class="title bg_color_{{filter.randInteger(24)}}">
+      建立关系
+    </view>
+    <!-- 昵称 -->
+    <view name="nickName" class="form_item" >
+      <text class='capital'>昵称: </text>
+      <input name="name" class="input_item"  data-content-type='nickName'
+      bindblur="bindInputBlur" placeholder="输入昵称" placeholder-class="form_item"
+      value="{{curRelationship.nickName}}" />
+    </view>
+    <!-- openid -->
+    <view name="openid" class="form_item" >
+      <text class='capital'>Open ID:</text>
+      <input name="name" class="input_item" data-content-type='openId'
+      bindblur="bindInputBlur" placeholder="输入Open ID" placeholder-class="form_item"
+      value="{{curRelationship.openid}}" />
+    </view>
+    <!-- 用户角色 -->
+    <!-- <view name="userRole" class="form_item" >
+      角色: {{curRelationship.origUserRole.name}}
+    </view> -->
+    <!-- 别名 -->
+    <view name="别名" class="form_item" >
+      <text class='capital'>别名:</text>
+      <input
+        name="name" class="input_item" data-content-type='name'
+        bindblur="bindNameBlur" placeholder="输入别名" placeholder-class="form_item"
+        value="{{curRelationship.name}}" />
+    </view>
+    <!-- 身份 -->
+    <picker 
+      name="relationship" class="form_item" 
+      bindchange="selectRelationship" value="{{index}}" 
+      range="{{USER_ROLES}}" range-key="name">
+      身份：           {{curRelationship.userRole.name}} ▾
+    </picker>  
+    <view class="actions bg_color_{{filter.randInteger(24)}}">
+      <!-- <button class="button" bindtap="onClickSave" type='default' size="mini">保存</button> -->
+      <button class="button" type='default' size="mini"
+      bindtap="onTapActions" data-action-type = "save">
+        保存
+      </button>
+    </view>
+  </view>
+  <view class='close_line'></view>
+  <image src='../../images/close.png' class='close_button' bindtap="onClose"/> 
+</view>
+ 

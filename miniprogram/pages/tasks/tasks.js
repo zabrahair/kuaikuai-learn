@@ -112,7 +112,7 @@ Page({
    */
   onScrollTouchBottom: function(e){
     let that = this
-    debugLog('when ReachBottom')
+    // debugLog('when ReachBottom')
     utils.onLoading()
     taskCommon.refreshTasks(that, false)
   },
@@ -121,7 +121,7 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-    debugLog('click share')
+    // debugLog('click share')
   },
 
   /**
@@ -166,8 +166,8 @@ Page({
     // 如果有编辑对话框传回的数值
     // 就根据这个数值刷新当前页面
     if(upTask){
-      debugLog('upTask', upTask)
-      debugLog('taskCommon.TASK_DIRECT_OBJ', taskCommon.TASK_DIRECT_OBJ)
+      // debugLog('upTask', upTask)
+      // debugLog('taskCommon.TASK_DIRECT_OBJ', taskCommon.TASK_DIRECT_OBJ)
       let curTaskStatus = that.data.curTaskStatus;
       let curTaskDirect = that.data.curTaskDirect
       switch(upTask.status.value){

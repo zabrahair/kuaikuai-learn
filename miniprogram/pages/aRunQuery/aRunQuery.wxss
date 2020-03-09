@@ -51,3 +51,32 @@ button {
   width: 95vw;
   height: 50vh;
 }
+
+.filter_picker,.last_filter,.filter_seperator{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  box-sizing: content-box;
+  height: 7vh;
+  margin-left: 0vw;
+}
+
+.scroll-content {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  justify-self: center;
+  align-self: center;
+  box-sizing: content-box;
+
+  width: 100%;
+  min-height: 100%;
+  padding: 3%;
+  color: black;
+  font-size: 6vw;
+  font-weight: 300;
+}

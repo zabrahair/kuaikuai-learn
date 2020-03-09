@@ -1,0 +1,35 @@
+function switchBonusIcon(curTask, BONUS_CLASSES_OBJ, TASK_FINISH_STATUS_OBJ){
+  // console.log('switchBonusIcon', JSON.stringify(curTask.finishStatus,null,4))
+  var statusValue = curTask.status.value
+  var curBonus = curTask.bonus
+  var curFinishStatus = curTask.finishStatus
+  var bonus = BONUS_CLASSES_OBJ[curBonus.name]
+  // console.log('switchBonusIcon', JSON.stringify(bonus, null, 4))
+  switch (statusValue) {
+    case 'CREATE':
+    case 'SAVED':
+    case 'ASSIGNED':
+    case 'RECEIVED':
+    case 'CLAIMED':
+    case 'IMPLEMENTING':
+    case 'CANCELED':
+    case 'REJECTED':
+    case 'DELETED':
+    case 'FINISHED':
+      return bonus.iconOff
+      break;
+    case 'APPROVED':
+      if (curFinishStatus.value == TASK_FINISH_STATUS_OBJ.FINISHED_OVER_TIME.value){
+        return bonus.iconOff
+      }else{
+        return bonus.iconOn
+      }
+      break;
+    default:
+  }
+}
+
+// 导出对外暴露的属性
+module.exports = {
+  switchBonusIcon: switchBonusIcon
+}

@@ -151,10 +151,35 @@ function whenAllUploaded(filesPath, callback){
   }, intervalSec)
 }
 
+function fetchImage(cloudFileId, callback){
+  wx.cloud.getTempFileURL({
+    fileList: [{
+      fileID: cloudFileId,
+      maxAge: 60 * 60 * 24 * 30, // one month
+    }],
+    success: res => {
+      // get temp file URL
+      console.log(res.fileList)
+      if (res.fileList && res.fileList.length > 0){
+        utils.runCallback(callback)(res.fileList[0])
+      }
+      
+    },
+    fail: err => {
+      // handle error
+      utils.runCallback(callback)(null)
+    },
+    complete: ()=>{
+    }
+  })
+  云函数
+}
+
 module.exports = {
   upLoadImage: upLoadImage,
   takeOrChooseImage: takeOrChooseImage,
   makeMediaFilePath: makeMediaFilePath,
   whenAllUploaded: whenAllUploaded,
-  makeFilesCloudPath: makeFilesCloudPath
+  makeFilesCloudPath: makeFilesCloudPath,
+  fetchImage: fetchImage,
 }

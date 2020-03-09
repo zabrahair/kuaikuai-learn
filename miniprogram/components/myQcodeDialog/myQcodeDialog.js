@@ -73,11 +73,13 @@ Component({
     getMyQcode(that) {
       let userInfo = utils.getUserInfo(globalData)
       // debugLog('userInfo', userInfo)
+      utils.onLoading('二维码生成中')
       wx.cloud.callFunction({
         name: 'GetMyQcode',
         data: {
           openid: userInfo._openid,
           userRole: userInfo.userRole,
+          nickName: userInfo.nickName,
         },
         success: res => {
           // debugLog('getMyQcode.res', res)
@@ -89,6 +91,9 @@ Component({
         },
         fail: error=>{
 
+        },
+        complete: ()=>{
+          utils.stopLoading()
         }
       })
     },

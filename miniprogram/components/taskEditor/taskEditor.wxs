@@ -7,6 +7,10 @@ function isDisabled(curTask, TASK_STATUS_OBJ){
 }
 
 function isItemShown(itemName, curTask, curOpenid, TASK_STATUS_OBJ){
+  // console.log('isItemShown:', JSON.stringify(itemName, null, 4))
+  // console.log('isItemShown:', JSON.stringify(curTask, null, 4))
+  // console.log('isItemShown:', JSON.stringify(curOpenid, null, 4))
+  // console.log('isItemShown:', JSON.stringify(TASK_STATUS_OBJ, null, 4))
   switch(itemName){
     case 'add_finish_image':
       if ((curTask.status.value == TASK_STATUS_OBJ.CLAIMED.value 

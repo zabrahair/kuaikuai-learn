@@ -21,7 +21,11 @@ Page({
    * 页面的初始数据
    */
   data: {
-    funcName: 'EbbingQuestions',
+    functionsIdx: 0,
+    functions: ['CountRepeated', 'EbbingCount'
+              , 'Update', 'appendBatchWords',
+                'FindRepeated','EbbingQuestions'],
+    funcName: 'CountRepeated',
     table: 'chinese-words',
     where: '',
     update: "小学三年级下，自助默写，默写卡，拼写",
@@ -94,12 +98,13 @@ Page({
   },
 
   submitAnswer: function(e){
+    let that = this
     let detail = utils.getEventDetailValue(e)
-    let functionName = detail.functionName
+    let functionName = that.data.funcName
     let tablerName = detail.tablerName
     let pWhere = detail.where
     let pUpdate = detail.update
-    // debugLog('detail', detail)d
+    debugLog('Now Fucntion', functionName)
     let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
     switch (functionName){
       case 'appendBatchWords':
@@ -131,9 +136,17 @@ Page({
               },
               success: res => {
                 debugLog('appendBatchWords.res', res)
+                that.setData({
+                  result: JSON.stringify(res, null, 4)
+                })
               },
               fail: err => {
-                console.error('【云函数】【appendBatchWords】调用失败', err)
+                console.error('【云函数】【appendBatchWords】调用失败', err.stack)
+                that.setData({
+                  result: JSON.stringify(res, null, 4)
+                    .replace(/\n/gi, '<br/>')
+                    .replace(/\s/gi, '&nbsp;')
+                })
               }
             })
           }, 300 * i)
@@ -154,13 +167,39 @@ Page({
           },
           success: res => {
             debugLog('Update.res', res)
+            that.setData({
+              result: JSON.stringify(res, null, 4)
+                .replace(/\n/gi, '<br/>')
+                .replace(/\s/gi, '&nbsp;')
+            })
           },
           fail: err => {
             console.error('【云函数】【 Update 】调用失败', err)
           }
         })
         break;
-
+      case 'CountRepeated':
+        wx.cloud.callFunction({
+          name: 'CountRepeated',
+          data: {
+            table: tablerName,
+            limit: 20,
+            pageIdx: 0
+          },
+          success: res => {
+            that.setData({
+              result: JSON.stringify(res, null, 4)
+                .replace(/\n/gi, '<br/>')
+                .replace(/\s/gi, '&nbsp;')
+            })
+            debugLog('FindRepeated.list.length', res.result.list.length)
+            debugLog('FindRepeated.list', res.result.list)
+          },
+          fail: err => {
+            console.error('【云函数】【 Update 】调用失败', err)
+          }
+        }) 
+        break;
       case 'FindRepeated': 
         wx.cloud.callFunction({
           name: 'CountRepeated',
@@ -187,6 +226,11 @@ Page({
                 pageIdx: 0
               },
               success: res => {
+                that.setData({
+                  result: JSON.stringify(res, null, 4)
+                    .replace(/\n/gi, '<br/>')
+                    .replace(/\s/gi, '&nbsp;')
+                })
                 debugLog('FindRepeated.list.length', res.result.list.length)
                 // debugLog('FindRepeated.list', res.result.list)
                 // debugLog('FindRepeated.updateResults', res.result.updateResults)
@@ -219,17 +263,35 @@ Page({
       case 'EbbingCount':
         learnHistoryApi.countEbbinghaus({}, ebbingRates[0], 0, res=>{
           debugLog('countEbbinghaus.intime.res', res)
+          that.setData({
+            result: res
+          })
         }, learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
         learnHistoryApi.countEbbinghaus({}, ebbingRates[0], 0, res => {
           debugLog('countEbbinghaus.timeout.res', res)
+          that.setData({
+            result: JSON.stringify(res, null, 4)
+              .replace(/\n/gi, '<br/>')
+              .replace(/\s/gi, '&nbsp;')
+          })
         }, learnHistoryApi.EBBING_STAT_MODE.TIMEOUT)
         break;
       case 'EbbingQuestions':
         learnHistoryApi.getEbbinghausQuestions({}, ebbingRates[0], 0, res => {
           debugLog('countEbbinghaus.intime.res', res)
+          that.setData({
+            result: JSON.stringify(res, null, 4)
+              .replace(/\n/gi, '<br/>')
+              .replace(/\s/gi, '&nbsp;')
+          })
         }, learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
         learnHistoryApi.getEbbinghausQuestions({}, ebbingRates[0], 0, res => {
           debugLog('countEbbinghaus.timeout.res', res)
+          that.setData({
+            result: result + "<br/>" + JSON.stringify(res, null, 4)
+              .replace(/\n/gi, '<br/>')
+              .replace(/\s/gi, '&nbsp;')
+          })
         }, learnHistoryApi.EBBING_STAT_MODE.TIMEOUT)
         break;      
       default:
@@ -293,6 +355,28 @@ Page({
 
   resetAnswer: function(e){
     
+  },
+
+  /**
+   *  过滤下拉框事件
+   */
+  onFilterActions: function (e) {
+    let that = this
+    let value = utils.getEventDetailValue(e)
+    let dataset = utils.getEventDataset(e)
+    let filterType = dataset.filterType
+    switch (filterType) {
+      case 'funcName':
+        let funcName = that.data.functions[value]
+        that.setData({
+          funcName: funcName,
+          functionsIdx: value,
+        })
+        break;
+      default:
+
+    }
+
   },
 
   /**

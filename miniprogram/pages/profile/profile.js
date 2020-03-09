@@ -29,8 +29,32 @@ Page({
    */
   onLoad: function (options) {
     let that = this
-    debugLog('profile.options', options)
-    that.login();
+    // debugLog('profile.options', options)
+    that.setData(
+      {options: options}
+      , ()=>{
+      that.login(()=>{
+        that.checkForMakeRelationship(that, options)
+      });
+      }
+    )
+  },
+
+  /**
+   * 判断是否有足够的options参数，打开建立联系的对话框
+   */
+  checkForMakeRelationship: function(that, options){
+    if(typeof options.openid == 'string'
+      && typeof options.userRole == 'string'
+      && typeof options.nickName == 'string'){
+      that.tapProfileFeature({
+        target : {
+          dataset:{
+            featureName: 'makeRelationship'
+          }
+        }
+      })
+    }
   },
 
   /**
@@ -51,6 +75,8 @@ Page({
     // debugLog('onShow', true)
     this.login();
   },
+
+
 
   /**
    * 生命周期函数--监听页面隐藏
@@ -102,7 +128,7 @@ Page({
   /**
    * 登陆
    */
-  login: function () {
+  login: function (callback) {
     let that = this
     let userInfo = utils.getUserInfo(globalData)
     this.setData({
@@ -166,10 +192,11 @@ Page({
                     // debugLog('globalData.userInfo', globalData.userInfo)
                     that.checkUserExisted()
                   })
-
                   that.setData({
                     authLogin: '',
                     isSignIn: true,
+                  }, ()=>{
+                    utils.runCallback(callback)()
                   })
                   utils.getTotalScore(userInfo, userScore => {
                     that.setData({
@@ -243,16 +270,9 @@ Page({
                     url: '/pages/index/index',
                   })
                 },
-
               });
-              // res.authSetting = {
-              //   "scope.userInfo": true,
-              //   "scope.userLocation": true
-              // }
-
             }
           })
-
         } else if (res.cancel) {
           errorLog('用户点击取消')
         }
@@ -290,6 +310,14 @@ Page({
     } else if (featureName == 'lastQuestions') {
       wx.navigateTo({
         url: '/pages/lastQuestions/lastQuestions',
+      })
+    } else if (featureName == 'makeRelationship') {
+      that.setData({
+        isShowMakeRelationship: true
+      })
+    } else if (featureName == 'manageTool') {
+      wx.navigateTo({
+        url: '/pages/aRunQuery/aRunQuery',
       })
     }
   }

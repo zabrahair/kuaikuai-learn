@@ -1,9 +1,17 @@
 <scroll-view class="container" scroll-Y='true'>
 <text>处理数据库</text>
-<slider class="days" bindchange="onDateRangeChange" min='1' max='100' step="-1" show-value/>
+<!-- <slider class="days" bindchange="onDateRangeChange" min='1' max='100' step="-1" show-value/> -->
 <form class="query_form"  bindsubmit="submitAnswer" bindreset="resetAnswer">
   <text>方法名</text>
-  <input class="" name='functionName' value="{{funcName}}"></input>
+  <!-- <input class="" name='functionName' value="{{funcName}}"></input> -->
+  <picker 
+  name="functionName" class='' data-filter-type='funcName'
+  bindchange="onFilterActions" value="{{functionsIdx}}" 
+  range="{{functions}}">
+    <view class="picker  filter_picker">
+    {{funcName}} ▾
+    </view>
+  </picker> 
   <text>数据库名</text>
   <input class="" name='tablerName' value="{{table}}"></input>
   <text>Where Body</text>
@@ -12,9 +20,10 @@
   <textarea class="" name='update'maxlength='-1' auto-height='true'value="{{update}}"></textarea>
   <button class="btn_answer" formType="submit" type="primary" >运行Query</button>
   <button class="btn_reset"  formType="reset" type="warn">重置</button>
-  <scroll-view class='result'>
+  <!-- <scroll-view class='result' scroll-x='true' scroll-y='true'>
     {{result}}
-  </scroll-view>
+  </scroll-view> -->
+   <rich-text class='scroll-content' nodes="{{result}}" bindtap="tap"/>
 </form>
 <dict-dialog
   isShown="{{isShownChineseMeaning}}"

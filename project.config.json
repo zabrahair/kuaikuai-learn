@@ -59,10 +59,10 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "pages/profile/profile",
+					"id": 1,
+					"name": "我的 /profile",
 					"pathName": "pages/profile/profile",
-					"query": "",
+					"query": "openid=ABCD&nickName=果果&userRole=学生",
 					"scene": null
 				},
 				{

@@ -125,7 +125,7 @@ Component({
      * 获得艾宾浩斯遗忘统计
      */
     loadEbbingStatistics: function(that){
-      debugLog('run loadEbbingStatistics')
+      // debugLog('run loadEbbingStatistics')
       utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
       let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
       let ebbingStatsInTime = []

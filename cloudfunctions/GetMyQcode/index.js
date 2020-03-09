@@ -13,16 +13,20 @@ exports.main = async (event, context) => {
   try {
     let openid = event.openid
     let userRole = event.userRole
+    let nickName = event.nickName
 
     if(openid && userRole){
-      let path = 'pages/profile/profile?openid=' + openid + '&userRole=' + userRole
+      let path = 'pages/profile/profile?'
+        + 'openid=' + openid 
+        + '&userRole=' + userRole 
+        + '&nickName=' + nickName
       const result = await cloud.openapi.wxacode.get({
         path: path,
         width: 430
       })
       console.log("result:" + JSON.stringify(result, null, 4))
       const upload = await cloud.uploadFile({
-        cloudPath: 'MyQcode/' + openid + '.png',
+        cloudPath: 'users/qcode/' + openid + '.png',
         fileContent: result.buffer
       })
       console.log("upload:" + JSON.stringify(upload, null, 4))

@@ -2,21 +2,22 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fa99211f-ad92-4a19-8755-da106abb7199" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudfunctions/Update/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/cloudfunctions/Update/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cloudfunctions/appendBatchWords/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/cloudfunctions/appendBatchWords/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/api/learnHistory.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/api/learnHistory.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cloudfunctions/GetMyQcode/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/cloudfunctions/GetMyQcode/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/miniprogram/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/common/task.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/common/task.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/components/myQcodeDialog/myQcodeDialog.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/components/myQcodeDialog/myQcodeDialog.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/miniprogram/components/statistic/statistic.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/components/statistic/statistic.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/components/statistic/statistic.wxml" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/components/statistic/statistic.wxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/const/global.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/const/global.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/pages/aRunQuery/aRunQuery.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/aRunQuery/aRunQuery.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/pages/aRunQuery/aRunQuery.wxml" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/aRunQuery/aRunQuery.wxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/article/article.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/article/article.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/common/common.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/common/common.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/selfRecite/selfRecite.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/selfRecite/selfRecite.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/words/words.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/gamesRoom/words/words.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/miniprogram/utils/util.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/utils/util.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/components/taskEditor/taskEditor.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/components/taskEditor/taskEditor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/components/taskEditor/taskEditor.wxs" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/components/taskEditor/taskEditor.wxs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/pages/profile/profile.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/profile/profile.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/pages/profile/profile.json" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/profile/profile.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/pages/profile/profile.wxml" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/profile/profile.wxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/pages/tasks/task.wxs" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/tasks/task.wxs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/pages/tasks/tasks.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/tasks/tasks.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/pages/tasks/tasks.wxml" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/tasks/tasks.wxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/pages/tasks/tasks.wxss" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/pages/tasks/tasks.wxss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/miniprogram/utils/media.js" beforeDir="false" afterPath="$PROJECT_DIR$/miniprogram/utils/media.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/project.config.json" beforeDir="false" afterPath="$PROJECT_DIR$/project.config.json" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -29,7 +30,20 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="FIRST">
+              <first_editor relative-caret-position="15">
+                <caret line="1" column="271" selection-start-line="1" selection-start-column="264" selection-end-line="1" selection-end-column="271" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -63,10 +77,11 @@
         <option value="$PROJECT_DIR$/miniprogram/pages/gamesRoom/spell/spell.js" />
         <option value="$PROJECT_DIR$/miniprogram/app.js" />
         <option value="$PROJECT_DIR$/miniprogram/test.txt" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds">
+  <component name="ProjectFrameBounds" fullScreen="true">
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="877" />
@@ -125,14 +140,16 @@
       <workItem from="1583249504692" duration="992000" />
       <workItem from="1583397353500" duration="1039000" />
       <workItem from="1583402631830" duration="299000" />
+      <workItem from="1583650974872" duration="1026000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4784000" />
+    <option name="totallyTimeSpent" value="5810000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="1440" height="877" extended-state="0" />
+    <frame x="0" y="0" width="1440" height="900" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24947146" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -210,6 +227,16 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="10" column="46" selection-start-line="10" selection-start-column="46" selection-end-line="10" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="FIRST">
+          <first_editor relative-caret-position="15">
+            <caret line="1" column="271" selection-start-line="1" selection-start-column="264" selection-end-line="1" selection-end-column="271" />
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>
