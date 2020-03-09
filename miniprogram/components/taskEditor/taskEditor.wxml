@@ -35,7 +35,7 @@
         <!-- 完成时间        -->
         <view name="deadlineDate" class='form_item'>
           <picker disabled="{{task.isDisabled(curTask, TASK_STATUS_OBJ)}}" 
-           mode="date" value="{{deadlineDate}}" 
+           mode="date" value="{{curTask.deadline.date}}" 
            start="{{deadlineDate}}" end="2099-12-31" 
            bindchange="bindDeadlineDateChange">
             <view class="picker">
@@ -43,7 +43,7 @@
             </view>
           </picker>
           <picker disabled="{{task.isDisabled(curTask, TASK_STATUS_OBJ)}}" 
-            name="deadlineTime" mode="time" value="{{deadlineTime}}" 
+            name="deadlineTime" mode="time" value="{{curTask.deadline.time}}" 
             start="00:00" end="23:59" bindchange="bindDeadlineTimeChange">
             <view class="picker">
               {{filter.formatTime(curTask.deadline.time)}} ▾ 前完成

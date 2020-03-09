@@ -122,14 +122,14 @@ function refreshList(that, isReset, callbackOnQuery, callbackOnCount, ) {
       })
     }
 
-    if (that.data.curFilterTable 
+    if (that.data.curFilterTable
       && that.data.curFilterTable.value != 'ALL') {
       where = Object.assign(where, {
         table: that.data.curFilterTable.value
       })
     }
 
-    if (that.data.curFilterAnswerType 
+    if (that.data.curFilterAnswerType
       && that.data.curFilterAnswerType.value != 'ALL') {
       where = Object.assign(where, {
         answerType: that.data.curFilterAnswerType.name
@@ -153,7 +153,7 @@ function refreshList(that, isReset, callbackOnQuery, callbackOnCount, ) {
           where
         , pageIdx
         , (totalCount => {
-          debugLog('total', totalCount)
+       //   debugLog('total', totalCount)
           that.setData({
             totalCount: totalCount
           }, () => {
@@ -209,20 +209,20 @@ function refreshDetailList(that, isReset) {
     }
     let orderBy = {
       field: 'answerTime',
-      direct: 'desc' 
+      direct: 'desc'
     }
 
-    
+
     if(isReset){
       let isCount = true
       learnHistoryApi.getAllHistory(where, null, totalCount => {
-        debugLog('total', totalCount)
+     //   debugLog('total', totalCount)
         that.setData({
           totalCount: totalCount
         })
-      }, orderBy, isCount)   
+      }, orderBy, isCount)
     }
-     
+
 
     learnHistoryApi.getAllHistory(where, pageIdx, list => {
       // debugLog('list', list)
@@ -259,12 +259,12 @@ function showQuestionDetail(that) {
 function whenIsShown(that){
   that.setData({
     histories: [],
-    totalCount: 0,    
+    totalCount: 0,
   },()=>{
     let userInfo = that.data.userInfo
     try {
       refreshDetailList(that, true)
-    } catch (err) { errorLog('err', err.stack) } 
+    } catch (err) { errorLog('err', err.stack) }
   })
 }
 

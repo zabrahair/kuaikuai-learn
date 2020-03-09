@@ -39,7 +39,7 @@ Component({
     dictMode: {
       type: String,
       value: gConst.DICT_SEARCH_MODE.WORD,
-    },    
+    },
   }),
 
   /**
@@ -55,7 +55,7 @@ Component({
       dialogCommon.initDialog(that)
     },
     show: function(){
-      debugLog('dictDialog.lifetimes.show')
+   //   debugLog('dictDialog.lifetimes.show')
     }
   },
   pageLifetimes: {
@@ -75,7 +75,7 @@ Component({
         })
         setTimeout(res => {
           wx.hideLoading()
-        }, ON_LOADING_TIMEOUT)  
+        }, ON_LOADING_TIMEOUT)
         if (dictMode == gConst.DICT_SEARCH_MODE.WORD){
           // debugLog('observers.word', word)
           that.getWordMeaning(that, table, word, res=>{
@@ -91,12 +91,12 @@ Component({
 
           })
 
-          
+
         } else if (dictMode == gConst.DICT_SEARCH_MODE.CHAR && char != null && char.length > 0){
           // debugLog('observers.char', char)
           that.searchCharMeaning(that, char);
         }
-        
+
       }
     },
   },
@@ -119,7 +119,7 @@ Component({
     searchCharMeaning(that, char) {
       let regex = new RegExp('<div class="dictionaries zdict">((?:(?!data-type-block="网友讨论).)+?)(?:<div class="zdict">[^<]+?<div class="dictentry">[^<]+?<div class="nr-box nr-box-shiyi wytl" data-type-block="网友讨论")', 'gi')
       that.searchCnMeaning(that, regex, char)
-    },    
+    },
     /**
      * 获取中文单词/字解释
      */
@@ -135,7 +135,7 @@ Component({
         timeout: 10000,
         url: uri,
         success: (res, res2) => {
-          
+
           let context = res.data.replace(/(\r|\n|\t)/gi, '')
           let rst = regex.exec(context)
           // debugLog('request.success.rst', rst)
@@ -155,7 +155,7 @@ Component({
                   throw new Error("meaning is empty")
                 },
               })
-              
+
             }
 
             // debugLog('meaning', meaning)
@@ -176,7 +176,7 @@ Component({
 
         },
         fail: (res, res2) => {
-          debugLog('request.fail.res', res)
+       //   debugLog('request.fail.res', res)
         },
         complete: (res) => {
           // debugLog('request.complete.res', res)
@@ -193,7 +193,7 @@ Component({
       })
       const MEANING_URI_PREFIX = 'https://dictionary.cambridge.org/zhs/词典/英语-汉语-简体/'
       let uri = MEANING_URI_PREFIX + content
-      debugLog('searchEnMeaning.uri', uri)
+   //   debugLog('searchEnMeaning.uri', uri)
       let timeout = 10000
       wx.request({
         method: 'GET',
@@ -244,7 +244,7 @@ Component({
 
         },
         fail: (res, res2) => {
-          debugLog('request.fail.res', res)
+       //   debugLog('request.fail.res', res)
         },
         complete: (res) => {
           // debugLog('request.complete.res', res)
@@ -258,8 +258,8 @@ Component({
     // function (e) {
     //   let that = this
     //   animation.playSwitchDialog(
-    //     that, 
-    //     animation.MAP.CLOSE_DIALOG.name, 
+    //     that,
+    //     animation.MAP.CLOSE_DIALOG.name,
     //     {},
     //     ()=>{
     //       that.setData({
@@ -269,7 +269,7 @@ Component({
     //       })
     //   })
     // },
-    /** 
+    /**
      * 朗读当前卡片
      */
     playCardText: function (e) {
@@ -279,7 +279,7 @@ Component({
       // meaning = meaning.replace(/\s/gi, '')
       // meaning = meaning.replace(/&[^;]+?;/gi, '')
       // meaning = meaning.replace(/[a-z]/gi, '')
-      
+
       // debugLog('playCardText.meaning', meaning)
       common.readCurrentWord(that, that.data.dictMode == gConst.DICT_SEARCH_MODE.WORD ? that.data.word : that.data.char)
     },
@@ -287,7 +287,7 @@ Component({
      * 更新单词的解释
      */
     updateWordMeaning: function(that, table, word, meaning){
-      debugLog('updateWordMeaning.run...')
+   //   debugLog('updateWordMeaning.run...')
       wx.cloud.callFunction({
         name: 'Update',
         data: {
@@ -311,7 +311,7 @@ Component({
      * 获取单词解释
      */
     getWordMeaning: function(that, table, word, callback){
-      debugLog('getWordMeaning.run...')
+   //   debugLog('getWordMeaning.run...')
       wx.cloud.callFunction({
         name: 'Query',
         data: {
@@ -328,7 +328,7 @@ Component({
         },
         success: res => {
           wx.hideLoading()
-          debugLog('getWordMeaning.res', res)
+       //   debugLog('getWordMeaning.res', res)
           try{
             let list = res.result.data
             if (list && list.length > 0 && list[0].htmlMeaning.length > 0) {

@@ -47,7 +47,7 @@ Component({
       // that.refreshStatistic(that);
     },
     show: function () {
-      debugLog('lifetimes.show')
+   //   debugLog('lifetimes.show')
     }
   },
   pageLifetimes: {

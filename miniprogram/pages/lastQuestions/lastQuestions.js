@@ -84,7 +84,7 @@ Page({
   onScrollTouchBottom: function (e) {
     let that = this
     utils.onLoading()
-    debugLog('onScrollTouchBottom')
+    // debugLog('onScrollTouchBottom')
     statCommon.refreshList(that, false)
   },
 
@@ -92,7 +92,7 @@ Page({
    * 用户点击右上角分享
    */
   onShareAppMessage: function () {
-    debugLog('click share')
+    // debugLog('click share')
   },
 
   /**
@@ -114,7 +114,7 @@ Page({
     let filterType = dataset.filterType
     let setDataObject = {}
 
-    debugLog('idx', idx)
+    // debugLog('idx', idx)
     switch(filterType){
       case 'fromDateOn':
         let dateStr = idx

@@ -17,8 +17,7 @@ const ON_LOADING_TIMEOUT = 10000
  * 点击标签过滤页的表名
  */
 const SELECTED_CSS = 'selected'
-function selectLang(that, e, callback) {
-  debugLog('selectLang.dataset', e.target.dataset)
+function selectLang(that, e, callback) {//   debugLog('selectLang.dataset', e.target.dataset)
   let dataset = utils.getEventDataset(e)
   let value = dataset.langValue
   let idx = parseInt(dataset.langIdx)
@@ -158,7 +157,7 @@ function searchCnMeaning(that, regex, content){
 
     },
     fail: (res, res2) => {
-      debugLog('request.fail.res', res)
+   //   debugLog('request.fail.res', res)
     },
     complete: (res) => {
       // debugLog('request.complete.res', res)
@@ -175,7 +174,7 @@ function searchEnMeaning(that, content) {
   })
   const MEANING_URI_PREFIX = 'https://dictionary.cambridge.org/zhs/词典/英语-汉语-简体/'
   let uri = MEANING_URI_PREFIX + content
-  debugLog('searchEnMeaning.uri', uri)
+// debugLog('searchEnMeaning.uri', uri)
   let timeout = 10000
   wx.request({
     method: 'GET',
@@ -226,7 +225,7 @@ function searchEnMeaning(that, content) {
 
     },
     fail: (res, res2) => {
-      debugLog('request.fail.res', res)
+   //   debugLog('request.fail.res', res)
     },
     complete: (res) => {
       // debugLog('request.complete.res', res)
@@ -257,7 +256,7 @@ function launchSearchKeyword(that){
         }
       }
     })
-  } else if (dictMode == gConst.DICT_SEARCH_MODE.CHAR 
+  } else if (dictMode == gConst.DICT_SEARCH_MODE.CHAR
     && word != null && word.length > 0) {
     // debugLog('observers.char', char)
     searchCharMeaning(that, word);
@@ -286,7 +285,7 @@ function setDictMode(that, e,  callback){
   }, ()=>{
     if(callback && typeof callback == 'function'){
       callback(that)
-    }  
+    }
   })
 }
 
@@ -294,7 +293,7 @@ function setDictMode(that, e,  callback){
  * 获取单词解释
  */
 function getWordMeaning(that, table, word, callback) {
-  debugLog('getWordMeaning.run...')
+  // debugLog('getWordMeaning.run...')
   wx.cloud.callFunction({
     name: 'Query',
     data: {
@@ -311,7 +310,7 @@ function getWordMeaning(that, table, word, callback) {
     },
     success: res => {
       wx.hideLoading()
-      debugLog('getWordMeaning.res', res)
+   //   debugLog('getWordMeaning.res', res)
       try {
         let list = res.result.data
         if (list && list.length > 0 && list[0].htmlMeaning.length > 0) {
@@ -337,7 +336,7 @@ function getWordMeaning(that, table, word, callback) {
  * 更新单词的解释
  */
 function updateWordMeaning(that, table, word, meaning) {
-  debugLog('updateWordMeaning.run...')
+  // debugLog('updateWordMeaning.run...')
   wx.cloud.callFunction({
     name: 'Update',
     data: {

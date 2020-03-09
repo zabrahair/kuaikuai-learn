@@ -14,7 +14,7 @@ function getUserConfigs(ifRefresh, updateConfigs) {
     if (userInfo.openId) {
       userApi.getUserConfigs(userInfo.openId
         , res => {
-          debugLog('getUserConfigs.res', res)
+          // debugLog('getUserConfigs.res', res)
           if (!res || updateConfigs) {
             // no user configs in db
             // create a user configs object in db
@@ -26,7 +26,7 @@ function getUserConfigs(ifRefresh, updateConfigs) {
               userInfo.openId
               , config
               , res => {
-                debugLog('getUserConfigs.updateUserConfigs.res', res);
+                // debugLog('getUserConfigs.updateUserConfigs.res', res);
               })
           } else {
             // user configs exists in db

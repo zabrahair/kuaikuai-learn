@@ -23,7 +23,7 @@ Page({
     
   }),
 
-  timer: new IntervalClock(1000),
+  timer: new IntervalClock(30000),
 
   /**
    * 生命周期函数--监听页面加载
@@ -176,25 +176,25 @@ Page({
           curTaskDirect = taskCommon.TASK_DIRECT_OBJ['委派他人']
           break;
         case 'CLAIMED':
-          curTaskStatus = upTask.status
+          // curTaskStatus = upTask.status
           curTaskDirect = taskCommon.TASK_DIRECT_OBJ['我的任务']
           break;
         case 'FINISHED':
-          curTaskStatus = upTask.status
+          // curTaskStatus = upTask.status
           curTaskDirect = taskCommon.TASK_DIRECT_OBJ['我的任务']
           break;
         case 'APPROVED':
-          curTaskStatus = upTask.status
+          // curTaskStatus = upTask.status
           curTaskDirect = taskCommon.TASK_DIRECT_OBJ['委派他人']
           break;
         case 'CANCELED':
-          curTaskStatus = upTask.status
+          // curTaskStatus = upTask.status
           curTaskDirect = taskCommon.TASK_DIRECT_OBJ['委派他人']
           break;
         case 'DELETED':
           break;
         case 'REJECTED':
-          curTaskStatus = upTask.status
+          // curTaskStatus = upTask.status
           curTaskDirect = taskCommon.TASK_DIRECT_OBJ['我的任务']
           break;
         default:

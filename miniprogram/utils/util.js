@@ -506,7 +506,7 @@ function runCallback(callback){
     return callback
   }else{
     return ()=>{
-      debugLog('I am a null fuction')
+      // debugLog('I am a null fuction')
     }
   }
 }

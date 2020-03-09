@@ -44,7 +44,7 @@ function createUser(insertData, callback) {
     data: insertData,
     success: res => {
       let result = res;
-      debugLog('【插入结果】user', result);
+   //   debugLog('【插入结果】user', result);
       utils.runCallback(callback)(result)
     },
     fail: err => {
@@ -52,7 +52,7 @@ function createUser(insertData, callback) {
         icon: 'none',
         title: '插入记录失败'
       })
-      debugLog('[数据库USER] [插入记录] 失败：', err.stack)
+   //   debugLog('[数据库USER] [插入记录] 失败：', err.stack)
     }
   })
 }

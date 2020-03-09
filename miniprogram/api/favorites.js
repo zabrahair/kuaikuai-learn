@@ -29,7 +29,7 @@ const createFavorite = function (tableName, insertData, callback) {
     data: favorite,
     success: res => {
       let result = res;
-      debugLog('【插入结果】user', result);
+      // debugLog('【插入结果】user', result);
       callback(result)
     },
     fail: err => {
@@ -37,7 +37,7 @@ const createFavorite = function (tableName, insertData, callback) {
         icon: 'none',
         title: '插入记录失败'
       })
-      debugLog('[数据库USER] [插入记录] 失败：', err)
+      // debugLog('[数据库USER] [插入记录] 失败：', err)
     }
   })
 }
@@ -94,7 +94,7 @@ const removeFavorite = function (tableName, removeData, callback) {
   }).remove({
     success: res => {
       let result = res;
-      debugLog('【删除结果】 favorites count:', result);
+      // debugLog('【删除结果】 favorites count:', result);
       callback(result)
     },
     fail: err => {
@@ -102,7 +102,7 @@ const removeFavorite = function (tableName, removeData, callback) {
         icon: 'none',
         title: '删除记录失败'
       })
-      debugLog('[数据库USER] [删除记录] 失败：', err)
+      // debugLog('[数据库USER] [删除记录] 失败：', err)
     }
   })
 }
@@ -115,7 +115,7 @@ function getTags(tableName, pWhere, pageIdx, callback){
     table: tableName,
   }
   Object.assign(where, {thing: pWhere})
-  debugLog('where', where)
+  // debugLog('where', where)
 
   db.collection(TABLE)
     .aggregate()

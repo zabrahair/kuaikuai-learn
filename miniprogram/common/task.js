@@ -19,8 +19,8 @@ const configsApi = require('../api/configs.js')
 
 const dialogCommon = require('../common/dialog.js')
 
-const USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
-const USER_ROLES = wx.getStorageSync(gConst.USER_ROLES_KEY)
+var USER_ROLE_OBJS
+var USER_ROLES
 var TASK_STATUS
 var TASK_STATUS_OBJ 
 var BONUS_CLASSES
@@ -67,9 +67,11 @@ function defaultEditorData(selfData){
  * 初始化页面
  */
 function initPage(that, callback){
-  // fetch configs
-  utils.refreshConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
-  utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
+  // // fetch configs
+  // utils.refreshConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
+  // utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
+  USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
+  USER_ROLES = wx.getStorageSync(gConst.USER_ROLES_KEY)
   // TASK STATUS
   TASK_STATUS = utils.getConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
   TASK_STATUS_OBJ = utils.array2Object(TASK_STATUS, 'value');
@@ -152,8 +154,8 @@ function getTaskTemplate(){
       content: null,
       bonus:  {name: '新兵', value: 1},
       deadline: {
-        date: '2020/02/20',
-        time: '00:12'
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
       },
 
       createTime: '',
@@ -266,7 +268,7 @@ function refreshMyTasks(that, isReset){
       openid: openid,
     },
   }
-  debugLog('where', where)
+  // debugLog('where', where)
   if (that.data.curTaskStatus.value != FILTER_ALL.value){
     Object.assign(where
       , {

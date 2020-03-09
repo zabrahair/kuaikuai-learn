@@ -94,10 +94,10 @@ function updateRelationship(that, callback){
       })
     } else {
       let curUser = result[0]
-      debugLog('curUser', curUser)
+   //   debugLog('curUser', curUser)
       let curRelationship = that.data.curRelationship
       let updateData = {}
-      debugLog('curRelationship', curRelationship)
+   //   debugLog('curRelationship', curRelationship)
       switch (curRelationship.userRole.value){
         case 'STUDENT':
           let children = curUser.children
@@ -140,7 +140,7 @@ function updateRelationship(that, callback){
           break;
         default:
       }
-      debugLog('updateData', updateData)
+   //   debugLog('updateData', updateData)
       // else update the user info with login time
       userApi.updateUser(curUser._id,
         updateData,
@@ -151,7 +151,7 @@ function updateRelationship(that, callback){
           utils.runCallback(callback)(curUser)
       })
     }
-  })  
+  })
 }
 
 module.exports = {

@@ -38,14 +38,14 @@ Component({
   data: dialogCommon.defaultDialogData({
     meaning: '',
   }),
-  
+
   observers: {lifetimes: {
     attached: function () {
       let that = this
       dialogCommon.initDialog(that)
     },
     show: function () {
-      debugLog('lifetimes.show')
+   //   debugLog('lifetimes.show')
     }
   },
   pageLifetimes: {
@@ -55,7 +55,7 @@ Component({
   },
     'isShown': function (isShown) {
       let that = this
-      debugLog('observers.isShown', isShown)
+   //   debugLog('observers.isShown', isShown)
       if (isShown == true) {
         dialogCommon.whenIsShown(that)
         that.getMyQcode(that)

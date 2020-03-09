@@ -39,7 +39,7 @@ Component({
         dialogCommon.initDialog(that)
       },
       show: function () {
-        debugLog('lifetimes.show')
+     //   debugLog('lifetimes.show')
       }
     },
     pageLifetimes: {
@@ -60,7 +60,7 @@ Component({
    * 组件的方法列表
    */
   methods: {
-    
+
     /**
      * Scroll View touch bottom
      */

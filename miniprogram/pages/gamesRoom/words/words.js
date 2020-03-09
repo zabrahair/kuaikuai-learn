@@ -122,14 +122,14 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    debugLog('words.options', options)
+    // debugLog('words.options', options)
     let that = this
     that.initOnLoad(that, options)
     that.whenPageOnShow(that)
   },
 
   initOnLoad: function (that, options) {
-    debugLog('initOnLoad.options', options)
+    // debugLog('initOnLoad.options', options)
     let gameMode = options.gameMode;
     let tableValue = options.tableValue
     let tableName = options.tableName
@@ -270,13 +270,13 @@ Page({
     let isCorrect = false
     try{
       dataset = utils.getEventDataset(e)
-      debugLog('submitAnswer.dataset', dataset)
+      // debugLog('submitAnswer.dataset', dataset)
       manualCheckResult = dataset.manualCheckResult
       for(let i in MANUAL_CHECK_RESULT){
         if (manualCheckResult == MANUAL_CHECK_RESULT[i].name){
-          debugLog('MANUAL_CHECK_RESULT[i].value', MANUAL_CHECK_RESULT[i].value)
+          // debugLog('MANUAL_CHECK_RESULT[i].value', MANUAL_CHECK_RESULT[i].value)
           if (MANUAL_CHECK_RESULT[i].value == true){
-            debugLog('curQuestion.word', curQuestion.word)
+            // debugLog('curQuestion.word', curQuestion.word)
             answer = curQuestion.word
           }
           break;
@@ -325,7 +325,7 @@ Page({
    */
   resetAnswer: function (e) {
     let that = this
-    debugLog('resetAnswer.e', e)
+    // debugLog('resetAnswer.e', e)
     if (that.checkPauseStatus()) {
       return;
     }
@@ -336,10 +336,10 @@ Page({
         content: MSG.CONFIRM_RESET_MSG,
         success(res) {
           if (res.confirm) {
-            debugLog('用户点击确定')
+            // debugLog('用户点击确定')
             common.resetQuestionStatus(that, e, scoreTimer)
           } else if (res.cancel) {
-            errorLog('用户点击取消')
+            // errorLog('用户点击取消')
           }
         }
       })
@@ -431,7 +431,7 @@ Page({
    */
   bindLastDateChange: function (e) {
     let that = this
-    debugLog('bindLastDateChange.e', e)
+ //   debugLog('bindLastDateChange.e', e)
     let lastDate = utils.getEventDetailValue(e);
     let lastTime = that.data.lastTime;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -446,7 +446,7 @@ Page({
    */
   bindLastTimeChange: function (e) {
     let that = this
-    debugLog('bindLastTimeChange.e', e)
+ //   debugLog('bindLastTimeChange.e', e)
     let lastDate = that.data.lastDate;
     let lastTime = e.detail.value;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -463,7 +463,7 @@ Page({
    */
   onClickSearch: function (e) {
     let that = this
-    debugLog('search now...')
+ //   debugLog('search now...')
     common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer();
   },
@@ -553,7 +553,7 @@ Page({
     let dictSearchChar = null
     try {
       let dataset = utils.getEventDataset(e)
-      debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
+   //   debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
       if (dataset.spellCard.letter.length > 0) {
         dictMode = gConst.DICT_SEARCH_MODE.CHAR
         dictSearchChar = dataset.spellCard.letter

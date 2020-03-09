@@ -51,7 +51,7 @@ Component({
       let that = this
       dialogCommon.whenIsShown(that, () => {
         // debugLog('observers.isShown', isShown)
-        debugLog('options', options)
+     //   debugLog('options', options)
         relationCommon.whenIsShown(that)
       })
     },
@@ -113,11 +113,11 @@ Component({
       let dataset = utils.getEventDataset(e)
       let actionType = dataset.actionType
       switch(actionType){
-        case 'save': 
+        case 'save':
           relationCommon.updateRelationship(
             that,
             userInfo=>{
-              debugLog('on close')
+           //   debugLog('on close')
               dialogCommon.onClose(null, that)
           })
           break;

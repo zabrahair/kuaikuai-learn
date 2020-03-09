@@ -45,7 +45,7 @@ Component({
     attached: function () {
       let that = this
       taskCommon.initEditor(that)
-  
+
     },
 
     show: function () {
@@ -67,7 +67,7 @@ Component({
       let that = this
       dialogCommon.whenIsShown(that, ()=>{
           // debugLog('observers.isShown', isShown)
-          debugLog('curTask', that.data.curTask)
+       //   debugLog('curTask', that.data.curTask)
           // debugLog('TASK_STATUS_OBJ', that.data.TASK_STATUS_OBJ)
           taskCommon.whenIsShown(that)
       })
@@ -94,7 +94,7 @@ Component({
         name: that.data.assignees[selIdx].name,
         openid: that.data.assignees[selIdx].openid,
       }
-      debugLog('selectAssingee.value', value)
+      // debugLog('selectAssingee.value', selIdx)
       that.setData({
         selAssigneeIdx: selIdx,
         curTask: curTask,
@@ -165,7 +165,7 @@ Component({
     onTapTaskActions: function(e){
       let that = this
       let dataset = utils.getEventDataset(e)
-      debugLog('dataset', dataset)
+   //   debugLog('dataset', dataset)
       let toUpdateStatus = dataset.toUpdateStatus
       let TASK_STATUS_OBJ = that.data.TASK_STATUS_OBJ
       let processFunc = null
@@ -182,14 +182,14 @@ Component({
           processFunc = taskCommon.implementTask
           taskCommon.uploadAndUpdateTask(that, processFunc, ()=>{
 
-          }) 
+          })
           break;
         case 'FINISHED':
           isDone = true
           processFunc = taskCommon.finishTask
           taskCommon.uploadAndUpdateTask(that, processFunc, ()=>{
 
-          })     
+          })
           break;
         case 'APPROVED':
           processFunc = taskCommon.approveTask
@@ -249,11 +249,11 @@ Component({
         }else{
           curTask['finishImages'] = filesPath
         }
-        
+
         that.setData({
           curTask: curTask
         },()=>{
-            debugLog('addFinishImage.curTask.finishImages', that.data.curTask.finishImages)
+         //   debugLog('addFinishImage.curTask.finishImages', that.data.curTask.finishImages)
         })
       })
     },

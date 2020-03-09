@@ -72,7 +72,7 @@ function IntervalClock(interval) {
 function Sample(){
   let timer = new IntervalClock(3000)
   timer.addTask('print', (task) => {
-    debugLog('I am invoker', new Date().toTimeString())
+    // debugLog('I am invoker', new Date().toTimeString())
     if (task.runnedTimes > 3) {
       timer.stop()
     }

@@ -59,7 +59,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    
+
   },
 
   /**
@@ -104,7 +104,7 @@ Page({
     let tablerName = detail.tablerName
     let pWhere = detail.where
     let pUpdate = detail.update
-    debugLog('Now Fucntion', functionName)
+ //   debugLog('Now Fucntion', functionName)
     let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
     switch (functionName){
       case 'appendBatchWords':
@@ -135,7 +135,7 @@ Page({
                 }
               },
               success: res => {
-                debugLog('appendBatchWords.res', res)
+             //   debugLog('appendBatchWords.res', res)
                 that.setData({
                   result: JSON.stringify(res, null, 4)
                 })
@@ -166,7 +166,7 @@ Page({
             }
           },
           success: res => {
-            debugLog('Update.res', res)
+         //   debugLog('Update.res', res)
             that.setData({
               result: JSON.stringify(res, null, 4)
                 .replace(/\n/gi, '<br/>')
@@ -192,15 +192,15 @@ Page({
                 .replace(/\n/gi, '<br/>')
                 .replace(/\s/gi, '&nbsp;')
             })
-            debugLog('FindRepeated.list.length', res.result.list.length)
-            debugLog('FindRepeated.list', res.result.list)
+         //   debugLog('FindRepeated.list.length', res.result.list.length)
+         //   debugLog('FindRepeated.list', res.result.list)
           },
           fail: err => {
             console.error('【云函数】【 Update 】调用失败', err)
           }
-        }) 
+        })
         break;
-      case 'FindRepeated': 
+      case 'FindRepeated':
         wx.cloud.callFunction({
           name: 'CountRepeated',
           data: {
@@ -209,13 +209,13 @@ Page({
             pageIdx: 0
           },
           success: res => {
-            debugLog('FindRepeated.list.length', res.result.list.length)
-            debugLog('FindRepeated.list', res.result.list)
+         //   debugLog('FindRepeated.list.length', res.result.list.length)
+         //   debugLog('FindRepeated.list', res.result.list)
           },
           fail: err => {
             console.error('【云函数】【 Update 】调用失败', err)
           }
-        }) 
+        })
         for (let i=0; i < 1; i++){
           setTimeout(() => {
             wx.cloud.callFunction({
@@ -231,17 +231,17 @@ Page({
                     .replace(/\n/gi, '<br/>')
                     .replace(/\s/gi, '&nbsp;')
                 })
-                debugLog('FindRepeated.list.length', res.result.list.length)
+             //   debugLog('FindRepeated.list.length', res.result.list.length)
                 // debugLog('FindRepeated.list', res.result.list)
                 // debugLog('FindRepeated.updateResults', res.result.updateResults)
-                debugLog('FindRepeated.updateResults.length', res.result.updateResults.length)
+             //   debugLog('FindRepeated.updateResults.length', res.result.updateResults.length)
                 // debugLog('FindRepeated.removeResults', res.result.removeResults)
-                debugLog('FindRepeated.removeResults.length', res.result.removeResults.length)
+             //   debugLog('FindRepeated.removeResults.length', res.result.removeResults.length)
               },
               fail: err => {
                 console.error('【云函数】【 Update 】调用失败', err)
               }
-            }) 
+            })
           }, 3000 * i )
         }
         wx.cloud.callFunction({
@@ -252,23 +252,23 @@ Page({
             pageIdx: 0
           },
           success: res => {
-            debugLog('FindRepeated.list.length', res.result.list.length)
-            debugLog('FindRepeated.list', res.result.list)
+         //   debugLog('FindRepeated.list.length', res.result.list.length)
+         //   debugLog('FindRepeated.list', res.result.list)
           },
           fail: err => {
             console.error('【云函数】【 Update 】调用失败', err)
           }
-        }) 
+        })
         break;
       case 'EbbingCount':
         learnHistoryApi.countEbbinghaus({}, ebbingRates[0], 0, res=>{
-          debugLog('countEbbinghaus.intime.res', res)
+       //   debugLog('countEbbinghaus.intime.res', res)
           that.setData({
             result: res
           })
         }, learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
         learnHistoryApi.countEbbinghaus({}, ebbingRates[0], 0, res => {
-          debugLog('countEbbinghaus.timeout.res', res)
+       //   debugLog('countEbbinghaus.timeout.res', res)
           that.setData({
             result: JSON.stringify(res, null, 4)
               .replace(/\n/gi, '<br/>')
@@ -278,7 +278,7 @@ Page({
         break;
       case 'EbbingQuestions':
         learnHistoryApi.getEbbinghausQuestions({}, ebbingRates[0], 0, res => {
-          debugLog('countEbbinghaus.intime.res', res)
+       //   debugLog('countEbbinghaus.intime.res', res)
           that.setData({
             result: JSON.stringify(res, null, 4)
               .replace(/\n/gi, '<br/>')
@@ -286,20 +286,20 @@ Page({
           })
         }, learnHistoryApi.EBBING_STAT_MODE.IN_TIME)
         learnHistoryApi.getEbbinghausQuestions({}, ebbingRates[0], 0, res => {
-          debugLog('countEbbinghaus.timeout.res', res)
+       //   debugLog('countEbbinghaus.timeout.res', res)
           that.setData({
             result: result + "<br/>" + JSON.stringify(res, null, 4)
               .replace(/\n/gi, '<br/>')
               .replace(/\s/gi, '&nbsp;')
           })
         }, learnHistoryApi.EBBING_STAT_MODE.TIMEOUT)
-        break;      
+        break;
       default:
-    }   
+    }
 
 
     /* test start */
-    // // debugLog('submitAnswer.e',e)
+    // debugLog('submitAnswer.e',e)
     // let form = utils.getEventDetailValue(e)
     // debugLog('submitAnswer.form', form)
     // let where = JSON.parse(form.where)
@@ -341,7 +341,7 @@ Page({
     // //   success: res => {
     // //     let result = res;
     // //     debugLog('[数据库' + table + '][更新记录]成功', result);
- 
+
     // //   },
     // //   fail: err => {
     // //     wx.showToast({
@@ -354,7 +354,7 @@ Page({
   },
 
   resetAnswer: function(e){
-    
+
   },
 
   /**

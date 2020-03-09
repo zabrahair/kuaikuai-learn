@@ -116,7 +116,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    debugLog('selfRecite.options', options)
+ //   debugLog('selfRecite.options', options)
     let that = this
     that.initOnLoad(that, options);
     that.whenPageOnShow(that)
@@ -361,7 +361,7 @@ Page({
         content: MSG.CONFIRM_RESET_MSG,
         success(res) {
           if (res.confirm) {
-            debugLog('用户点击确定')
+         //   debugLog('用户点击确定')
             common.resetQuestionStatus(that, e, scoreTimer)
           } else if (res.cancel) {
             errorLog('用户点击取消')
@@ -424,7 +424,7 @@ Page({
    */
   bindLastDateChange: function (e) {
     let that = this
-    debugLog('bindLastDateChange.e', e)
+ //   debugLog('bindLastDateChange.e', e)
     let lastDate = e.detail.value;
     let lastTime = that.data.lastTime;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -440,7 +440,7 @@ Page({
    */
   bindLastTimeChange: function (e) {
     let that = this
-    debugLog('bindLastTimeChange.e', e)
+ //   debugLog('bindLastTimeChange.e', e)
     let lastDate = that.data.lastDate;
     let lastTime = e.detail.value;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -457,7 +457,7 @@ Page({
    */
   onClickSearch: function (e) {
     let that = this
-    debugLog('search now...')
+ //   debugLog('search now...')
     common.getQuestions(that, that.data.gameMode, dataLoadTimer);
     that.resetAnswer();
   },
@@ -475,7 +475,7 @@ Page({
         // 当卡没反过来的时候
       }
       ,pThat=>{
-        debugLog('curSentences', pThat.data.curSentences)
+     //   debugLog('curSentences', pThat.data.curSentences)
         pThat.setData({
           curSentences: pThat.data.curSentences
         })

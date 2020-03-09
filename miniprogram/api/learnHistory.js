@@ -27,7 +27,7 @@ const create = function (pHistory, callback) {
     data: history,
     success: res => {
       let result = res;
-      debugLog('【插入结果】 history', result);
+      // debugLog('【插入结果】 history', result);
       callback(result)
     },
     fail: err => {
@@ -35,7 +35,7 @@ const create = function (pHistory, callback) {
         icon: 'none',
         title: '插入记录失败'
       })
-      debugLog('[数据库history] [插入记录] 失败：', err)
+      // debugLog('[数据库history] [插入记录] 失败：', err)
     }
   })
 }
@@ -332,7 +332,7 @@ function findLastHistory(pQuestionTable, pQuestionId, callback){
     .limit(1)
     .get()
     .then(res => {
-      debugLog('findLastHistory', res)
+      // debugLog('findLastHistory', res)
       // debugLog('findLastHistory.length', res.data.length)
       if (res.data.length > 0) {
         callback(res.data[0])
@@ -538,9 +538,9 @@ function getLastQuestions(pMatch, pageIdx = 0, callback, isCount){
     Object.assign(match, pMatch)
   }
   let now = new Date()
-  debugLog('match', match)
-  debugLog('pageIdx', pageIdx)
-  debugLog('isCount', isCount)
+  // debugLog('match', match)
+  // debugLog('pageIdx', pageIdx)
+  // debugLog('isCount', isCount)
   let dbAggr = db.collection(TABLE).aggregate()
     .match(match)
     .project({
@@ -553,7 +553,7 @@ function getLastQuestions(pMatch, pageIdx = 0, callback, isCount){
         word: 1,
         topic: 1,
         author: 1,
-        time: 1, 
+        time: 1,
         country: 1,
         meaning: 1,
         tags: 1,
@@ -597,7 +597,7 @@ function getLastQuestions(pMatch, pageIdx = 0, callback, isCount){
       .count('total')
       .end()
       .then(res => {
-        debugLog('getLastQuestions.res', res)
+     //   debugLog('getLastQuestions.res', res)
         if (res.list[0] && res.list[0].total > 0) {
           utils.runCallback(callback)(res.list[0].total)
           return
@@ -608,7 +608,7 @@ function getLastQuestions(pMatch, pageIdx = 0, callback, isCount){
       .catch(err => {
         errorLog('getLastQuestions.err', err.stack)
         utils.runCallback(callback)(-1)
-      })    
+      })
 
   }else{
     dbAggr
@@ -616,7 +616,7 @@ function getLastQuestions(pMatch, pageIdx = 0, callback, isCount){
       .limit(perPageCount)
       .end()
       .then(res => {
-        debugLog('getLastQuestions.res', res)
+     //   debugLog('getLastQuestions.res', res)
         // debugLog('questCorrectStat.res', res.list)
         // debugLog('getTags.length', res.list.length)
         if (res.list.length > 0) {
@@ -645,7 +645,7 @@ function getAllHistory(pWhere, pageIdx, callback, pOrderBy, isCount=false){
     Object.assign(where, pWhere)
   }
 
-  let dbSearch = 
+  let dbSearch =
   db.collection(TABLE)
     .where(where)
     .field({
@@ -662,7 +662,7 @@ function getAllHistory(pWhere, pageIdx, callback, pOrderBy, isCount=false){
         country: true,
       },
       ebbStamp: true,
-      isCorrect: true,      
+      isCorrect: true,
     })
     .orderBy(pOrderBy.field, pOrderBy.direct)
 

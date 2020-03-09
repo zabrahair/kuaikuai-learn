@@ -607,8 +607,8 @@ Page({
 
     for (let i in curSpellCards){
       // debugLog('showOneMoreAnswer.i:',i)
-      debugLog('curSpellCards[i].usedCardIdx', curSpellCards[i])
-      debugLog('that.data.curQuestion', that.data.curQuestion)
+      // debugLog('curSpellCards[i].usedCardIdx', curSpellCards[i])
+      // debugLog('that.data.curQuestion', that.data.curQuestion)
       if (curSpellCards[i].usedCardIdx == null){
         // debugLog('curSpellCards[i].blankValue == BLANK_EMPTY')
         // 填上一个正确答案，只添一个
@@ -684,7 +684,7 @@ Page({
     let dictSearchChar = null
     try {
       let dataset = utils.getEventDataset(e)
-      debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
+      // debugLog('dataset.spellCard.letter', dataset.spellCard.letter)
       if (dataset.spellCard.letter.length > 0) {
         dictMode = gConst.DICT_SEARCH_MODE.CHAR
         dictSearchChar = dataset.spellCard.letter

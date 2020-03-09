@@ -43,7 +43,7 @@ Component({
   observers: {
     'isShown': function (isShown) {
       let that = this
-      debugLog('observers.isShown', isShown)
+   //   debugLog('observers.isShown', isShown)
       if (isShown == true) {
         that.getMyQcode(that)
 

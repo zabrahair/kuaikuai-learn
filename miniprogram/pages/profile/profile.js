@@ -258,12 +258,12 @@ Page({
       content: MSG.SIGNOUT_CONFIRM_MSG,
       success(res) {
         if (res.confirm) {
-          debugLog('用户点击确定')
+          // debugLog('用户点击确定')
           wx.openSetting({
             success(res) {
               console.log(res.authSetting)
               delete globalData.userInfo
-              debugLog('globalData', globalData)
+              // debugLog('globalData', globalData)
               wx.clearStorage({
                 complete: function(e){
                   wx.switchTab({

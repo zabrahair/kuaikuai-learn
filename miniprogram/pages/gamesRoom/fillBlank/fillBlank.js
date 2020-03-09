@@ -251,8 +251,8 @@ Page({
 
     // debugLog('formValues', formValues)
 
-    debugLog('curQuestion.answer', curQuestion)
-    debugLog('answer', answer)
+ //   debugLog('curQuestion.answer', curQuestion)
+ //   debugLog('answer', answer)
     // 同時針對回車和Button提交
     isCorrect = that.checkAnswer(curQuestion.result, answer)
     // debugLog('isCorrect', isCorrect)
@@ -287,7 +287,7 @@ Page({
    */
   resetAnswer: function (e) {
     let that = this
-    debugLog('resetAnswer.e', e)
+ //   debugLog('resetAnswer.e', e)
     if (that.checkPauseStatus()) {
       return;
     }
@@ -298,7 +298,7 @@ Page({
         content: MSG.CONFIRM_RESET_MSG,
         success(res) {
           if (res.confirm) {
-            debugLog('用户点击确定')
+         //   debugLog('用户点击确定')
             common.resetQuestionStatus(that, e, scoreTimer)
           } else if (res.cancel) {
             errorLog('用户点击取消')
@@ -384,7 +384,7 @@ Page({
    */
   bindLastDateChange: function (e) {
     let that = this
-    debugLog('bindLastDateChange.e', e)
+ //   debugLog('bindLastDateChange.e', e)
     let lastDate = e.detail.value;
     let lastTime = that.data.lastTime;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -399,7 +399,7 @@ Page({
    */
   bindLastTimeChange: function (e) {
     let that = this
-    debugLog('bindLastTimeChange.e', e)
+ //   debugLog('bindLastTimeChange.e', e)
     let lastDate = that.data.lastDate;
     let lastTime = e.detail.value;
     let date = utils.mergeDateTime(lastDate, lastTime)
@@ -416,7 +416,7 @@ Page({
    */
   onClickSearch: function (e) {
     let that = this
-    debugLog('search now...')
+ //   debugLog('search now...')
     common.getQuestions(that, that.data.gameMode, dataLoadTimer, that => {
       common.processFillBlankQuestion(that)
     });

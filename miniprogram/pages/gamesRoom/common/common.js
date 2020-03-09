@@ -104,7 +104,7 @@ function makeEbbingStamp(that, pHistoryRecord, callback){
         let nextEbbRate = utils.nextEbbingRate(lastEbbRate)
         // 从最近一次到现在的时间
         let timeSpanFromLast = now.getTime() - lastEbbStamp.time
-        debugLog('从最近一次到现在的时间', utils.formatDeciTimer(timeSpanFromLast))
+     //   debugLog('从最近一次到现在的时间', utils.formatDeciTimer(timeSpanFromLast))
         if (timeSpanFromLast >= nextEbbRate.from
           && timeSpanFromLast <= nextEbbRate.to){
       //        判断当前时间是否在下一级标签的区间
@@ -134,8 +134,8 @@ function makeEbbingStamp(that, pHistoryRecord, callback){
             curEbbStamp.timeStr = utils.formatTime(new Date(curEbbStamp.time))
             pHistoryRecord.ebbStamp = curEbbStamp
           }
-          
-          
+
+
           //  将标签时间设到下一级别的from临界时间上
 
         }
@@ -148,7 +148,7 @@ function makeEbbingStamp(that, pHistoryRecord, callback){
         curEbbStamp.timeStr = utils.formatTime(now)
         pHistoryRecord.ebbStamp = curEbbStamp
       }
-      debugLog('有历史记录', pHistoryRecord)
+   //   debugLog('有历史记录', pHistoryRecord)
       utils.runCallback(callback)(pHistoryRecord)
     }else{
       //  如果没有
@@ -158,7 +158,7 @@ function makeEbbingStamp(that, pHistoryRecord, callback){
       curEbbStamp.time = now.getTime()
       curEbbStamp.timeStr = utils.formatTime(now)
       pHistoryRecord.ebbStamp = curEbbStamp
-      debugLog('没有历史记录', pHistoryRecord)
+      // debugLog('没有历史记录', pHistoryRecord)
       utils.runCallback(callback)(pHistoryRecord)
     }
   })
@@ -185,7 +185,7 @@ function recordHistory(that, question, answer) {
   // debugLog('historyRecord', historyRecord)
   makeEbbingStamp(that, historyRecord, pHistoryRecord=>{
     learnHistoryApi.create(pHistoryRecord, (res) => {
-      debugLog('learnHistoryCreate.success.res', res)
+   //   debugLog('learnHistoryCreate.success.res', res)
     })
   })
 }
@@ -237,7 +237,7 @@ function clickFavoriteSwitch(that, e) {
  */
 function onTapReciteCard(that, e, unusedCallback, usedCallback, callback) {
   let dataset = utils.getEventDataset(e)
-  debugLog('onTapAnswerCard.dataset', dataset)
+  // debugLog('onTapAnswerCard.dataset', dataset)
   let curSpellCards = that.data.curSpellCards;
   let cardIdx = parseInt(dataset.cardIdx)
   let curCard = curSpellCards[cardIdx];
@@ -256,13 +256,13 @@ function onTapReciteCard(that, e, unusedCallback, usedCallback, callback) {
   let selectedCard = dataset.spellCard
 
   if (curSpellCards[cardIdx].cardState == CARD_STATE.UNUSED) {
-    debugLog('when equal unused', curSpellCards[cardIdx].cardState)
+ //   debugLog('when equal unused', curSpellCards[cardIdx].cardState)
     // selectedCard.tempCardIdx = cardIdx
     curCard.cardState = CARD_STATE.USED
     try { unusedCallback(that, curSpellCards[cardIdx])}catch(e){}
   } else if (curSpellCards[cardIdx].cardState == CARD_STATE.USED) {
     curCard.cardState = CARD_STATE.UNUSED
-    debugLog('when equal used', curSpellCards[cardIdx].cardState)
+ //   debugLog('when equal used', curSpellCards[cardIdx].cardState)
     try { usedCallback(that, curSpellCards[cardIdx])}catch (e) { }
     if (typeof curCard.usedBlankIdx == 'number') {
       // debugLog('typeof curCard.usedBlankIdx', typeof curCard.usedBlankIdx)
@@ -272,8 +272,8 @@ function onTapReciteCard(that, e, unusedCallback, usedCallback, callback) {
     }
     selectedCard = false
   }
-  debugLog('selectCard', selectedCard)
-  debugLog('onTapAnswerCard.curSpellCards', curSpellCards)
+  // debugLog('selectCard', selectedCard)
+  // debugLog('onTapAnswerCard.curSpellCards', curSpellCards)
   that.setData({
     curSpellCards: curSpellCards,
     selectedCard: selectedCard,
@@ -571,7 +571,7 @@ function getFavoritesQuestions(that, mode, dataLoadTimer, callback) {
       , wherefilters
       , pageIdx
       , (things, pageIdx) => {
-        debugLog('favoritesApi.getFavorites', things)
+     //   debugLog('favoritesApi.getFavorites', things)
         if (things.length && things.length > 0) {
           try {
             let questions = that.data.questions.concat(things)
@@ -1133,7 +1133,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
     that.data.selectedTags.find(elem=>{
       tags.push(elem.text)
     })
-    debugLog('tags', tags)
+ //   debugLog('tags', tags)
     tagsConds = tagsConds.and(tags)
   }
 
@@ -1166,7 +1166,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
         //   content: MSG.WHETHER_WANT_TO_CLEAR_CURRENT_DATA,
         //   success(res) {
         //     if (res.confirm) {
-        //       // debugLog('用户点击确定')
+        //        debugLog('用户点击确定')
               that.setData({
                 tags: []
               })
@@ -1503,7 +1503,7 @@ function onClickEnterInTagRoom(that, e) {
   || that.data.gameMode == gConst.GAME_MODE.HISTORY){
     url += '&lastDate=' + that.data.lastDate
   }
-  debugLog('onClickEnterInTagRoom.url', url)
+  // debugLog('onClickEnterInTagRoom.url', url)
   wx.navigateTo({
     url: url
   })
