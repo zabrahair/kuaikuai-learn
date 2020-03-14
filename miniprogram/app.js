@@ -54,20 +54,21 @@ App({
         timeout: 60000,
       })
       // Get Configs
-      utils.refreshUserRoleConfigs(that.globalData)
-      const configsApi = require('./api/configs.js')
-      // 回答类型
-      utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
-      // 系统设置
-      utils.refreshConfigs(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
-      // 加成类型
-      utils.refreshConfigs(gConst.CONFIG_TAGS.COMBO_TYPE)
-      // 艾宾浩斯遗忘曲线设置
-      utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
-      // 任务状态
-      utils.refreshConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
-      // 勋章等级
-      utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
+      // utils.refreshUserRoleConfigs(that.globalData)
+      // const configsApi = require('./api/configs.js')
+      
+      // // 回答类型
+      // utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
+      // // 系统设置
+      // utils.refreshConfigs(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
+      // // 加成类型
+      // utils.refreshConfigs(gConst.CONFIG_TAGS.COMBO_TYPE)
+      // // 艾宾浩斯遗忘曲线设置
+      // utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+      // // 任务状态
+      // utils.refreshConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
+      // // 勋章等级
+      // utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
 
       this.login();
       userInfoUtils.getUserConfigs(true)
@@ -75,8 +76,8 @@ App({
     }
   },
   /**
- * 登陆
- */
+   * 登陆
+   */
   login: function () {
     let that = this
     let globalData = this.globalData
@@ -137,6 +138,21 @@ App({
         }
       }
     })
+  },
+
+  /**
+   * 当小程序显示的时候
+   */
+  onShow: function(e){
+    let that = this
+    utils.loadAllConfigs()
+  },
+
+  /**
+   * 当小程序隐藏的时候
+   */
+  onHide: function(e){
+
   },
 
   /**

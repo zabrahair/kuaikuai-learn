@@ -11,6 +11,7 @@ const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
 const statCommon = require('../../common/statistic.js')
+const poemCommon = require('../../common/poem.js')
 const common = require('../gamesRoom/common/common.js')
 
 Page({
@@ -28,10 +29,10 @@ Page({
     let that = this
     that.setData({
       options: options
-    },()=>{
+    }, () => {
       statCommon.initList(that)
     })
-    
+
   },
 
   /**
@@ -45,7 +46,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    poemCommon.search('鹅鹅鹅', result=>{
 
+    })
   },
 
   /**
@@ -115,7 +118,7 @@ Page({
     let setDataObject = {}
 
     // debugLog('idx', idx)
-    switch(filterType){
+    switch (filterType) {
       case 'fromDateOn':
         let dateStr = idx
         setDataObject['curFilterFromDate'] = dateStr
@@ -124,7 +127,7 @@ Page({
         let filterTable = that.data.filtersTable[idx]
         setDataObject['curFilterTable'] = filterTable
         break;
-      case 'answerType': 
+      case 'answerType':
         let filterAnswerType = that.data.filtersAnswerType[idx]
         setDataObject['curFilterAnswerType'] = filterAnswerType
         break;
@@ -162,7 +165,7 @@ Page({
   /**
    * 重新做题
    */
-  showQuestion: function(e){
+  showQuestion: function (e) {
     let that = this
     let dataset = utils.getEventDataset(e)
     let curItem = dataset.item
@@ -173,34 +176,34 @@ Page({
       lastDate: that.data.curFilterFromDate,
       selAnswerType: curItem.answerType,
     },
-    ()=>{
-      common.onClickEnterInTagRoom(that, e)
-    })
+      () => {
+        common.onClickEnterInTagRoom(that, e)
+      })
 
   },
   /**
    * 刷新共有多少道题目被检索
    */
-  refreshTotalCount: function(totalCount){
+  refreshTotalCount: function (totalCount) {
     wx.setNavigationBarTitle({
-      title: '共做了' + totalCount+'道题'
+      title: '共做了' + totalCount + '道题'
     })
   },
 
   /**
    * 切换开始日期的使用
    */
-  onTapSwitchFromDate: function(e){
+  onTapSwitchFromDate: function (e) {
     let that = this
     let ifUsingFromDate = that.data.ifUsingFromDate
-    if (ifUsingFromDate){
+    if (ifUsingFromDate) {
       ifUsingFromDate = false
-    }else{
+    } else {
       ifUsingFromDate = true
     }
     that.setData({
       ifUsingFromDate: ifUsingFromDate
-    },()=>{
+    }, () => {
       statCommon.refreshList(that, true)
     })
   },

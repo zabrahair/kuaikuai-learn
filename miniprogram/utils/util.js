@@ -95,7 +95,10 @@ const log = function (object, message, tabs) {
   console.log(message + ':' + JSON.stringify(object, tabs))
 }
 
-const resetStatus = function (object, key, defaultValue, setValue) {
+/**
+ * 将对象中特定的属性恢复到默认值除了特定位置的key:value
+ */
+const resetObjectValues = function (object, key, defaultValue, setValue) {
   // debugLog(object);
   // debugLog(setValue);
   for (let i in object) {
@@ -134,11 +137,12 @@ const pickerMaker = function (array, selectProperty) {
 
 const getUserInfo = function (globalData) {
   let userInfo = {}
-  if (globalData.userInfo && globalData.userInfo != '') {
-    userInfo = globalData.userInfo;
-  } else {
+  // if (globalData.userInfo && globalData.userInfo != '') {
+  //   userInfo = globalData.userInfo;
+  // } else {
     userInfo = wx.getStorageSync('userInfo')
-  }
+    // debugLog("getUserInfo.userInfo", userInfo)
+  // }
 
   return userInfo
 }
@@ -179,9 +183,13 @@ const extractFileInfo = function (filePath) {
 }
 
 const getUserRole = function(inputVertifyCode){
-  let userRoleObjs = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
+  debugLog('getUserRole.start', inputVertifyCode)
+  let userRoleObjs = wx.getStorageSync(gConst.USER_ROLES_LIST_KEY)
+  debugLog('getUserRole.userRoleObjs', userRoleObjs)
   for (let i in userRoleObjs){
+    debugLog('getUserRole.for', userRoleObjs[i])
     if (userRoleObjs[i].vertifyCode == inputVertifyCode){
+      debugLog('getUserRole.found', inputVertifyCode)
       return userRoleObjs[i].name
     }
   }
@@ -308,7 +316,7 @@ function refreshUserRoleConfigs(){
     tags: gConst.CONFIG_TAGS.USER_ROLE_TAG
   }, 0, (configs, pageIdx)=>{
     // debugLog('refreshUserRoleConfigs.configs', configs);
-    wx.setStorageSync(gConst.USER_ROLES_OBJS_KEY, configs)
+    wx.setStorageSync(gConst.USER_ROLES_LIST_KEY, configs)
     let userRoles = {}
     let registerVertifyCode = {}
     for(let i in configs){
@@ -515,13 +523,33 @@ function runCallback(callback){
  * 一次性循环加载多页
  * pTimeout默认是500
  */
+const IS_CONTINUE_LOAD = {
+  TRUE: {
+    name: "继续",
+    value: true
+  },
+  FALSE: {
+    name: "等待",
+    value: false
+  }
+}
 function loadPagesData(callback, timeout=500) {
   let pageIdx = 0
+  let isContinue = Object.assign({}, IS_CONTINUE_LOAD.TRUE)
+  let usedTime = 0
   let loadTimer = setInterval(() => {
-    if (pageIdx < 100) {
-      runCallback(callback)(pageIdx, loadTimer)
-      pageIdx++
-    } else {
+    usedTime += timeout
+    if (isContinue.value == true){
+      if (pageIdx < 100) {
+        // 之所以不能赋值是因为我们要保持isContinue原先指向的指针
+        Object.assign(isContinue, IS_CONTINUE_LOAD.TRUE)
+        runCallback(callback)(pageIdx, loadTimer, isContinue)
+        pageIdx++
+      } else {
+        clearInterval(loadTimer)
+      }
+    }
+    if (usedTime > 300000){
       clearInterval(loadTimer)
     }
   }, timeout)
@@ -655,6 +683,111 @@ function getDateFromStr(dateStr){
   return date;
 }
 
+/** 
+ * 加载所有的配置方法
+ */
+const LAST_LOAD_CONFIGS_TIMESTAMP = 'LAST_LOAD_CONFIGS_TIMESTAMP'
+const CONFIG_INDEX = 'CONFIG_INDEX'
+const CONFIG_MAP = 'CONFIG_MAP'
+function loadAllConfigs(isForceReload = false){
+  // 加载所有的配置项目
+  let db = wx.cloud.database()
+  let $ = db.command.aggregate
+  let _ = db.command
+  let rawConfigs = []
+  let lastLoadConfigsTimeStamp = wx.getStorageSync(LAST_LOAD_CONFIGS_TIMESTAMP)
+  lastLoadConfigsTimeStamp = lastLoadConfigsTimeStamp ? lastLoadConfigsTimeStamp: 0
+  // 如果配置更新实践少于3600000毫秒不更新
+  if ((new Date().getTime() - lastLoadConfigsTimeStamp) < 3600000 && isForceReload == false){
+    return
+  }
+  onLoading('配置加载中')
+  loadPagesData((pageIdx, loadTimer, isContinue) => {
+    wx.cloud.callFunction({
+      name: 'GetAllConfigGroups',
+      data: {
+        pageIdx: pageIdx,
+      },
+      success: res => {
+        let list = res.result.list
+        try {
+          if (list && list.length > 0) {
+            // debugLog('loadAllConfigs.list', list)
+              isContinue.value = true
+              rawConfigs  = rawConfigs.concat(list)
+          } else {
+            // 当加载完成
+            // debugLog('loadAllConfigs.rawConfigs', rawConfigs)
+            clearInterval(loadTimer)
+            switchProcessAllConfigs(rawConfigs)
+          }
+        } catch (err) {
+          errorLog('[云函数] 调用失败：', err.stack)
+          clearInterval(loadTimer)
+          wx.showToast({
+            image: gConst.ERROR_ICON,
+            title: MSG.SOME_EXCEPTION,
+            duration: 1000,
+          })
+        }
+      },
+      fail: err => {
+        errorLog('[云函数] 调用失败：', err.stack)
+        clearInterval(loadTimer)
+        wx.showToast({
+          image: gConst.ERROR_ICON,
+          title: MSG.SOME_EXCEPTION,
+          duration: 1000,
+        })
+      }
+    }) 
+  }, getDataLoadInterval())
+}
+/**
+ * 将加载进来的Configs分存到不同的Storage的key:value中
+ */
+function switchProcessAllConfigs(rawConfigs){
+  // debugLog('switchProcessAllConfigs.params', rawConfigs)
+  let configIndex = []
+  let configIndexMap = {}
+  for (let i in rawConfigs){
+    let type = rawConfigs[i]._id
+    let configs = rawConfigs[i].list
+    let configsMap  = array2Object(configs, 'name')
+    configIndex.push(type)
+    configIndexMap[type] = configsMap
+    switch(type){
+      case 'USER_ROLE':
+        let userRolesNameMap = {}
+        let userRolesVertifyCodeMap = {}
+        for (let i in configs){
+          userRolesNameMap[configs[i].value] = configs[i].name
+          userRolesVertifyCodeMap[configs[i].value] = configs[i].vertifyCode
+        }
+        wx.setStorageSync(gConst.USER_ROLES_LIST_KEY, configs)
+        // wx.setStorageSync(type + '_MAP', configsMap)
+        wx.setStorageSync(gConst.USER_ROLES_KEY, userRolesNameMap)
+        wx.setStorageSync(gConst.REGISTER_VERTIFY_CODE, userRolesVertifyCodeMap)
+        break;
+      // case 'TASK_STATUS':
+      // case 'SYSTEM_CONFIG':
+      // case 'COMBO_TYPE':
+      // case 'ANSWER_TYPE':
+      // case 'BONUS_CLASSES':
+      // case 'EBBINGHAUS_RATES':
+      // case 'ANSWER_RESULT':
+      default:
+        wx.setStorageSync(type + '', configs)
+        // wx.setStorageSync(type + '_MAP', configsMap)
+        break;
+    }
+  }
+  wx.setStorageSync(LAST_LOAD_CONFIGS_TIMESTAMP, new Date().getTime())
+  wx.setStorageSync(CONFIG_INDEX, configIndex)
+  wx.setStorageSync(CONFIG_MAP, configIndexMap)
+  stopLoading()
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -663,9 +796,32 @@ module.exports = {
   getEventDetailValue: getEventDetailValue,
   getEventDetail: getEventDetail,
 
+  /* -- Object & Array 相关 -- */
   array2Object: array2Object,
-  runCallback: runCallback,
+  arrayJoin: arrayJoin,
+  getArrFromObjectsArr: getArrFromObjectsArr,
+  getObjFromArray: getObjFromArray,
+  cloneObj: cloneObj,
+  sortByPropLenArray: sortByPropLenArray,
+  resetObjectValues: resetObjectValues,
+
+  /* -- Page 相关 -- */
   loadPagesData: loadPagesData,
+  IS_CONTINUE_LOAD: IS_CONTINUE_LOAD,
+
+  /* -- Configs 方法 */
+  loadAllConfigs: loadAllConfigs,
+  switchProcessAllConfigs: switchProcessAllConfigs,
+  // refreshConfigs: refreshConfigs,
+  getConfigs: getConfigs,
+  initStorage: initStorage,
+  getStorage: getStorage,
+
+  /* -- 用户信息相关 -- */
+  // refreshUserRoleConfigs: refreshUserRoleConfigs,
+  getUserInfo: getUserInfo,
+  setUserInfo: setUserInfo,
+  getUserRole: getUserRole,
 
   /* -- 时间相关 -- */
   formatOnlyTime: formatOnlyTime,
@@ -676,34 +832,34 @@ module.exports = {
   mergeDateTime: mergeDateTime,
   getDateFromStr: getDateFromStr,
 
-  getObjFromArray: getObjFromArray,
+  /* -- 方法流程 -- */
+  runCallback: runCallback,
+
+  /* -- 文件 & 路径 -- */
   getFilename: getFilename,
   getFileExtension: getFileExtension,
-  isPunctuation: isPunctuation,
-  resetStatus: resetStatus,
-  cloneObj: cloneObj,
-  pickerMaker: pickerMaker,
   extractFileInfo: extractFileInfo,
-  arrayJoin: arrayJoin,
-  getArrFromObjectsArr: getArrFromObjectsArr,
+
+  /* -- 文字类 -- */
+  isPunctuation: isPunctuation,
+
+  /* -- 显示 & 提示 -- */
+  onLoading: onLoading,
+  stopLoading: stopLoading,
+
+  /* -- 控件 -- */
+  pickerMaker: pickerMaker,
+
+  /* -- DB -- */
   ORDER: ORDER,
-  sortByPropLenArray: sortByPropLenArray,
 
-
-  /** 功能型方法 */
+  /** 业务相关 */
   nextEbbingRate: nextEbbingRate,
   prevEbbingRate: prevEbbingRate,
-  refreshUserRoleConfigs: refreshUserRoleConfigs,
-  refreshConfigs: refreshConfigs,
-  getConfigs: getConfigs,
   getGamingStatistics: getGamingStatistics,
-  getUserRole: getUserRole,
   getTotalScore: getTotalScore,
-  getUserInfo: getUserInfo,
-  setUserInfo: setUserInfo,
+
+  /* -- 时钟相关 -- */
   getDataLoadInterval: getDataLoadInterval,
-  initStorage: initStorage,
-  getStorage: getStorage,
-  onLoading: onLoading,
-  stopLoading, stopLoading,
+
 }

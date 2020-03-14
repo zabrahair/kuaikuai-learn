@@ -1,5 +1,5 @@
 <wxs module="filter" src="../../utils/filter.wxs"></wxs>
-<wxs module="page" src="./lastQuestions.wxs"></wxs>
+<wxs module="page" src="./poemDict.wxs"></wxs>
 <view class='container'>
   <view class='header bg_color_{{filter.randInteger(24)}}'>
     <picker wx:if="{{ifUsingFromDate==true}}"

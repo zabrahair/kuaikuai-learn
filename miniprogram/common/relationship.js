@@ -14,7 +14,7 @@ const userApi = require('../api/user.js')
 const configsApi = require('../api/configs.js')
 const dialogCommon = require('../common/dialog.js')
 
-var USER_ROLES = [].concat(wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY))
+var USER_ROLES = [].concat(wx.getStorageSync(gConst.USER_ROLES_LIST_KEY))
 USER_ROLES.splice(USER_ROLES.length - 1, 1)
 const USER_ROLES_OBJ = utils.array2Object(USER_ROLES, 'value')
 const USER_ROLES_NAME_OBJ = utils.array2Object(USER_ROLES, 'name')

@@ -10,7 +10,7 @@ const utils = require('../../utils/util.js');
 const TABLES = require('../../const/collections.js')
 
 const dbApi = require('../../api/db.js')
-utils.refreshConfigs(gConst.CONFIG_TAGS.COMBO_TYPE)
+// utils.refreshConfigs(gConst.CONFIG_TAGS.COMBO_TYPE)
 
 Component({
   /**

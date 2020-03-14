@@ -64,14 +64,6 @@
       <view class='sperator_title'>其他练习 ‣</view> 
       <scroll-view class="all_words_container" scroll-y="true">
         <view class="all_words">
-          <view class="word_card done_card"
-            wx:for-items='{{questionsDone}}' wx:for-item='question' 
-            wx:for-index='idx' wx:key="_id" 
-            data-card-idx="{{idx}}" data-question='{{question}}'
-            bindtap="onClickDoneCard"            
-          >
-            {{question.questionText}}
-          </view> 
           <view class="word_card left_card {{(idx == curQuestionIndex)?'current_card':''}} {{(question.isCorrect == false)?'wrong_card':''}} "
             wx:for-items='{{questions}}' wx:for-item='question' 
             wx:for-index='idx' wx:key="_id" 
@@ -85,7 +77,14 @@
             </view>
             {{question.questionText}}
           </view>
-        
+          <view class="word_card done_card"
+            wx:for-items='{{questionsDone}}' wx:for-item='question' 
+            wx:for-index='idx' wx:key="_id" 
+            data-card-idx="{{idx}}" data-question='{{question}}'
+            bindtap="onClickDoneCard"            
+          >
+            {{question.questionText}}
+          </view>           
         </view>
       </scroll-view>
     </scroll-view>

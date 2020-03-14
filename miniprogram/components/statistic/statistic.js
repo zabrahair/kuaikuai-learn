@@ -126,7 +126,7 @@ Component({
      */
     loadEbbingStatistics: function(that){
       // debugLog('run loadEbbingStatistics')
-      utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
+      // utils.refreshConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
       let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
       let ebbingStatsInTime = []
       let ebbingStatsTimeout = []

@@ -18,7 +18,7 @@ const _ = db.command
 
 const userApi = require('../../api/user');
 const vertifyCodes = gConst.REGISTER_VERTIFY_CODE;
-const USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
+const USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_LIST_KEY)
 Page({
 
   /**
@@ -37,7 +37,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    utils.refreshUserRoleConfigs(globalData)
+    // utils.refreshUserRoleConfigs(globalData)
     let userInfo = utils.getUserInfo(globalData)
     // debugLog('globalData.userInfo', userInfo);
     this.setData({ userInfo: userInfo })

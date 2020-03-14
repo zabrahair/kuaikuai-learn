@@ -23,7 +23,7 @@ Page({
   data: {
     functionsIdx: 0,
     functions: ['CountRepeated', 'EbbingCount'
-              , 'Update', 'appendBatchWords',
+              , 'Update', 'AppendBatchWords',
                 'FindRepeated','EbbingQuestions'],
     funcName: 'CountRepeated',
     table: 'chinese-words',
@@ -107,7 +107,7 @@ Page({
  //   debugLog('Now Fucntion', functionName)
     let ebbingRates = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
     switch (functionName){
-      case 'appendBatchWords':
+      case 'AppendBatchWords':
         /* test add chinese batch */
         let wordsAll = detail.where
         let wordsArray = wordsAll.split('\n')
@@ -141,7 +141,7 @@ Page({
                 })
               },
               fail: err => {
-                console.error('【云函数】【appendBatchWords】调用失败', err.stack)
+                console.error('【云函数】【AppendBatchWords】调用失败', err.stack)
                 that.setData({
                   result: JSON.stringify(res, null, 4)
                     .replace(/\n/gi, '<br/>')

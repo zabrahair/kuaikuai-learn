@@ -13,8 +13,8 @@ const dbApi = require('../../api/db.js')
 const common = require('../gamesRoom/common/common.js')
 const configsApi = require('../../api/configs.js')
 // init system configs
-utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
-utils.refreshConfigs(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
+// utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
+// utils.refreshConfigs(gConst.CONFIG_TAGS.SYSTEM_CONFIG)
 
 var dataLoadTimer;
 

@@ -23,22 +23,20 @@ Page({
     
   }),
 
-  timer: new IntervalClock(30000),
-
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
     let that = this
     taskCommon.initList(that)
-    that.setTimerTasks(that)
+    
   },
 
   /**
    * 设置定时任务
    */
   setTimerTasks: function(that){
-    that.timer.addTask('任务剩余时间', (timerTask) => {
+    that.data.timer.addTask('任务剩余时间', (timerTask) => {
       let tasks = that.data.tasks
       let now = new Date()
       for (let i in tasks) {
@@ -60,7 +58,7 @@ Page({
         tasks: tasks
       })
     })
-    that.timer.start()
+    that.data.timer.start()
   },
 
   /**
@@ -74,21 +72,27 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    
+    let that = this
+    that.setData({
+      timer: new IntervalClock(30000),
+    },()=>{
+      that.setTimerTasks(that)
+    })
   },
 
   /**
    * 生命周期函数--监听页面隐藏
    */
   onHide: function () {
-
+    let that = this
+    that.data.timer.stop()
   },
 
   /**
    * 生命周期函数--监听页面卸载
    */
   onUnload: function () {
-
+    
   },
 
   /**
@@ -217,6 +221,39 @@ Page({
   /**
    * 过滤任务状态
    */
+  onFilter: function (e) {
+    let that = this
+    let idx = utils.getEventDetailValue(e)
+    let dataset = utils.getEventDataset(e)
+    let filterType = dataset.filterType
+    let setDataObject = {}
+    // debugLog('idx', idx)
+    // debugLog('filterType', filterType)
+    switch (filterType) {
+      case 'FromDateOn':
+        let dateStr = idx
+        setDataObject['curFilterFromDate'] = dateStr
+        break;
+      case 'TaskDirect':
+        let curTaskDirect = that.data.TASK_DIRECT[idx]
+        setDataObject['curTaskDirect'] = curTaskDirect
+        setDataObject['curTaskStatus'] = that.data.filterTaskStatus[0]
+        break;
+      case 'TaskStatus':
+        let status = that.data.filterTaskStatus[idx]
+        setDataObject['curTaskStatus'] = status
+        break;
+      default:
+    }
+    debugLog('setDataObject', setDataObject)
+    that.setData(setDataObject, () => {
+      taskCommon.refreshTasks(that, true)
+    })
+  },
+
+  /**
+   * 过滤任务状态
+   */
   onFilterTaskStatus: function(e){
     let that = this
     let statusIdx = utils.getEventDetailValue(e)
@@ -241,5 +278,23 @@ Page({
     }, () => {
       taskCommon.refreshTasks(that, true)
     })
-  }
+  },
+
+  /**
+   * 切换开始日期的使用
+   */
+  onTapSwitchFromDate: function (e) {
+    let that = this
+    let ifUsingFromDate = that.data.ifUsingFromDate
+    if (ifUsingFromDate) {
+      ifUsingFromDate = false
+    } else {
+      ifUsingFromDate = true
+    }
+    that.setData({
+      ifUsingFromDate: ifUsingFromDate
+    }, () => {
+      taskCommon.refreshTasks(that, true)
+    })
+  },
 })

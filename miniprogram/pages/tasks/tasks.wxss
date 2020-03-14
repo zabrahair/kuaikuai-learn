@@ -1,6 +1,6 @@
 @import '../../css/list.wxss';
 
-.filter_picker,.last_filter,.filter_seperator{
+.filter_from_date,.filter_picker,.last_filter,.filter_seperator{
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
@@ -9,6 +9,27 @@
   box-sizing: content-box;
   height: 7vh;
   margin-left: 0vw;
+}
+
+.btn_from_date_switch {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1vw;
+
+}
+
+.on {
+  width: 5vw;
+  height: 9vw;  
+}
+
+.off {
+  margin-top: 3.5vw;
+  width: 9vw;
+  height: 5vw;
 }
 
 .filter_picker:after {
@@ -40,7 +61,7 @@
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
 
   padding-top: 3vw;
@@ -121,7 +142,7 @@
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  right: -5vw;
+  right: -3vw;
   bottom: 0vh;
   height: 10vw;
   width: 10vw;

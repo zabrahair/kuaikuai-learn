@@ -16,7 +16,7 @@ const configsApi = require('../api/configs.js')
 
 const dialogCommon = require('../common/dialog.js')
 
-const USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
+const USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_LIST_KEY)
 const USER_ROLES = wx.getStorageSync(gConst.USER_ROLES_KEY)
 const FILTER_ALL = { name: "所有", value: "ALL", orderIdx: 0 }
 
@@ -30,12 +30,14 @@ const _ = db.command
  */
 function initPage(that, callback) {
   // fetch configs
-  utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
+  // utils.refreshConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
   // ANSWER_TYPE
   let ANSWER_TYPE = utils.getConfigs(gConst.CONFIG_TAGS.ANSWER_TYPE)
   let ANSWER_TYPE_OBJ = utils.array2Object(ANSWER_TYPE, 'value');
   let EBBINGHAUS_RATES = utils.getConfigs(gConst.CONFIG_TAGS.EBBINGHAUS_RATES)
   let EBBINGHAUS_RATES_OBJ = utils.array2Object(EBBINGHAUS_RATES, 'name');
+  let ANSWER_RESULT = utils.getConfigs(gConst.CONFIG_TAGS.ANSWER_RESULT)
+  let ANSER_RESULT_OBJ = utils.array2Object(ANSWER_RESULT, 'name');
   // userInfo
   let userInfo = utils.getUserInfo(globalData)
   // userRole
@@ -50,6 +52,8 @@ function initPage(that, callback) {
     ANSWER_TYPE_OBJ: ANSWER_TYPE_OBJ,
     EBBINGHAUS_RATES: EBBINGHAUS_RATES,
     EBBINGHAUS_RATES_OBJ: EBBINGHAUS_RATES_OBJ,
+    ANSWER_RESULT: ANSWER_RESULT,
+    ANSER_RESULT_OBJ: ANSER_RESULT_OBJ,
     curItem: null
   }
   , () => {
@@ -69,6 +73,7 @@ function initList(that) {
       filtersAnswerType: [FILTER_ALL].concat(that.data.ANSWER_TYPE),
       filtersTable: [FILTER_ALL].concat(TABLES.LIST),
       filtersEbbinghaus: [FILTER_ALL].concat(that.data.EBBINGHAUS_RATES),
+      filtersAnswerResult: that.data.ANSWER_RESULT,
       // 当先选项
       today: utils.formatDate(new Date()),
       ifUsingFromDate: true,
@@ -76,6 +81,7 @@ function initList(that) {
       curFilterTable: FILTER_ALL,
       curFilterAnswerType: options.answerType ? utils.getObjFromArray(that.data.ANSWER_TYPE, 'name', options.answerType) : FILTER_ALL,
       curFilterEbbinghaus: FILTER_ALL,
+      curFilterAnswerResult: that.data.ANSWER_RESULT[0]
     })
     // 刷新给我的任务列表
     refreshList(that, true)
@@ -144,6 +150,13 @@ function refreshList(that, isReset, callbackOnQuery, callbackOnCount, ) {
             name: that.data.curFilterEbbinghaus.name
           }
         }
+      })
+    }
+
+    if (that.data.curFilterAnswerResult
+      && that.data.curFilterAnswerResult.value != 'ALL') {
+      where = Object.assign(where, {
+        isCorrect: that.data.curFilterAnswerResult.value
       })
     }
 

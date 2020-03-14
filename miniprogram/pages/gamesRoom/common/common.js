@@ -710,7 +710,7 @@ function getEbbingQuestions(that, mode, dataLoadTimer, callback) {
   // debugLog('curEbbingRate', curEbbingRate)
   let tableValue = that.data.tableValue
   let allQuest = []
-  utils.loadPagesData((pageIdx, loadTimer) => {
+  utils.loadPagesData((pageIdx, loadTimer, isContinue) => {
     learnHistoryApi.getEbbinghausQuestions({
       table: tableValue,
       question: {
@@ -723,6 +723,8 @@ function getEbbingQuestions(that, mode, dataLoadTimer, callback) {
       // debugLog('list', list)
       try {
         if (list.length && list.length > 0) {
+          // 之所以不能赋值是因为我们要保持isContinue原先指向的指针
+          Object.assign(isContinue, utils.IS_CONTINUE_LOAD.TRUE)
           let questions = []
           for (let i in list) {
             questions.push(list[i].question)
@@ -747,7 +749,8 @@ function getEbbingQuestions(that, mode, dataLoadTimer, callback) {
             }
           })
         }
-      } catch (e) {
+      } catch (err) {
+        errorLog('getEbbingQuestions.err', err.stack)
         clearInterval(loadTimer)
         wx.showToast({
           image: gConst.ERROR_ICON,

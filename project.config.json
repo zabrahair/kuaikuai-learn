@@ -211,6 +211,12 @@
 					"pathName": "pages/lastQuestions/lastQuestions",
 					"query": "",
 					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "古诗词大典",
+					"pathName": "pages/poemDict/poemDict",
+					"scene": null
 				}
 			]
 		}

@@ -47,8 +47,8 @@ function defaultEditorData(selfData){
     children: [],
     parents: [],
     assignees: [],
-    userRole: null,
-    userInfo: null,
+    // userRole: null,
+    // userInfo: null,
     
     // 控件相关字段
     selAssigneeIdx: 0,
@@ -70,7 +70,7 @@ function initPage(that, callback){
   // // fetch configs
   // utils.refreshConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
   // utils.refreshConfigs(gConst.CONFIG_TAGS.BONUS_CLASSES)
-  USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_OBJS_KEY)
+  USER_ROLE_OBJS = wx.getStorageSync(gConst.USER_ROLES_LIST_KEY)
   USER_ROLES = wx.getStorageSync(gConst.USER_ROLES_KEY)
   // TASK STATUS
   TASK_STATUS = utils.getConfigs(gConst.CONFIG_TAGS.TASK_STATUS)
@@ -83,10 +83,12 @@ function initPage(that, callback){
   TASK_FINISH_STATUS_OBJ = utils.array2Object(TASK_FINISH_STATUS, 'value')
   // userInfo
   let userInfo = utils.getUserInfo(globalData)
+  // debugLog('userInfo', userInfo)
   // userRole
   let userRole = userInfo.userRole
   that.setData({
-    openid: userInfo._openid,
+    gConst: gConst,
+    openid: userInfo.openId,
     userInfo: userInfo,
     userRole: userRole,
     USER_ROLES: USER_ROLES,
@@ -188,6 +190,8 @@ function defaultListData(selfData) {
     curTask: curTask,
     tasks: [],
     pageIdx: 0,
+    openid: null,
+    userRole: null,
   }
   let finalData = Object.assign(selfData, defaultData)
   // debugLog('finalData', finalData)
@@ -198,6 +202,8 @@ function initList(that) {
   initPage(that, ()=>{
     that.setData({
       TASK_DIRECT: TASK_DIRECT,
+      ifUsingFromDate: true,
+      curFilterFromDate: utils.formatDate(new Date()),
       filterTaskStatus: that.data.filterTaskStatus.concat(TASK_STATUS),
       curTaskDirect: TASK_DIRECT[0],
     })
@@ -259,15 +265,31 @@ function showTaskEditor(that){
  * 发给我的任务刷新
  */
 function refreshMyTasks(that, isReset){
-  let openid = that.data.userInfo._openid
+  let openid = that.data.userInfo.openId
+  // debugLog('openid', openid)
+  if(!openid || openid.trim() == ''){
+    // debugLog('No user no tasks') 
+    return
+  }
   let pageIdx = that.data.pageIdx
   let taskDirect = that.data.curTaskDirect.value
+  debugLog('taskDirect', taskDirect)
+  debugLog('openid', openid)
   let where = {
     isRemoved: _.or([_.exists(false), false]),
     [taskDirect] : {
-      openid: openid,
+      "openid": openid,
     },
   }
+  // 创建时间过滤
+  let lastDate = utils.getDateFromStr(that.data.curFilterFromDate)
+  debugLog('lastDate', lastDate)
+  if (that.data.curFilterFromDate && that.data.ifUsingFromDate) {
+    Object.assign(where, {
+      assignTime: _.gte(lastDate.getTime())
+    })
+  }
+
   // debugLog('where', where)
   if (that.data.curTaskStatus.value != FILTER_ALL.value){
     Object.assign(where
@@ -279,10 +301,10 @@ function refreshMyTasks(that, isReset){
     )
   }
 
-  // debugLog('where', where)
+  debugLog('where', where)
   taskApi.query(where, pageIdx, tasks=>{
     // debugLog('refreshMyTasks.pageIdx', pageIdx)
-    // debugLog('refreshMyTasks.tasks', tasks)
+    debugLog('refreshMyTasks.tasks.length', tasks.length)
     if(tasks.length > 0){
       // debugLog('isReset', isReset)
       if (!isReset){
@@ -327,8 +349,18 @@ function createTask(that, callback) {
   }
   // debugLog('createTask.task', task)
   taskApi.create(task, res => {
-    // debugLog('createTask', res)
-    utils.runCallback(callback)({ task: task, res: res })
+    if(task.toWho.openid == that.data.userInfo.openId){
+      //  如果是自己的任务直接认领
+      task['_id'] = res._id
+      that.setData({
+        curTask: task
+      },()=>{
+        claimTask(that, callback)
+      })
+    }else{
+      //  如果不是自己发给自己的任务
+      utils.runCallback(callback)({ task: task, res: res })
+    }
   })
 }
 
@@ -410,8 +442,16 @@ function finishTask(that, callback) {
   taskApi.cloudWhereUpdate({_id: task._id }
     , task
     , res => {
-      // debugLog('created Task', res)
-      utils.runCallback(callback)({ task: task, res: res })
+      // debugLog('createTask', res)
+      if (task.toWho.openid == that.data.userInfo.openId) {
+        //  如果是自己发给自己的任务，直接复核
+        approveTask(that, callback)
+      } else {
+        //  如果不是自己发给自己的任务
+        // debugLog('created Task', res)
+        utils.runCallback(callback)({ task: task, res: res })
+      }
+
   })
 }
 
