@@ -14,12 +14,20 @@ function request(reqParams, callback) {
   let url = reqParams.url
   let method = reqParams.method ? reqParams.method : 'GET'
   let timeout = reqParams.timeout ? reqParams.timeout : 10000
+  debugLog('request.url', url)
   wx.request({
     method: method,
     timeout: timeout,
     url: url,
     success: (res, other) => {
-      utils.runCallback(callback)(res)
+      debugLog('request.status',res.status)
+      if(res.statusCode == 200)
+      {
+        utils.runCallback(callback)(res.data)
+      }else{
+        utils.runCallback(callback)(null)
+      }
+
     },
     fail: (err) => {
       //   debugLog('request.fail.res', res)

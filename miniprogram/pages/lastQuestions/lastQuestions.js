@@ -166,12 +166,14 @@ Page({
     let that = this
     let dataset = utils.getEventDataset(e)
     let curItem = dataset.item
+    debugLog('curItem', curItem)
     that.setData({
       selectedTags: curItem.question.tags,
-      gameMode: gConst.GAME_MODE.HISTORY,
+      gameMode: gConst.GAME_MODE.ONLY_ONE,
       selectedTable: TABLES.MAP[curItem.table],
       lastDate: that.data.curFilterFromDate,
       selAnswerType: curItem.answerType,
+      topic: curItem.question.topic?curItem.question.topic:curItem.question.word
     },
     ()=>{
       common.onClickEnterInTagRoom(that, e)

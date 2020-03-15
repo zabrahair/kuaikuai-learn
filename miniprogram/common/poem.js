@@ -18,8 +18,8 @@ function search(key, callback){
     method: reqUtils.METHODS.GET,
     timeout: DEFAULT_TIMEOUT
   }
-  reqUtils.request(reqParams, (result)=>{
-    debugLog('search', 'result')
+  reqUtils.request(reqParams, result=>{
+    debugLog('search', result)
   })
 }
 

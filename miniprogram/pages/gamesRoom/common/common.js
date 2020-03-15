@@ -326,6 +326,48 @@ function onTapSpellCard(that, e, callback) {
 }
 
 /**
+ * 根据Topic只拿一道题目
+ */
+function getOnlyOneQuestion(that, callback){
+  let pageIdx  = 0
+  debugLog('topic', that.data.options.topic)
+  dbApi.queryPages(
+    that.data.tableValue,
+    _.or([{
+      word: that.data.options.topic
+    },{
+        topic: that.data.options.topic
+    }]),
+    pageIdx,
+    (res, pageIdx) => {
+      // debugLog('getNormalQuestions.res', res)
+      // debugLog('getNormalQuestions.pageIdx', pageIdx)
+      if (res.length && res.length > 0) {
+        let questions = that.data.questions.concat(res)
+        that.setData({
+          questions: questions,
+        }, function () {
+          if (pageIdx == 0) {
+            // 生成下一道题目
+            onClickNextQuestion(that, null, null, 0)
+          }
+        })
+      } else {
+        // when finish questions load
+        writeQuestionsCorrectStat(that, dataLoadTimer, res => {
+          // debugLog('getNormalQuestions.questions', that.data.questions)
+          // debugLog('getNormalQuestions.questionsDone', that.data.questionsDone)
+          clearInterval(dataLoadTimer)
+          if (typeof callback == 'function') {
+            callback(that)
+          }
+        })
+      }
+    }
+  )
+}
+
+/**
   * Get Normal Question
   */
 function getNormalQuestions(that, dataLoadTimer, callback) {
@@ -908,6 +950,11 @@ function getQuestions(that, gameMode, dataLoadTimer, callback) {
       title: that.data.tableName + gConst.GAME_MODE.EBBINGHAUS + that.data.titleSubfix
     })
     getEbbingQuestions(that, gConst.GAME_MODE.EBBINGHAUS, dataLoadTimer, callback);
+  } else if (gameMode == gConst.GAME_MODE.ONLY_ONE) {
+    wx.setNavigationBarTitle({
+      title: that.data.tableName + gConst.GAME_MODE.ONLY_ONE + that.data.titleSubfix
+    })
+    getOnlyOneQuestion(that, gConst.GAME_MODE.ONLY_ONE, dataLoadTimer, callback);
   }
 }
 
@@ -1500,13 +1547,17 @@ function onClickEnterInTagRoom(that, e) {
     url = '/pages/gamesRoom/fillBlank/fillBlank?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
   } else if (that.data.selAnswerType == '自助背诵') {
     url = '/pages/gamesRoom/article/article?gameMode=' + that.data.gameMode + '&tableValue=' + that.data.selectedTable.value + '&tableName=' + that.data.selectedTable.name + '&filterTags=' + tagsStr;
-  }
+  } 
 
   if (that.data.gameMode == gConst.GAME_MODE.WRONG
   || that.data.gameMode == gConst.GAME_MODE.HISTORY){
     url += '&lastDate=' + that.data.lastDate
   }
-  // debugLog('onClickEnterInTagRoom.url', url)
+
+  if (that.data.gameMode == gConst.GAME_MODE.ONLY_ONE){
+    url += '&topic=' + that.data.topic
+  }
+  debugLog('onClickEnterInTagRoom.url', url)
   wx.navigateTo({
     url: url
   })

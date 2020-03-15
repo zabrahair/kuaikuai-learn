@@ -126,6 +126,7 @@ module.exports = {
     WRONG_SLOW: '错而慢',
     FAVORITES: '收藏',
     EBBINGHAUS: '艾宾浩斯',
+    ONLY_ONE: '一道题'
   },
   DEFAULT_USER_CONFIGS: {
     divideSpeedFloor: 4000,
