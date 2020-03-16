@@ -199,4 +199,22 @@ Page({
       common.getTags(that, that.data.selectedTable.value, dataLoadTimer)
     })
   },
+  
+  /**
+     * 显示所有标签
+     */
+  onShowAllTags: function (e) {
+    let that = this
+    if (that.data.isShownAllTags) {
+      that.setData({
+        isShownAllTags: false,
+        showTagsBtnText: '显示所有标签'
+      })
+    } else {
+      that.setData({
+        isShownAllTags: true,
+        showTagsBtnText: '隐藏标签'
+      })
+    }
+  }
 })

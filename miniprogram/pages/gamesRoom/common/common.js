@@ -1159,6 +1159,53 @@ function getTags(that, tableName, dataLoadTimer, callback) {
 }
 
 /**
+ * 处理标签添加属性，主要是过滤用户不需要的标签
+ */
+function processTags(tags, table, callback){
+  let allFilters = utils.getUserInfo().filterTags
+  let filterTags = allFilters[table]
+  // debugLog('filterTags', filterTags)
+  let filterTagsKeys = Object.keys(filterTags)
+  for(let i=0; i < tags.length; i++){
+    let tag = tags[i]
+    if(!tag.isInFilters){
+      for (let j = 0; j < filterTagsKeys.length; j++) {
+        let key = filterTagsKeys[j]
+        let filter = filterTags[key]
+        // debugLog('filter', filter)
+        let regExp = new RegExp(filter.value, 'gi')
+        let rst = regExp.exec(tag.text)
+        // debugLog('rst', rst)
+        if (rst != null && rst.length > 0){
+          tag['orderIdx'] = filter.orderIdx
+          tag['isInFilters'] = true
+        }
+      }
+    }
+  }
+
+  tags.sort((a, b) => {
+    if(!a.orderIdx){
+      a.orderIdx = 9999
+    }
+    if (!b.orderIdx) {
+      b.orderIdx = 9999
+    }
+    if (a.orderIdx < b.orderIdx) {
+      return utils.ORDER.ASC
+    } else if (a.orderIdx > b.orderIdx) {
+      return utils.ORDER.DESC
+    } else {
+        return 0
+    }
+  })
+
+  // debugLog('processTags', tags)
+
+  return tags
+}
+
+/**
  * 獲取所有的標籤,只获取标签在记录第一层的标签。
  */
 function getNormalTags(that, tableName, dataLoadTimer) {
@@ -1201,6 +1248,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
         let tags = that.data.tags
         let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
         // debugLog('getNormalTags.sort', that.data.tags)
+        processTags(sortTags, that.data.selectedTable.value, null)
         that.setData({
           tags: sortTags
         }, ()=>{
@@ -1227,6 +1275,7 @@ function getNormalTags(that, tableName, dataLoadTimer) {
           // }
         // })
       }
+
       // sort tags
       that.setData({
         tags: that.data.tags.concat(tags)
@@ -1266,6 +1315,7 @@ function getFavoriteTags(that, tableName, dataLoadTimer) {
         // stop load
         let tags = that.data.tags
         let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
+        processTags(sortTags, that.data.selectedTable.value, null)
         that.setData({
           tags: sortTags
         }, () => {
@@ -1342,6 +1392,7 @@ function getHistoryTags(that, tableName, dataLoadTimer) {
         // stop load
         let tags = that.data.tags
         let sortTags = utils.sortByPropLenArray(tags, 'text', utils.ORDER.DESC)
+        processTags(sortTags, that.data.selectedTable.value, null)
         that.setData({
           tags: sortTags
         })
@@ -1676,6 +1727,7 @@ module.exports = {
   initDataBodyInTagRoom: initDataBodyInTagRoom,
   resetTagsPageSelected: resetTagsPageSelected,
   recoverSelectedTags: recoverSelectedTags,
+  processTags: processTags,
   getTags: getTags,
   getNormalTags: getNormalTags,
   getFavoriteTags: getFavoriteTags,

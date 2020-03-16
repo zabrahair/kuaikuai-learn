@@ -165,37 +165,103 @@ function searchCnMeaning(that, regex, content){
   })
 }
 
+// /**
+// * 获取英语单词/字解释(【剑桥英语】dictionary.cambridge.org)
+// */
+// function searchEnMeaning(that, content) {
+//   that.setData({
+//     meaning: ''
+//   })
+//   const MEANING_URI_PREFIX = 'https://dictionary.cambridge.org/us/dictionary/english-chinese-simplified/'
+//   let uri = MEANING_URI_PREFIX + content
+// // debugLog('searchEnMeaning.uri', uri)
+//   let timeout = 10000
+//   wx.request({
+//     method: 'GET',
+//     timeout: 10000,
+//     url: uri,
+//     success: (res, res2) => {
+
+//       let context = res.data.replace(/(\r|\n|\t)/gi, '')
+//       // let context = data.replace(/\n/gi, '')
+//       let regex = new RegExp('(<div class="di-body">.+?)(?:<small)', 'gi')
+//       // debugLog('request.success.context', context)
+//       let rst = regex.exec(context)
+//       // debugLog('request.success.rst', rst)
+//       try {
+
+//         let meaning = rst[1]
+//         meaning = meaning.replace(/<source.+?\/>/gi, '')
+//         meaning = meaning.replace(/<amp-audio.+?>.+?<\/amp-audio>/gi, '')
+//         meaning = meaning.replace(/<script.+?<\/script>/gi, '')
+//         meaning = meaning.replace(/<a.+?<\/a>/gi, '')
+//         // meaning = meaning.replace(/<\/a>/gi, '')
+//         if (!meaning || meaning.trim() == '') {
+//           wx.showToast({
+//             title: MSG.NO_MEANING,
+//             duration: 1500,
+//             complete: res => {
+//               throw new Error("meaning is empty")
+//             },
+//           })
+//         }
+
+
+//         // debugLog('meaning', meaning)
+//         that.setData({
+//           meaning: meaning
+//         }, res => {
+//           if (that.data.dictMode == gConst.DICT_SEARCH_MODE.WORD) {
+//             that.updateWordMeaning(that, that.data.table, that.data.word, that.data.meaning)
+//           }
+//           wx.hideLoading()
+//         })
+//       } catch (e) {
+//         that.setData({
+//           meaning: '',
+//         })
+//         that.onClose()
+//       }
+
+//     },
+//     fail: (res, res2) => {
+//    //   debugLog('request.fail.res', res)
+//     },
+//     complete: (res) => {
+//       // debugLog('request.complete.res', res)
+//     }
+//   })
+// }
+
 /**
-* 获取英语单词/字解释
+* 获取英语单词/字解释(【金山词霸】www.iciba.com)
 */
 function searchEnMeaning(that, content) {
   that.setData({
     meaning: ''
   })
-  const MEANING_URI_PREFIX = 'https://dictionary.cambridge.org/zhs/词典/英语-汉语-简体/'
+  const MEANING_URI_PREFIX = 'https://www.iciba.com/'
   let uri = MEANING_URI_PREFIX + content
-// debugLog('searchEnMeaning.uri', uri)
+  debugLog('searchEnMeaning.uri', uri)
   let timeout = 10000
   wx.request({
     method: 'GET',
     timeout: 10000,
     url: uri,
     success: (res, res2) => {
-
+      
       let context = res.data.replace(/(\r|\n|\t)/gi, '')
-      // let context = data.replace(/\n/gi, '')
-      let regex = new RegExp('(<div class="di-body">.+?)(?:<small)', 'gi')
       // debugLog('request.success.context', context)
+      // let context = data.replace(/\n/gi, '')
+      let regex = new RegExp('(<div class="in-base">.+?)(?:<hr style="height:1px;border:none;margin:0;margin-top:15px;border-top:1px solid #e4e3c7;")', 'gi')
       let rst = regex.exec(context)
-      // debugLog('request.success.rst', rst)
+      // debugLog('request.success.rst', rst[1])
       try {
 
         let meaning = rst[1]
-        meaning = meaning.replace(/<source.+?\/>/gi, '')
-        meaning = meaning.replace(/<amp-audio.+?>.+?<\/amp-audio>/gi, '')
-        meaning = meaning.replace(/<script.+?<\/script>/gi, '')
-        meaning = meaning.replace(/<a.+?<\/a>/gi, '')
-        // meaning = meaning.replace(/<\/a>/gi, '')
+        meaning = meaning.replace(/<!--.+?-->/gi, '')
+        // debugLog('request.success.meaning', meaning)
+        meaning += '</div>'
         if (!meaning || meaning.trim() == '') {
           wx.showToast({
             title: MSG.NO_MEANING,
@@ -225,13 +291,14 @@ function searchEnMeaning(that, content) {
 
     },
     fail: (res, res2) => {
-   //   debugLog('request.fail.res', res)
+      //   debugLog('request.fail.res', res)
     },
     complete: (res) => {
       // debugLog('request.complete.res', res)
     }
   })
 }
+
 
 function launchSearchKeyword(that){
   wx.showLoading({

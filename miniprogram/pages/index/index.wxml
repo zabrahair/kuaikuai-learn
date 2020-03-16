@@ -18,6 +18,16 @@
         <text class='value'>{{totalScore}}</text>
       </view>
     </view>
+    <!-- 被委派任务的人 -->
+    <picker 
+      disabled="{{task.isDisabled(curTask, TASK_STATUS_OBJ)}}"
+      name="assingee"  
+      bindchange="selectRelationship" value="{{curRelationshipIdx?curRelationshipIdx:0}}" 
+      range="{{relationships}}" range-key="name">
+      <view class="relationship">
+      我现在是: {{curRelationship.name}} ▾
+      </view>
+    </picker> 
   </view>
   <scroll-view class='content' scroll-y='true'>
     <view class='items'>

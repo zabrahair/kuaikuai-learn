@@ -1,3 +1,4 @@
+<wxs module="page" src="../../css/tagsRoom.wxs"></wxs>
 <view class='container'>
   <scroll-view class="tables-container" scroll-y='true'>
     <view class='tables-cloud'>
@@ -26,7 +27,8 @@
   </scroll-view>
   <scroll-view class="tags-container" scroll-y='true'>
     <view class='tags-cloud'>
-      <view class='tag {{tag.css}}'
+      <view wx:if="{{tag.isInFilters||isShownAllTags}}" 
+        class="tag {{page.isSelectedTag(tag, selectedTags)?'selected':''}}"
         wx:for-items='{{tags}}' wx:for-item='tag' 
         wx:for-index='idx' wx:key="tag" 
         data-tag-count='{{tag.count}}' 
@@ -44,6 +46,6 @@
   </scroll-view>
   <view class='buttons'> 
     <button class="button" bindtap="onClickEnter" type='primary'>进入</button>
-    <!-- <button class="button" bindtap="onKeywordSearch" type='warn' size="mini">重来</button> -->
+    <button class="button" bindtap="onShowAllTags" type='warn' size="mini">{{showTagsBtnText?showTagsBtnText:'显示所有标签'}}</button>
   </view>
 </view>

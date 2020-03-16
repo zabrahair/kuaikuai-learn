@@ -1,0 +1,16 @@
+/**
+ * 如果选中Tag就
+ */
+function isSelectedTag(curTag, selectedTags) {
+  for (var i = 0; i < selectedTags.length; i++) {
+    if (curTag.text == selectedTags[i].text) {
+      return true
+    }
+  }
+  return false
+}
+
+// 导出对外暴露的属性
+module.exports = {
+  isSelectedTag: isSelectedTag
+}

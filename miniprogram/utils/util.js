@@ -404,7 +404,7 @@ function array2Object(array, pKey){
 /**
  * 根据Array对象里面的属性排序
  * sortProp： 用来排序的字段
- * order：降序：-1，升序：1
+ * order：降序：1，升序：-1
  */
 const ORDER = {
   ASC: -1,

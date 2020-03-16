@@ -4,7 +4,9 @@ const UNSELECT = 'unselected';
 const SELECTED = 'selected';
 const storageKeys = {
   userInfo: 'userInfo',
-  totalScore: 'totalScore'
+  totalScore: 'totalScore',
+  nowUserInfo: 'nowUserInfo', //用户指定以他人的额身份查询
+  isSwitchOtherUser: 'isSwitchOtherUser', //用户指定以他人的额身份查询
 }
 const userInfoObj = {
   userRole: '',
@@ -142,7 +144,7 @@ module.exports = {
     SPELLING: '拼写',
     OPTIONS_SELECT: '选择题',
     FILL_BLANK: '填空题',
-    RICITE_ARTICLE: '背文章',
+    RICITE_ARTICLE: '自助背诵',
     CONNECT_ITEMS: '连线题',
   },
   TAGS_LOCATION: {

@@ -13,6 +13,7 @@ const dbApi = require('../../api/db.js')
 const userApi = require('../../api/user.js')
 const learnHistoryApi = require('../../api/learnHistory.js')
 const favoritesApi = require('../../api/favorites.js')
+const usersCommon = require('../../common/users.js')
 
 Page({
 
@@ -86,6 +87,11 @@ Page({
       that.setData({
         isRefreshStatistic: true,
       })
+    })
+
+    // 获得用户的关系人
+    usersCommon.getRelationships(that, (pThat)=>{
+
     })
   },
 
@@ -345,4 +351,27 @@ Page({
     })
   },
 
+  /**
+   * 选择关系人 
+   */
+  selectRelationship: function (e) {
+    let that = this
+    let selIdx = utils.getEventDetailValue(e)
+    let relationships = that.data.relationships
+    let curRelationship = relationships[selIdx]
+    that.setData({
+      curRelationshipIdx: selIdx,
+      curRelationship: curRelationship,
+    },()=>{
+      if (selIdx != 0){
+        usersCommon.getOtherUserInfo(curRelationship.openid, res => {
+          let user = res
+          wx.setStorageSync(gConst.storageKeys.nowUserInfo, user)
+          wx.setStorageSync(gConst.storageKeys.isSwitchOtherUser, true)
+        })
+      }else{
+        wx.setStorageSync(gConst.storageKeys.isSwitchOtherUser, false)      
+      }
+    })
+  },
 })

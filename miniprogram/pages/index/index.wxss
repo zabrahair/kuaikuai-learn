@@ -62,9 +62,23 @@
   justify-content: space-around;
   align-items: flex-start;
 
-  width: 50vw;
+  width: 30vw;
   height: 10vh;
 
+}
+
+.relationship {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
+  width: 40vw;
+  height: 10vh;
+
+  color: white;
+  font-size: 4vw;
 }
 
 .username {
@@ -223,3 +237,4 @@
   height: 5vw;
 
 }
+
