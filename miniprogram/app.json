@@ -31,8 +31,10 @@
     "navigationBarTitleText": "快快學習",
     "navigationBarTextStyle": "black",
     "enablePullDownRefresh": true,
-    "onReachBottomDistance": 50
+    "onReachBottomDistance": 50,
+    "pageOrientation": "auto"
   },
+  "resizable": true,
   "sitemapLocation": "sitemap.json",
   "style": "v2",
   "tabBar": {

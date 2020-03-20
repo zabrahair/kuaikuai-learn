@@ -107,7 +107,7 @@ Page({
     questionViewWidth: 50,
     cardFontSize: 13.5,
     maxCardFontSize: 15,
-    minCardFontSize: 5,
+    minCardFontSize: 8,
 
     // filters
     tags: [],

@@ -311,7 +311,7 @@
   align-items: center;
 
   width: 90vw;
-  height: 15vh;
+  min-height: 15vh;
   margin-top: 1vh;
   border-radius: 3vw;
   padding: 0vw;

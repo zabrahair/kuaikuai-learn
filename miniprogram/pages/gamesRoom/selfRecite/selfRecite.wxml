@@ -23,7 +23,7 @@
       <image class='filters_icon' src='{{gConst.SEARCH_ICON}}' bindtap="onClickSearch" />
     </view>
     <!-- style="height: {{cardFontSize*6}}vw;" -->
-    <movable-area class='question' style="height: {{cardFontSize*7}}vw;"
+    <movable-area class='question' style="max-height: {{cardFontSize*7}}vw; height: {{cardFontSize*7}}vw;"
       animation="{{fadeInOutQuestionBlock}}">
       <image class="favorite" data-question-id="{{curQuestion._id}}"
       src="{{isFavorited?gConst.FAVORITED_ICON:gConst.NOT_FAVORITED_ICON}}" 

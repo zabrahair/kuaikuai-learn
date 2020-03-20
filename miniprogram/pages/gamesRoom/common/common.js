@@ -1163,9 +1163,16 @@ function getTags(that, tableName, dataLoadTimer, callback) {
  */
 function processTags(tags, table, callback){
   let allFilters = utils.getUserInfo().filterTags
+  if (!allFilters) {
+    for (let i = 0; i < tags.length; i++) {
+      tags[i]['isInFilters'] = true
+    }
+    return
+  }
   let filterTags = allFilters[table]
   // debugLog('filterTags', filterTags)
   let filterTagsKeys = Object.keys(filterTags)
+
   for(let i=0; i < tags.length; i++){
     let tag = tags[i]
     if(!tag.isInFilters){
