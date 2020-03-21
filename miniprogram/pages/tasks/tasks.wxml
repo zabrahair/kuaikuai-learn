@@ -74,6 +74,7 @@
             {{task.fromWho.name}} 委派给 {{task.toWho.name}}
             </view>
             <text class="task_content">任务: {{task.content}}</text>
+            <text class="task_content">留言: {{task.comments[task.comments.length-1].content}}</text>
           </view>
           <view class='right'>
             <button class="task_action" type='primary' size='mini'

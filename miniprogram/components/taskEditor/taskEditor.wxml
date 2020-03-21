@@ -53,7 +53,7 @@
         <view 
           class="finish_images" 
           wx:if="{{task.isItemShown('finish_images_list', curTask, openid, TASK_STATUS_OBJ)}}" >
-          <text class="images_list_title">任务完成截图</text>
+          <text class="images_list_title">【任务完成截图】</text>
           <view class="add_image" 
             wx:if="{{task.isItemShown('add_finish_image', curTask, openid, TASK_STATUS_OBJ)}}" 
             bindtap='addFinishImage'>
@@ -65,6 +65,13 @@
             wx:for-items='{{curTask.finishImages}}' wx:key="id" 
             wx:for-item='finishImage' wx:for-index='id'/>
         </view>
+        <comments 
+          class="comments_area"
+          isShowInputArea="{{task.isItemShown('enable_input_comment', curTask, openid, TASK_STATUS_OBJ)}}"
+          userInfo="{{userInfo}}"
+          comments="{{curTask.comments}}"
+          bindappend="onRenewComment"
+         />
       </form>
     </scroll-view>
     <view class="actions bg_color_{{filter.randInteger(24)}}">

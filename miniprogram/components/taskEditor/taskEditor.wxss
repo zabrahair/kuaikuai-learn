@@ -146,3 +146,14 @@
   margin-left: 5vw;
   margin-right: 5vw;
 }
+
+.comments_area {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  
+  width: 100%;
+  min-height: 20vh;  
+}

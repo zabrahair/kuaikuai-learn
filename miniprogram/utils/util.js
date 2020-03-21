@@ -788,6 +788,26 @@ function switchProcessAllConfigs(rawConfigs){
   stopLoading()
 }
 
+/**
+ * 给对象加事件字段
+ */
+function addTime2Object(type, object){
+  let now = new Date()
+  switch(type){
+    case 'create':
+      object['createTime'] = now.getTime()
+      object['createTimeStr'] = formatDateTime(now)   
+      break;
+    case 'update':
+      object['updateTime'] = now.getTime()
+      object['updateTimeStr'] = formatDateTime(now)   
+      break;
+    default:
+  }
+
+  return object
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -829,6 +849,7 @@ module.exports = {
   formatDate: formatDate,
   formatDeciTimer: formatDeciTimer,
   formatDateTime: formatDateTime,
+  addTime2Object: addTime2Object,
   mergeDateTime: mergeDateTime,
   getDateFromStr: getDateFromStr,
 

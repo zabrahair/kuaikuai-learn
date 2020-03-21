@@ -31,7 +31,14 @@ function isItemShown(itemName, curTask, curOpenid, TASK_STATUS_OBJ){
       } else {
         return false;
       }
-      break;
+    case 'enable_input_comment':
+      if (curTask.status.value == TASK_STATUS_OBJ.CLAIMED.value
+        || curTask.status.value == TASK_STATUS_OBJ.IMPLEMENTING.value
+        || curTask.status.value == TASK_STATUS_OBJ.FINISHED.value) {
+        return true;
+      } else {
+        return false;
+      }
       break;
     default:
   }

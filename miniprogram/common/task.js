@@ -48,7 +48,7 @@ function defaultEditorData(selfData){
     parents: [],
     assignees: [],
     // userRole: null,
-    // userInfo: null,
+    userInfo: null,
     
     // 控件相关字段
     selAssigneeIdx: 0,
@@ -57,6 +57,8 @@ function defaultEditorData(selfData){
     deadlineTime: new Date().toLocaleTimeString(),
     
     // 提交业务内容相关字段
+
+
   }
   let finalData = Object.assign(selfData, defaultData)
   // debugLog('finalData', finalData)
@@ -273,8 +275,8 @@ function refreshMyTasks(that, isReset){
   }
   let pageIdx = that.data.pageIdx
   let taskDirect = that.data.curTaskDirect.value
-  debugLog('taskDirect', taskDirect)
-  debugLog('openid', openid)
+  // debugLog('taskDirect', taskDirect)
+  // debugLog('openid', openid)
   let where = {
     isRemoved: _.or([_.exists(false), false]),
     [taskDirect] : {
@@ -283,7 +285,7 @@ function refreshMyTasks(that, isReset){
   }
   // 创建时间过滤
   let lastDate = utils.getDateFromStr(that.data.curFilterFromDate)
-  debugLog('lastDate', lastDate)
+  // debugLog('lastDate', lastDate)
   if (that.data.curFilterFromDate && that.data.ifUsingFromDate) {
     Object.assign(where, {
       assignTime: _.gte(lastDate.getTime())
@@ -301,10 +303,10 @@ function refreshMyTasks(that, isReset){
     )
   }
 
-  debugLog('where', where)
+  // debugLog('where', where)
   taskApi.query(where, pageIdx, tasks=>{
     // debugLog('refreshMyTasks.pageIdx', pageIdx)
-    debugLog('refreshMyTasks.tasks.length', tasks.length)
+    // debugLog('refreshMyTasks.tasks.length', tasks.length)
     if(tasks.length > 0){
       // debugLog('isReset', isReset)
       if (!isReset){

@@ -14,7 +14,6 @@ const dialogCommon = require('../../common/dialog.js')
 
 /* DB API */
 const dbApi = require('../../api/db.js')
-// const userApi = require('../../api/user.js')
 const userApi = require('../../api/user.js')
 const taskCommon = require('../../common/task.js')
 
@@ -276,10 +275,40 @@ Component({
         current: curUrl, // 当前显示图片的http链接
         urls: finishImagesUrl // 需要预览的图片http链接列表
       })
+    },
+
+    /**
+     * 当更新留言
+     */
+    onRenewComment: function(e){
+      debugLog('aaa')
+      let that = this
+      let detail = utils.getEventDetail(e)
+      let renewComment = detail.comment
+      let comments = that.data.curTask.comments ? that.data.curTask.comments : []
+      debugLog('renewComment', renewComment)
+      // 追加或者更新留言
+      if(comments.length < 1){
+        comments.push(renewComment)
+      }else{
+        let isFoundHistory = false
+        for({v, k} in comments.length){
+          if (v.createTime == renewComment.createTime 
+          && v.author == renewComment.author){
+            comments[i] = renewComment
+            isFoundHistory = true
+            break;
+          }
+        }
+        if (!isFoundHistory){
+          comments.push(renewComment)
+        }
+      }
+      that.data.curTask.comments = comments
+      // debugLog('curTask', that.data.curTask)
+      that.setData({
+        curTask: that.data.curTask
+      })
     }
-
-
-
-
   }
 })

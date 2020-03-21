@@ -1,0 +1,22 @@
+<!-- 留言 -->
+<view class='comment_area'>
+  <text class="title">【留言】</text>
+  <!-- 新增留言要求 -->
+  <textarea
+  wx:if="{{isShowInputArea}}"
+  name="commentInput" class="comment_input" 
+  data-input-state="{{inputState}}"
+  bindblur="bindCommentInputed" placeholder="输入留言" 
+  value="{{curComment}}"
+  auto-height  />
+  <view class="comment_item"
+    wx:for-items='{{comments}}' wx:key="createTimeStr" 
+    wx:for-item='item' wx:for-index='createTimeStr'>
+    <view class="comment_info">
+      【{{item.author.name}}】在【{{item.createTimeStr}}】留言：
+    </view>
+    <view class="comment_content">
+      {{item.content}}
+    </view>
+  </view>
+</view>
