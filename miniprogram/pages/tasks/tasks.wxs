@@ -31,5 +31,5 @@ function switchBonusIcon(curTask, BONUS_CLASSES_OBJ, TASK_FINISH_STATUS_OBJ){
 
 // 导出对外暴露的属性
 module.exports = {
-  switchBonusIcon: switchBonusIcon
+  switchBonusIcon: switchBonusIcon,
 }

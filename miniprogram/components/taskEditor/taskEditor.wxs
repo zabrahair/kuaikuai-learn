@@ -1,5 +1,7 @@
 function isDisabled(curTask, TASK_STATUS_OBJ){
-  if (curTask.status.value == TASK_STATUS_OBJ.CREATE.value || curTask.status.value == TASK_STATUS_OBJ.SAVED.value){
+  if (curTask.status.value == TASK_STATUS_OBJ.CREATE.value 
+  || curTask.status.value == TASK_STATUS_OBJ.COPY.value
+  || curTask.status.value == TASK_STATUS_OBJ.SAVED.value){
     return false;
   }else{
     return true;
@@ -48,7 +50,9 @@ function isItemShown(itemName, curTask, curOpenid, TASK_STATUS_OBJ){
 function isButtonShown(curTask, nextTaskValue, curOpenid, TASK_STATUS_OBJ){
   switch (nextTaskValue){
     case 'ASSIGNED':
-      if (curTask.status.value == TASK_STATUS_OBJ.CREATE.value || curTask.status.value == TASK_STATUS_OBJ.SAVED.value){
+      if (curTask.status.value == TASK_STATUS_OBJ.CREATE.value 
+      || curTask.status.value == TASK_STATUS_OBJ.COPY.value 
+      || curTask.status.value == TASK_STATUS_OBJ.SAVED.value){
         return true
       } else {
         return false
@@ -119,9 +123,18 @@ function isButtonShown(curTask, nextTaskValue, curOpenid, TASK_STATUS_OBJ){
   }
 }
 
+function switchBonusIcon(curTask, BONUS_CLASSES_OBJ) {
+  // console.log('switchBonusIcon', JSON.stringify(curTask.status,null,4))
+  var statusValue = curTask.status.value
+  var curBonus = curTask.bonus
+  var bonus = BONUS_CLASSES_OBJ[curBonus.name]
+  return bonus.iconOn
+}
+
 // 导出对外暴露的属性
 module.exports = {
   isDisabled: isDisabled,
   isButtonShown: isButtonShown,
   isItemShown: isItemShown,
+  switchBonusIcon: switchBonusIcon,
 }

@@ -83,7 +83,7 @@
           style="{{(!question.leftCorrect && question.leftCorrect != 0)?'display: none;':''}}">
           {{question.leftCorrect<0?-question.leftCorrect:question.leftCorrect}}
           </view>
-          {{question.word}}
+          {{(question.meaning&&queation.meaning!='')?question.meaning:question.word}}
         </view>
         <view class="word_card done_card"
           wx:for-items='{{questionsDone}}' wx:for-item='question' 
@@ -91,7 +91,7 @@
           data-card-idx="{{idx}}" data-question='{{question}}'
           bindtap="onClickDoneCard"
         >
-          {{question.word}}
+          {{(question.meaning&&queation.meaning!='')?question.meaning:question.word}}
         </view>        
       </view>
     </scroll-view>

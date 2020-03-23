@@ -209,6 +209,21 @@ function getTimeFromNow(pTime, now, unitStartIdx){
   return timeSpanStr
 }
 
+/**
+ * 剪切一部分数组
+ */
+function sliceArray(array, startIdx, endIdx) {
+  if (array && array.length > 0 && startIdx) {
+    if (endIdx) {
+      return array.slice(startIdx, endIdx)
+    } else {
+      return array.slice(startIdx)
+    }
+  }
+  return array
+
+}
+
 // 导出对外暴露的属性
 module.exports = {
   randInteger: randInteger,
@@ -220,6 +235,11 @@ module.exports = {
   formatDateShort: formatDateShort,
   formatTime: formatTime,
   formatTimeShort: formatTimeShort,
+
+  /**
+   * 数组
+   */
+  sliceArray: sliceArray,
 
   formatBoolean: formatBoolean,
   intervalTime: intervalTime,

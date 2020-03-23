@@ -53,8 +53,8 @@ function defaultEditorData(selfData){
     // 控件相关字段
     selAssigneeIdx: 0,
     selBonusIdx: 0,
-    deadlineDate: new Date().toLocaleDateString(),
-    deadlineTime: new Date().toLocaleTimeString(),
+    deadlineDate: utils.formatDate(new Date()),
+    deadlineTime: utils.formatOnlyTime(new Date()),
     
     // 提交业务内容相关字段
 
@@ -158,8 +158,8 @@ function getTaskTemplate(){
       content: null,
       bonus:  {name: '新兵', value: 1},
       deadline: {
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
+        date: utils.formatDate(new Date()),
+        time: utils.formatOnlyTime(new Date()),
       },
 
       createTime: '',
@@ -208,6 +208,7 @@ function initList(that) {
       curFilterFromDate: utils.formatDate(new Date()),
       filterTaskStatus: that.data.filterTaskStatus.concat(TASK_STATUS),
       curTaskDirect: TASK_DIRECT[0],
+      curBatchStatus: TASK_STATUS_OBJ.CLAIMED
     })
     // 刷新给我的任务列表
     refreshTasks(that, true)
@@ -339,8 +340,8 @@ function refreshMyTasks(that, isReset){
 /** 
  * 创建一个委派任务
  */
-function createTask(that, callback) {
-  let task = Object.assign({}, that.data.curTask)
+function createTask(that, pTask, callback) {
+  let task = Object.assign({}, pTask)
   let now = new Date()
   task.assignTime = now.getTime();
   task.assignTimeStr = utils.formatDateTime(now);
@@ -369,8 +370,8 @@ function createTask(that, callback) {
 /**
  * 认领任务
  */
-function claimTask(that, callback){
-  let task = Object.assign({}, that.data.curTask)
+function claimTask(that, pTask, callback){
+  let task = Object.assign({}, pTask)
   let now = new Date()
   task.claimTime = now.getTime();
   task.claimTimeStr = utils.formatDateTime(now);
@@ -391,8 +392,8 @@ function claimTask(that, callback){
 /**
  * 执行任务
  */
-function implementTask(that, callback) {
-  let task = Object.assign({}, that.data.curTask)
+function implementTask(that, pTask, callback) {
+  let task = Object.assign({}, pTask)
   let now = new Date()
   task.implementTime = now.getTime();
   task.implementTimeStr = utils.formatDateTime(now);
@@ -413,8 +414,8 @@ function implementTask(that, callback) {
 /**
  * 完成任务
  */
-function finishTask(that, callback) {
-  let task = Object.assign({}, that.data.curTask)
+function finishTask(that, pTask, callback) {
+  let task = Object.assign({}, pTask)
   let now = new Date()
   task.finishTime = now.getTime();
   task.finishTimeStr = utils.formatDateTime(now);
@@ -460,8 +461,8 @@ function finishTask(that, callback) {
 /**
  * 复核任务
  */
-function approveTask(that, callback) {
-  let task = Object.assign({}, that.data.curTask)
+function approveTask(that, pTask, callback) {
+  let task = Object.assign({}, pTask )
   let now = new Date()
   task.approveTime = now.getTime();
   task.approveTimeStr = utils.formatDateTime(now);
@@ -481,8 +482,8 @@ function approveTask(that, callback) {
 /**
  * 取消任务
  */
-function cancelTask(that, callback) {
-  let task = Object.assign({}, that.data.curTask)
+function cancelTask(that, pTask, callback) {
+  let task = Object.assign({}, pTask)
   let now = new Date()
   task.cancelTime = now.getTime();
   task.cancelTimeStr = utils.formatDateTime(now);
@@ -502,8 +503,8 @@ function cancelTask(that, callback) {
 /**
  * 拒绝任务
  */
-function rejectTask(that, callback) {
-  let task = Object.assign({}, that.data.curTask)
+function rejectTask(that, pTask, callback) {
+  let task = Object.assign({}, pTask )
   let now = new Date()
   task['rejectTime'] = now.getTime();
   task['rejectTimeStr'] = utils.formatDateTime(now);
@@ -523,8 +524,8 @@ function rejectTask(that, callback) {
 /**
  * 删除任务
  */
-function deleteTask(that, callback) {
-  let task = Object.assign({}, that.data.curTask)
+function deleteTask(that, pTask, callback) {
+  let task = Object.assign({}, pTask)
   let now = new Date()
   task['deleteTime'] = now.getTime();
   task['deleteTimeStr'] = utils.formatDateTime(now);
@@ -562,42 +563,136 @@ function refreshTasks(that, isReset){
 /**
  * 上传完文件后再更新记录
  */
-function uploadAndUpdateTask(that, processFunc, callback){
-  wx.showModal({
-    title: MSG.CONFIRM_UPDATE_TITLE,
-    content: MSG.CONFIRM_UPDATE_MSG,
-    success(res) {
-      if (res.confirm) {
-        utils.onLoading(MSG.PROCESSING)
-        media.whenAllUploaded(that.data.curTask.finishImages
-          , (filesPath) => {
-            let curTask = that.data.curTask
-            if (filesPath && filesPath.length > 0) {
-              curTask['finishImages'] = filesPath
-            }
-            that.setData({
-              curTask: curTask
-            }, () => {
-              // debugLog('finishImages', that.data.curTask.finishImages)
-              processFunc(that, result => {
-                wx.showToast({
-                  title: that.data.curTask.status.message,
-                  duration: gConst.TOAST_DURATION_TIME
-                })
-                setTimeout(() => {
-                  that.triggerEvent('refresh', { upTask: result.task })
-                  dialogCommon.onClose(null, that)
-                  utils.stopLoading()
-                }, gConst.TOAST_DURATION_TIME / 2)
-                return;
-              })
+function uploadAndUpdateTask(that, pTask, processFunc, isConfirm=true, beforeProcess, callback){
+  let task = pTask
+  var nextProcess = function(){
+    utils.onLoading(MSG.PROCESSING)
+    media.whenAllUploaded(task.finishImages
+      , (filesPath) => {
+        let curTask = task
+        if (filesPath && filesPath.length > 0) {
+          curTask['finishImages'] = filesPath
+        }
+        that.setData({
+          curTask: curTask
+        }, () => {
+          // debugLog('finishImages', that.data.curTask.finishImages)
+          processFunc(that, task, result => {
+            wx.showToast({
+              title: task.status.message,
+              duration: gConst.TOAST_DURATION_TIME
             })
+            utils.stopLoading()
+            setTimeout(() => {
+              that.triggerEvent('refresh', { upTask: result.task })
+              dialogCommon.onClose(null, that)
+            }, gConst.TOAST_DURATION_TIME / 2)
+            return;
           })
-      } else if (res.cancel) {
-        errorLog('用户点击取消')
+        })
+      })
+  }
+
+  beforeProcess(nextProcess)
+}
+
+/**
+ * 更新任务状态
+ */
+function updateTaskStatus(that, e, pTask, isConfirm=true, callback ) {
+  let dataset = utils.getEventDataset(e)
+  let toUpdateStatus = dataset.toUpdateStatus
+  let TASK_STATUS_OBJ = that.data.TASK_STATUS_OBJ
+  let task = pTask
+  let processFunc = null
+  let isDone = false
+  switch (toUpdateStatus.value) {
+    case 'ASSIGNED':
+      processFunc = createTask
+      break;
+    case 'CLAIMED':
+      processFunc = claimTask
+      break;
+    case 'IMPLEMENTING':
+      isDone = true
+      processFunc = implementTask
+    case 'FINISHED':
+      if (!processFunc){
+        isDone = true
+        processFunc = finishTask
       }
-    }
-  })
+      uploadAndUpdateTask(that, task, processFunc, isConfirm, (nextProcess) => {
+        if (isConfirm) {
+          wx.showModal({
+            title: MSG.CONFIRM_UPDATE_TITLE,
+            content: MSG.CONFIRM_UPDATE_MSG,
+            success(res) {
+              if (res.confirm) {
+                utils.runCallback(nextProcess)()
+              } else if (res.cancel) {
+                errorLog('用户点击取消')
+              }
+            }
+          })
+        } else {
+          utils.runCallback(nextProcess)()
+        }
+      }, () => {
+        utils.runCallback(callback)()
+      })
+      break;
+    case 'APPROVED':
+      processFunc = approveTask
+      break;
+    case 'CANCELED':
+      processFunc = cancelTask
+      break;
+    case 'DELETED':
+      processFunc = deleteTask
+      break;
+    case 'REJECTED':
+      processFunc = rejectTask
+      break;
+    default:
+  }
+  if (isDone) {
+    return;
+  }
+  if(isConfirm){
+    wx.showModal({
+      title: MSG.CONFIRM_UPDATE_TITLE,
+      content: MSG.CONFIRM_UPDATE_MSG,
+      success(res) {
+        if (res.confirm) {
+          processFunc(that, task, result => {
+            utils.runCallback(callback)()
+            wx.showToast({
+              title: that.data.curTask.status.message,
+              duration: gConst.TOAST_DURATION_TIME
+            })
+            setTimeout(() => {
+              that.triggerEvent('refresh', { upTask: result.task })
+              dialogCommon.onClose(null, that)
+            }, gConst.TOAST_DURATION_TIME / 2)
+          })
+        } else if (res.cancel) {
+          errorLog('用户点击取消')
+        }
+      }
+    })
+  }else{
+    processFunc(that, task, result => {
+      utils.runCallback(callback)()
+      wx.showToast({
+        title: that.data.curTask.status.message,
+        duration: gConst.TOAST_DURATION_TIME
+      })
+      setTimeout(() => {
+        that.triggerEvent('refresh', { upTask: result.task })
+        dialogCommon.onClose(null, that)
+      }, gConst.TOAST_DURATION_TIME / 2)
+    })
+  }
 }
 
 module.exports = {
@@ -608,6 +703,7 @@ module.exports = {
   /** common */
   initPage: initPage,
   getTaskTemplate: getTaskTemplate,
+  updateTaskStatus: updateTaskStatus,
 
   /** Editor */
   defaultEditorData: defaultEditorData,

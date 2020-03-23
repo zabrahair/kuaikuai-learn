@@ -163,70 +163,7 @@ Component({
 
     onTapTaskActions: function(e){
       let that = this
-      let dataset = utils.getEventDataset(e)
-   //   debugLog('dataset', dataset)
-      let toUpdateStatus = dataset.toUpdateStatus
-      let TASK_STATUS_OBJ = that.data.TASK_STATUS_OBJ
-      let processFunc = null
-      let isDone = false
-      switch (toUpdateStatus.value){
-        case 'ASSIGNED':
-          processFunc = taskCommon.createTask
-          break;
-        case 'CLAIMED':
-          processFunc = taskCommon.claimTask
-          break;
-        case 'IMPLEMENTING':
-          isDone = true
-          processFunc = taskCommon.implementTask
-          taskCommon.uploadAndUpdateTask(that, processFunc, ()=>{
-
-          })
-          break;
-        case 'FINISHED':
-          isDone = true
-          processFunc = taskCommon.finishTask
-          taskCommon.uploadAndUpdateTask(that, processFunc, ()=>{
-
-          })
-          break;
-        case 'APPROVED':
-          processFunc = taskCommon.approveTask
-          break;
-        case 'CANCELED':
-          processFunc = taskCommon.cancelTask
-          break;
-        case 'DELETED':
-          processFunc = taskCommon.deleteTask
-          break;
-        case 'REJECTED':
-          processFunc = taskCommon.rejectTask
-          break;
-        default:
-      }
-      if(isDone){
-        return;
-      }
-      wx.showModal({
-        title: MSG.CONFIRM_UPDATE_TITLE,
-        content: MSG.CONFIRM_UPDATE_MSG,
-        success(res) {
-          if (res.confirm) {
-            processFunc(that, result => {
-              wx.showToast({
-                title: that.data.curTask.status.message,
-                duration: gConst.TOAST_DURATION_TIME
-              })
-              setTimeout(() => {
-                that.triggerEvent('refresh', { upTask: result.task })
-                dialogCommon.onClose(null, that)
-              }, gConst.TOAST_DURATION_TIME / 2)
-            })
-          } else if (res.cancel) {
-            errorLog('用户点击取消')
-          }
-        }
-      })
+      taskCommon.updateTaskStatus(that, e, that.data.curTask, true, ()=>{})
     },
 
     /**
@@ -289,7 +226,7 @@ Component({
       debugLog('renewComment', renewComment)
       // 追加或者更新留言
       if(comments.length < 1){
-        comments.push(renewComment)
+        comments.unshift(renewComment)
       }else{
         let isFoundHistory = false
         for({v, k} in comments.length){
@@ -301,7 +238,7 @@ Component({
           }
         }
         if (!isFoundHistory){
-          comments.push(renewComment)
+          comments.unshift(renewComment)
         }
       }
       that.data.curTask.comments = comments

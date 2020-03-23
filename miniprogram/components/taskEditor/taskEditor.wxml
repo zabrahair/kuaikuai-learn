@@ -29,7 +29,7 @@
           bindchange="selectBonus" value="{{index}}" 
           range="{{BONUS_CLASSES}}" range-key="name">
           <view class="picker">
-          奖励: {{curTask.bonus.value}} 点 ▾
+          奖励: 【{{curTask.bonus.name}}】勋章 ▾
           </view>
         </picker> 
         <!-- 完成时间        -->

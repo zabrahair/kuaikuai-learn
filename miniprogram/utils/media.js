@@ -114,16 +114,12 @@ function whenAllUploaded(filesPath, callback){
     let filePath
     if(i < filesPath.length){
       filePath = filesPath[i]
-      // debugLog('filePath', filePath)
+
     }
     i++
     accuSec = intervalSec * i
-    // debugLog('accuSec', accuSec)
-    // debugLog('limitTime', limitTime)
-    // debugLog('i', i)
     // 中止时钟
     if (accuSec > limitTime || uploadedCount == filesPath.length){
-      // debugLog('all uploaded', filesPath)
       utils.runCallback(callback)(filesPath)
       clearInterval(timer)
     }
@@ -133,9 +129,7 @@ function whenAllUploaded(filesPath, callback){
           || typeof filePath.url != 'string'
           || filePath.url.length < 1){
             upLoadImage(filePath, url => {
-              // debugLog('uploaded', url)
               filePath['url'] = url
-              // debugLog('uploaded filePath', filePath)
               uploadedCount++
               // delete filePath.path
             })

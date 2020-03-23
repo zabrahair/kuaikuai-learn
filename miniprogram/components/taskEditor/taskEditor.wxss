@@ -153,7 +153,20 @@
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  
+
   width: 100%;
   min-height: 20vh;  
+}
+
+.bonus_icon {
+  /* position: absolute; */
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  right: 0vw;
+  bottom: 0vh;
+  height: 5vw;
+  width: 5vw;
 }

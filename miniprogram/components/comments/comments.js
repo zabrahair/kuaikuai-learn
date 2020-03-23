@@ -95,7 +95,7 @@ Component({
           break;
         default:
       }
-      debugLog('comment', comment)
+      // debugLog('comment', comment)
       that.triggerEvent(inputState, { comment: comment })
     },
   }

@@ -158,6 +158,33 @@ Page({
   },
 
   /**
+   * 显示任务详情
+   */
+  copyCurrentTask: function (e) {
+    let that = this
+    let dataset = utils.getEventDataset(e)
+    let curTask = dataset.task
+    let copyTask = taskCommon.getTaskTemplate()
+    let now = new Date()
+    Object.assign(copyTask, {
+      fromWho: curTask.fromWho,
+      toWho: curTask.toWho,
+      content: curTask.content,
+      bonus: curTask.bonus,
+      deadline: {
+        date: utils.formatDate(now),
+        time: curTask.deadline.time,
+      },
+      status: that.data.TASK_STATUS_OBJ.COPY
+    })
+    that.setData({
+      curTask: copyTask,
+    }, () => {
+      taskCommon.showTaskEditor(that)
+    })
+  },
+
+  /**
    * 当关闭任务对话框
    */
   refreshTasks: function(e){
@@ -297,4 +324,83 @@ Page({
       taskCommon.refreshTasks(that, true)
     })
   },
+  /**
+   * 对打勾的任务做状态切换，选中/未选中
+   */
+  onSelMultiTasks: function(e){
+    let that = this
+    let checkedTaskIds = utils.getEventDetail(e).value
+    debugLog('checkedTaskIds', checkedTaskIds)
+    // 找到指定_id的任务然后切换状态
+    for (let i in that.data.tasks) {
+      let task = that.data.tasks[i]
+      // debugLog('checkedTaskIds.includes(task._id)', checkedTaskIds.includes(task._id))
+      if (checkedTaskIds.includes(task._id)==true) {
+        that.data.tasks[i]['checked'] = true
+      }else{
+        that.data.tasks[i]['checked'] = false
+      }
+    }
+
+    that.setData({
+      tasks: that.data.tasks
+    })
+  },
+
+  /**
+   * 选择要更新成的状态
+   */
+  changeBatchStatus: function(e){
+    let that = this
+    let statusOffset = 5
+    let value = parseInt(utils.getEventDetail(e).value)
+    let curBatchStatus = that.data.TASK_STATUS[statusOffset+value]
+    that.setData({
+      curBatchStatus: curBatchStatus
+    })
+  },
+
+  /**
+   * 批量更新任务状态
+   */
+  toBatchUpdate: function(e){
+    let that = this
+    wx.showModal({
+      title: MSG.CONFIRM_UPDATE_TITLE,
+      content: MSG.CONFIRM_UPDATE_ALL_MSG,
+      success(res) {
+        if (res.confirm) {
+          for (let i = 0; i < that.data.tasks.length; i++) {
+            let task = that.data.tasks[i]
+            if (task.checked == true) {
+              delete task.checked
+              taskCommon.updateTaskStatus(that, e, task, false, () => { 
+                if (i == that.data.tasks.length - 1){
+                  that.onPullDownRefresh()
+                }
+              })
+            }
+          }
+        } else if (res.cancel) {
+          errorLog('用户点击取消')
+        }
+      }
+    })
+  },
+  
+  /**
+   * 清空选中的选项
+   */
+  onClearSelectTasks: function(e){
+    let that = this
+    // 找到指定_id的任务然后切换状态
+    for (let i in that.data.tasks) {
+      let task = that.data.tasks[i]
+        that.data.tasks[i]['checked'] = false
+    }
+
+    that.setData({
+      tasks: that.data.tasks
+    })    
+  }
 })
