@@ -148,6 +148,55 @@ function updateUserConfigs(openid, userConfigs, callback) {
   })
 }
 
+/**
+ * 获取用户的所有关系
+ */
+function getRelationships(callback) {
+  const db = wx.cloud.database()
+  const $ = db.command.aggregate
+  const _ = db.command
+  let userInfo = wx.getStorageSync('userInfo')
+  let openid;
+
+  if (userInfo && userInfo._openid) {
+    openid = userInfo._openid
+    // 根据条件查询所有用户
+    db.collection(TABLE)
+      .where({ _id: openid })
+      .field({
+        _id: true,
+        relationships: true,
+      })
+      .get({
+        success: res => {
+          let result = res.data;
+          if (result.length > 0) {
+            // debugLog('children', result[0]);
+            utils.runCallback(callback)(result[0])
+          } else {
+            wx.showToast({
+              icon: 'none',
+              title: '查询记录失败'
+            })
+            utils.runCallback(callback)(null)
+          }
+
+        },
+        fail: err => {
+          wx.showToast({
+            icon: 'none',
+            title: '查询记录失败'
+          })
+          callback(null)
+          errorLog('[数据库] [查询记录] 失败：', err)
+        }
+      })
+  }
+}
+
+/**
+ * 获取孩子（children）属性的所有关系
+ */
 function getChildren(callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
@@ -191,6 +240,9 @@ function getChildren(callback) {
   }
 }
 
+/**
+ * 获取家长（parent）属性的所有关系
+ */
 function getParents(callback) {
   const db = wx.cloud.database()
   const $ = db.command.aggregate
@@ -240,4 +292,5 @@ module.exports = {
   updateUserConfigs: updateUserConfigs,
   getChildren: getChildren,
   getParents: getParents,
+  getRelationships: getRelationships,
 }

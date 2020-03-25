@@ -1,0 +1,15 @@
+function getCardCss(tableValue){
+  // console.log('tableValue', tableValue)
+  if(tableValue.indexOf('chinese')!=-1){
+    return 'chinese_card'
+  }else if (tableValue.indexOf('english') != -1) {
+    return 'english_card'
+  }else{
+    return ''
+  }
+}
+
+// 导出对外暴露的属性
+module.exports = {
+  getCardCss: getCardCss
+}

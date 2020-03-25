@@ -46,7 +46,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    poemCommon.search('鹅鹅鹅', result=>{
+    poemCommon.search('师说', result=>{
 
     })
   },

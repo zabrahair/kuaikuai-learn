@@ -808,6 +808,119 @@ function addTime2Object(type, object){
   return object
 }
 
+/**
+ * 加载字体
+ */
+function loadFonts(){
+  // 楷体
+  wx.loadFontFace({
+    family: 'Kaiti',
+    source: 'url("https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/mp-fonts/KaitiGB2312.ttf?sign=5e1bfcd20a0c093bb4ca278307be9cbf&t=1585042613")',
+    success: {}
+  })  
+}
+
+/**
+ * 通过一个Range返回一个数字数组
+ */
+function getRange(start, end, step){
+  let array = []
+  let i = start
+  if(start >= end){
+    return null
+  }
+  for(i; i <= end; i+=step){
+    array.push(i)
+  }
+
+  return array
+}
+
+/**
+ * 获取时间区间选择器的数据
+ */
+function getTimePeriodPickerData(){
+  let array = [
+    {
+      showName: '月',
+      name: 'month',
+      value: getRange(0, 12, 1)
+    },
+    {
+      showName: '星期',
+      name: 'week',
+      value: getRange(0, 7, 1)
+    },
+    {
+      showName: '天',
+      name: 'day',
+      value: getRange(0, 30, 1)
+    },
+    {
+      showName: '时',
+      name: 'hour',
+      value: getRange(0, 24, 1)
+    },
+    {
+      showName: '分',
+      name: 'minute',
+      value: getRange(0, 60, 1)
+    }
+  ]
+  return array
+}
+
+/**
+ * 获取时间区间对象
+ */
+function getTimePeriodObj(){
+  let object = {
+    month: {
+      showName: '月',
+      name: 'month',
+      unitMillSecs: 2592000000,
+      value: 0
+    },
+    week: {
+      showName: '星期',
+      name: 'week',
+      unitMillSecs: 604800000,
+      value: 0
+    },
+    day: {
+      showName: '天',
+      name: 'day',
+      unitMillSecs: 86400000,
+      value: 0
+    },
+    hour: {
+      showName: '时',
+      name: 'hour',
+      unitMillSecs: 3600000,
+      value: 0
+    },
+    minute: {
+      showName: '分',
+      name: 'minute',
+      unitMillSecs: 60000,
+      value: 0
+    }
+  }
+  return object
+}
+/**
+ * 通过事件跨度获取毫秒数
+ */
+function getMillSecsFromPeriod(timePeriod){
+  let totalMillSecs = 0
+  let keys = Object.keys(timePeriod)
+  for (let i in keys){
+    let key = keys[i]
+    totalMillSecs += timePeriod[key].value * timePeriod[key].unitMillSecs
+  }
+  return totalMillSecs
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -824,10 +937,12 @@ module.exports = {
   cloneObj: cloneObj,
   sortByPropLenArray: sortByPropLenArray,
   resetObjectValues: resetObjectValues,
+  getRange: getRange,
 
   /* -- Page 相关 -- */
   loadPagesData: loadPagesData,
   IS_CONTINUE_LOAD: IS_CONTINUE_LOAD,
+  loadFonts: loadFonts,
 
   /* -- Configs 方法 */
   loadAllConfigs: loadAllConfigs,
@@ -852,6 +967,9 @@ module.exports = {
   addTime2Object: addTime2Object,
   mergeDateTime: mergeDateTime,
   getDateFromStr: getDateFromStr,
+  getMillSecsFromPeriod: getMillSecsFromPeriod,
+  getTimePeriodObj: getTimePeriodObj,
+  getTimePeriodPickerData: getTimePeriodPickerData,
 
   /* -- 方法流程 -- */
   runCallback: runCallback,

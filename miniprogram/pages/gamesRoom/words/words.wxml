@@ -1,4 +1,5 @@
 <wxs module="filter" src="../../../utils/filter.wxs"></wxs>
+<wxs module="page" src="../../../css/questionPage.wxs"></wxs>
 <scroll-view class='scroll-container' scroll-y="true">
 <view class='container'>
   <score-title
@@ -45,8 +46,8 @@
         {{filterTags}}
       </view>   
       <view class="alphabet_cards">
-        <view class='alphabet_card {{spellCard.cardState}}'
-        style="width: {{cardFontSize*1.2}}vw; height: {{cardFontSize*2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
+        <view class="alphabet_card {{page.getCardCss(tableValue)}} {{spellCard.cardState}}"
+        style="width: {{cardFontSize*1.2}}vw; height: {{cardFontSize*1.2}}vw; font-size: {{cardFontSize}}vw; border-radius: {{cardFontSize/5}}vw"
         wx:for-items='{{curSpellCards}}' wx:for-item='spellCard' 
         wx:for-index='idx' wx:key="id" 
         data-spell-card='{{spellCard}}' data-card-idx='{{idx}}'

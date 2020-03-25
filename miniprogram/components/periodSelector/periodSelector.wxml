@@ -1,0 +1,13 @@
+<view class='component'>
+  <picker 
+    wx:for-items='{{period_units}}' wx:key="name" 
+    wx:for-item='item' wx:for-index='idx'
+    name="item.name" 
+    data-period-name="{{item.name}}"
+    bindchange="onPeriodChange" value="{{selPeriod[item.name].value-1}}" 
+    range="{{item.value}}" >
+    <view class="picker">
+    {{selPeriod[item.name].value}}{{item.showName}} ▾
+    </view>
+  </picker> 
+</view>

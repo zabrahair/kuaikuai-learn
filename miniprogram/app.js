@@ -8,6 +8,12 @@ const userInfoUtils = require('./utils/userInfo.js')
 const TABLES = require('./const/collections.js')
 
 const updateManager = wx.getUpdateManager()
+
+/**
+ * 加载楷体
+ */
+utils.loadFonts()
+
 /**
  * 小程序升级检测
  */

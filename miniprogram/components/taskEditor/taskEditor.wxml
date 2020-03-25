@@ -32,6 +32,12 @@
           奖励: 【{{curTask.bonus.name}}】勋章 ▾
           </view>
         </picker> 
+        <!-- 完成时间区间 -->
+        <view name="deadlineDate" class='form_item'>
+          <periodSelector
+            bindchanged="onTaskPeriodChange"
+          />
+        </view>
         <!-- 完成时间        -->
         <view name="deadlineDate" class='form_item'>
           <picker disabled="{{task.isDisabled(curTask, TASK_STATUS_OBJ)}}" 

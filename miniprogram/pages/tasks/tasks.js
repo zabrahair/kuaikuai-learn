@@ -13,9 +13,7 @@ const dbApi = require('../../api/db.js')
 const taskCommon = require('../../common/task.js')
 const IntervalClock = require('../../utils/clock.js').IntervalClock;
 
-
 Page({
-
   /**
    * 页面的初始数据
    */
@@ -29,7 +27,6 @@ Page({
   onLoad: function (options) {
     let that = this
     taskCommon.initList(that)
-    
   },
 
   /**
@@ -198,12 +195,11 @@ Page({
     // 就根据这个数值刷新当前页面
     if(upTask){
       // debugLog('upTask', upTask)
-      // debugLog('taskCommon.TASK_DIRECT_OBJ', taskCommon.TASK_DIRECT_OBJ)
       let curTaskStatus = that.data.curTaskStatus;
       let curTaskDirect = that.data.curTaskDirect
       switch(upTask.status.value){
         case 'ASSIGNED':
-          curTaskStatus = upTask.status
+          // curTaskStatus = upTask.status
           curTaskDirect = taskCommon.TASK_DIRECT_OBJ['委派他人']
           break;
         case 'CLAIMED':
@@ -254,8 +250,7 @@ Page({
     let dataset = utils.getEventDataset(e)
     let filterType = dataset.filterType
     let setDataObject = {}
-    // debugLog('idx', idx)
-    // debugLog('filterType', filterType)
+
     switch (filterType) {
       case 'FromDateOn':
         let dateStr = idx
@@ -272,7 +267,7 @@ Page({
         break;
       default:
     }
-    debugLog('setDataObject', setDataObject)
+
     that.setData(setDataObject, () => {
       taskCommon.refreshTasks(that, true)
     })
@@ -330,7 +325,7 @@ Page({
   onSelMultiTasks: function(e){
     let that = this
     let checkedTaskIds = utils.getEventDetail(e).value
-    debugLog('checkedTaskIds', checkedTaskIds)
+    // debugLog('checkedTaskIds', checkedTaskIds)
     // 找到指定_id的任务然后切换状态
     for (let i in that.data.tasks) {
       let task = that.data.tasks[i]
@@ -365,6 +360,8 @@ Page({
    */
   toBatchUpdate: function(e){
     let that = this
+    let wantProcess = 0
+    let processedCount = 0
     wx.showModal({
       title: MSG.CONFIRM_UPDATE_TITLE,
       content: MSG.CONFIRM_UPDATE_ALL_MSG,
@@ -373,10 +370,13 @@ Page({
           for (let i = 0; i < that.data.tasks.length; i++) {
             let task = that.data.tasks[i]
             if (task.checked == true) {
+              wantProcess++
               delete task.checked
               taskCommon.updateTaskStatus(that, e, task, false, () => { 
-                if (i == that.data.tasks.length - 1){
+                processedCount++
+                if (wantProcess == processedCount){
                   that.onPullDownRefresh()
+                  utils.stopLoading();
                 }
               })
             }

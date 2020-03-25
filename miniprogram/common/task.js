@@ -104,33 +104,47 @@ function initPage(that, callback){
     assignees: [{ name: '自己', openid: userInfo.openId}]
   }
   ,()=>{
-    // children
-    userApi.getChildren(res => {
-      // debugLog('getChildren', res)
-      if (res.children) {
+    // relationship
+    userApi.getRelationships(res => {
+      // debugLog('getRelationship', res)
+      if (res.relationships) {
         that.setData({
-          assignees: that.data.assignees.concat(res.children),
-          children: res.children,
+          assignees: that.data.assignees.concat(res.relationships),
+          children: res.relationships,
         }
-        ,()=>{
-          // debugLog('getChildren.assignees', that.data.assignees)
-        })
+          , () => {
+            // debugLog('getRelationship.assignees', that.data.assignees)
+          })
       }
     })
 
-    // parents
-    userApi.getParents(res => {
-      if (res.parents) {
-        // debugLog('getParents', res)
-        that.setData({
-          assignees: that.data.assignees.concat(res.parents),
-          parents: res.parents
-        }, () => {
-          // debugLog('getParents.assignees', that.data.assignees)
-          // debugLog('getParents.parents', that.data.parents)
-        })
-      }
-    })
+    // // children
+    // userApi.getChildren(res => {
+    //   // debugLog('getChildren', res)
+    //   if (res.children) {
+    //     that.setData({
+    //       assignees: that.data.assignees.concat(res.children),
+    //       children: res.children,
+    //     }
+    //     ,()=>{
+    //       // debugLog('getChildren.assignees', that.data.assignees)
+    //     })
+    //   }
+    // })
+
+    // // parents
+    // userApi.getParents(res => {
+    //   if (res.parents) {
+    //     // debugLog('getParents', res)
+    //     that.setData({
+    //       assignees: that.data.assignees.concat(res.parents),
+    //       parents: res.parents
+    //     }, () => {
+    //       // debugLog('getParents.assignees', that.data.assignees)
+    //       // debugLog('getParents.parents', that.data.parents)
+    //     })
+    //   }
+    // })
 
     // 设置完成后回调
     utils.runCallback(callback)()
@@ -358,7 +372,7 @@ function createTask(that, pTask, callback) {
       that.setData({
         curTask: task
       },()=>{
-        claimTask(that, callback)
+        claimTask(that, task, callback)
       })
     }else{
       //  如果不是自己发给自己的任务
@@ -448,7 +462,7 @@ function finishTask(that, pTask, callback) {
       // debugLog('createTask', res)
       if (task.toWho.openid == that.data.userInfo.openId) {
         //  如果是自己发给自己的任务，直接复核
-        approveTask(that, callback)
+        approveTask(that, task, callback)
       } else {
         //  如果不是自己发给自己的任务
         // debugLog('created Task', res)
@@ -582,6 +596,7 @@ function uploadAndUpdateTask(that, pTask, processFunc, isConfirm=true, beforePro
               title: task.status.message,
               duration: gConst.TOAST_DURATION_TIME
             })
+            utils.runCallback(callback)()
             utils.stopLoading()
             setTimeout(() => {
               that.triggerEvent('refresh', { upTask: result.task })
@@ -592,7 +607,6 @@ function uploadAndUpdateTask(that, pTask, processFunc, isConfirm=true, beforePro
         })
       })
   }
-
   beforeProcess(nextProcess)
 }
 
@@ -621,7 +635,8 @@ function updateTaskStatus(that, e, pTask, isConfirm=true, callback ) {
         isDone = true
         processFunc = finishTask
       }
-      uploadAndUpdateTask(that, task, processFunc, isConfirm, (nextProcess) => {
+      uploadAndUpdateTask(that, task, processFunc, isConfirm, 
+      (nextProcess) => {
         if (isConfirm) {
           wx.showModal({
             title: MSG.CONFIRM_UPDATE_TITLE,
@@ -637,7 +652,8 @@ function updateTaskStatus(that, e, pTask, isConfirm=true, callback ) {
         } else {
           utils.runCallback(nextProcess)()
         }
-      }, () => {
+      }, 
+      () => {
         utils.runCallback(callback)()
       })
       break;

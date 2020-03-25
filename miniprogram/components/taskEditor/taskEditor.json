@@ -1,6 +1,7 @@
 {
   "component": true,
   "usingComponents": {
-    "comments": "../comments/comments"
+    "comments": "../comments/comments",
+    "periodSelector": "../periodSelector/periodSelector"
   }
 }

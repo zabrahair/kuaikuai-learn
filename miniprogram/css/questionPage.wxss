@@ -224,7 +224,7 @@
   position: relative;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
   z-index: 99;
@@ -233,11 +233,6 @@
   margin: 1vw;
 
   border-radius: 3vw;
-  font-size: 10vw;
-  color: white;
-  font-weight: 200;
-  background: linear-gradient(-70deg, rgba(230, 211, 48, 0.9),
-   30%, rgba(245, 72, 3, 0.9));
   box-shadow: 2px 2px 1px 1px rgba(0, 0, 255, .2);
 }
 
@@ -252,7 +247,7 @@
   justify-self: center;
 
   width: 50%;
-  height: 35%;
+  height: 50%;
 }
 
 @keyframes toFront {
@@ -277,8 +272,29 @@
   animation-timing-function: ease-out;
   animation-iteration-count: 1;
   transform: rotateY(0deg);
+  background: cornsilk;
 
-  color: rgba(255, 255, 255, 1);
+}
+
+.chinese_card {
+  font-size: 10vw;
+  font-family: "Kaiti";
+  color: black;
+  font-weight: 100;
+  background-size: 100%;
+  background-image: url('https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/mp-images/mizige-2.png?sign=73cf2986bf4ac800fd5b9f3fa824f1e7&t=1585031271');
+}
+
+.english_card {
+  font-size: 10vw;
+  color: black;
+  font-weight: 100;
+  font-family: cursive;
+  background-repeat: no-repeat;
+  background-position: 0% -25%;
+  background-size: 110%;
+  background-image: url('https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/mp-images/english_lines.png?sign=b6b0b651fac7df95361f48d3f428f9fb&t=1585032731');
+  
 }
 
 @keyframes toBack {
@@ -299,7 +315,8 @@
   animation-iteration-count: 1;
   color: rgba(255, 255, 255, 0);
   transform: rotateY(180deg);
-
+  background: linear-gradient(-70deg, rgba(230, 211, 48, 0.9),
+   30%, rgba(245, 72, 3, 0.9));
 }
 
 /** 操作按钮 */

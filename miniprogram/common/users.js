@@ -23,13 +23,13 @@ function getRelationships(that, callback){
     openid: userInfo.openId
   }]
 
-  // children
-  userApi.getChildren(res => {
-    // debugLog('getChildren', res)
-    if (res.children) {
+  // get relationships
+  userApi.getRelationships(res => {
+    // debugLog('getRelationships', res)
+    if (res.relationships) {
       relationships = that.data.relationships ? that.data.relationships : relationships
       that.setData({
-        relationships: relationships.concat(res.children),
+        relationships: relationships.concat(res.relationships),
         curRelationship: relationships[0],
         curRelationshipIdx: 0,
       }
@@ -40,22 +40,39 @@ function getRelationships(that, callback){
     }
   })
 
-  // parents
-  userApi.getParents(res => {
-    if (res.parents) {
-      // debugLog('getParents', res)
-      let relationships = that.data.relationships ? that.data.relationships : relationships
-      that.setData({
-        relationships: relationships.concat(res.parents),
-        curRelationship: relationships[0],
-        curRelationshipIdx: 0,
-      }, () => {
-        // debugLog('getParents.assignees', that.data.assignees)
-        // debugLog('getParents.parents', that.data.parents)
-        utils.runCallback(callback)(that)
-      })
-    }
-  })
+  // // children
+  // userApi.getChildren(res => {
+  //   // debugLog('getChildren', res)
+  //   if (res.children) {
+  //     relationships = that.data.relationships ? that.data.relationships : relationships
+  //     that.setData({
+  //       relationships: relationships.concat(res.children),
+  //       curRelationship: relationships[0],
+  //       curRelationshipIdx: 0,
+  //     }
+  //       , () => {
+  //         // debugLog('getChildren.assignees', that.data.assignees)
+  //         utils.runCallback(callback)(that)
+  //       })
+  //   }
+  // })
+
+  // // parents
+  // userApi.getParents(res => {
+  //   if (res.parents) {
+  //     // debugLog('getParents', res)
+  //     let relationships = that.data.relationships ? that.data.relationships : relationships
+  //     that.setData({
+  //       relationships: relationships.concat(res.parents),
+  //       curRelationship: relationships[0],
+  //       curRelationshipIdx: 0,
+  //     }, () => {
+  //       // debugLog('getParents.assignees', that.data.assignees)
+  //       // debugLog('getParents.parents', that.data.parents)
+  //       utils.runCallback(callback)(that)
+  //     })
+  //   }
+  // })
 }
 
 /**

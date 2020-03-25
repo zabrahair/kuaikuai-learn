@@ -19,11 +19,26 @@ function search(key, callback){
     timeout: DEFAULT_TIMEOUT
   }
   reqUtils.request(reqParams, result=>{
-    debugLog('search', result)
+    
+    result = result.replace(/(\r|\n|\t|\s{3})/gi, '')
+    result = result.replace(/<script.+?<\/script>/gi, '')
+    result = result.replace(/<!DOCTYPE.+?>/gi, '')
+    debugLog('result', result)
+    let regex = new RegExp('(<div)', 'gi')
+    // new RegExp('(<div class="main3">.*?<div class="left">.*?)(?:<form id="FromPage")', "igm")
+    let rst = regex.exec("<div <div <div")
+    debugLog('rst', rst)
+    debugLog('rst', rst.length)
+    regex.compile('(<div class="sons">.+?</div>)[^<]+?(?:<div style=" width:1px; height:1px; overflow:hidden;">)', "img")
+    // rst = regex.exec(result)
+    // debugLog('rst', rst)
+    // debugLog('rst', rst.length)
+
   })
 }
 
 
 module.exports = {
-  search: search
+  search: search,
+
 }

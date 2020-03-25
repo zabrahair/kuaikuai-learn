@@ -122,6 +122,9 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
+    // 加载字体
+    utils.loadFonts()
+    
     // debugLog('words.options', options)
     let that = this
     that.initOnLoad(that, options)
