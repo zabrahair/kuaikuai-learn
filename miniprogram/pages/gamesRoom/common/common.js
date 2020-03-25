@@ -1520,17 +1520,25 @@ function recoverSelectedTags(that){
   let selectedTags = that.data.selectedTags
   let tags = that.data.tags
   // debugLog('selectedTags', selectedTags)
-  tags.find(tagCard=>{
-    for (let i in selectedTags){
-      if (selectedTags[i].text == tagCard.text) {
-        // debugLog('selectedTags[i].text', selectedTags[i].text)
+  for(let i in tags){
+    let tagCard = tags[i]
+    for (let j in selectedTags) {
+      if (selectedTags[j].text == tagCard.text) {
         tagCard['css'] = SELECTED_CSS
+        // 把选中的Tags放到最前面
+        tags.splice(i, 1)
+        tags.unshift(tagCard)
         break;
       } else {
         tagCard['css'] = ''
       }
     }
+  }
+
+  that.setData({
+    tags: tags
   })
+
 }
 
 /**
@@ -1559,6 +1567,7 @@ function tapTagInTagRoom(that, e, callback) {
 
   if (isFound == false) {
     tags[tagIdx]['css'] = SELECTED_CSS
+    let selTag = tags[tagIdx]
     selectedTags.push(
       {
         text: tagText,

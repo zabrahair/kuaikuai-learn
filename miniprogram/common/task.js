@@ -347,14 +347,13 @@ function refreshMyTasks(that, isReset){
   }
   // 创建时间过滤
   let lastDate = utils.getDateFromStr(that.data.curFilterFromDate)
-  // debugLog('lastDate', lastDate)
   if (that.data.curFilterFromDate && that.data.ifUsingFromDate) {
+    let endDate = new Date(lastDate.getTime() + utils.getTimePeriodObj().day.unitMillSecs)
     Object.assign(where, {
-      assignTime: _.gte(lastDate.getTime())
+      assignTime: _.gte(lastDate.getTime()).and(_.lte(endDate.getTime()))
     })
   }
 
-  // debugLog('where', where)
   if (that.data.curTaskStatus.value != FILTER_ALL.value){
     Object.assign(where
       , {

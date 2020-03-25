@@ -58,7 +58,7 @@
         bindtap="onTapReciteCard" 
         bindlongpress="openDictDialog"
         >
-        <image wx:if="{{(spellCard.cardState=='card_used')?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/>
+        <!-- <image wx:if="{{(spellCard.cardState=='card_used')?true:false}}" class='card-back-icon' src ='{{gConst.THINKING_ICON}}'/> -->
         {{spellCard.letter}}
         </view>
       </view>

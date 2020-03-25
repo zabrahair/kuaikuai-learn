@@ -22,9 +22,9 @@
   min-height: 100vh;
 
   background-size: 100vw 100vh;
-  background: radial-gradient(circle at left bottom, #f0d805e1 10%, transparent),
+  /* background: radial-gradient(circle at left bottom, #f0d805e1 10%, transparent),
             radial-gradient(ellipse at 50% 20%, #02bff8bd 30%, transparent),
-            radial-gradient(circle at right bottom, #64f802bd 50%, transparent);
+            radial-gradient(circle at right bottom, #64f802bd 50%, transparent); */
 }
 
 .content {
@@ -83,8 +83,8 @@
   font-size: 14vw;
   color: green;
   font-weight: 800;
-  background: linear-gradient(50deg, rgba(17, 144, 202, 0.9),
-   70%, rgba(11, 245, 3, 0.9));
+  background: linear-gradient(50deg, rgba(17, 144, 202, 0.5),
+   70%, rgba(11, 245, 3, 0.5));
   box-shadow: 0px 0px 5px 4px rgba(110, 110, 167, 0.4);
 }
 
@@ -308,6 +308,7 @@
     transform: rotateY(180deg);
   }
 }
+
 .card_used {
   animation-name: toBack;
   animation-duration: 0.3s;
@@ -315,8 +316,13 @@
   animation-iteration-count: 1;
   color: rgba(255, 255, 255, 0);
   transform: rotateY(180deg);
-  background: linear-gradient(-70deg, rgba(230, 211, 48, 0.9),
-   30%, rgba(245, 72, 3, 0.9));
+
+  background-repeat: no-repeat;
+  background-size: 250%;
+  background-image: url('https://6b75-kuaikuai-fjpqg-1301178064.tcb.qcloud.la/mp-images/card_bg.jpg?sign=a87b991a8408b7013799a530369ddd24&t=1585138355');
+  
+  /* background: linear-gradient(-70deg, rgba(230, 211, 48, 0.9),
+   30%, rgba(245, 72, 3, 0.9)); */
 }
 
 /** 操作按钮 */

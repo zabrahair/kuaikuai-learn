@@ -155,7 +155,7 @@
   flex-wrap: wrap;
   justify-content: flex-start;
   align-items: flex-start;
-  color: azure;
+  color: midnightblue;
   font-size: 3vw;
 
   height: 20%;
@@ -175,7 +175,6 @@
   justify-content: flex-start;
   align-items: center;
 
-  color: azure;
   font-size: 3vw;
   height: 20%;
   width: 95%;
