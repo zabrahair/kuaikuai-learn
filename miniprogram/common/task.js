@@ -250,7 +250,9 @@ function whenIsShown(that){
         curTask.content = ''
         curTask.bonus = BONUS_CLASSES[0]
         let now = new Date()
-        now.setHours(now.getHours()+1)
+        curTask.assignTime = now.getTime()
+        curTask.assignTimeStr = utils.formatDateTime(now)
+        now.setHours(now.getHours() + 1)
         curTask.deadline = {
           date: utils.formatDate(now),
           time: utils.formatOnlyTime(now)
@@ -267,7 +269,50 @@ function whenIsShown(that){
           curTask: curTask,
         })
         break;
+      case TASK_STATUS_OBJ.COPY.value:
+        let copyTask = taskCommon.getTaskTemplate()
+        now = new Date()
+        // 算出原本的period
+        let assignTime = curTask.assignTime
+        let deadline = utils.mergeDateTime(curTask.deadline.date, curTask.deadline.time)
+        let period = deadline.getTime() - assignTime
+        // 算出新的date 和 time
+        deadline = new Date(now + period)
+        Object.assign(copyTask, {
+          fromWho: curTask.fromWho,
+          toWho: curTask.toWho,
+          content: curTask.content,
+          bonus: curTask.bonus,
+          assignTime: now.getTime(),
+          assignTimeStr:utils.formatDateTime(now),
+          deadline: {
+            date: utils.formatDate(deadline),
+            time: utils.formatOnlyTime(deadline),
+            period: period,
+          },
+          status: that.data.TASK_STATUS_OBJ.COPY
+        })
+        that.setData({
+          curTask: curTask,
+        })
+        break;
       default:
+        // 创建和复制就不用转换了，因为已经转换过了
+        if (curTask.status.value != TASK_STATUS_OBJ.COPY.value 
+        && curTask.status.value != TASK_STATUS_OBJ.CREATE.value){
+          let deadline = utils.mergeDateTime(curTask.deadline.date, curTask.deadline.time)
+          period = curTask.deadline.period ? curTask.deadline.period : (deadline.getTime() - curTask.assignTime)
+          Object.assign(curTask, {
+            deadline: {
+              date: utils.formatDate(deadline),
+              time: utils.formatOnlyTime(deadline),
+              period: period,
+            },
+          })
+          that.setData({
+            curTask: curTask,
+          })
+        }
     }
 
   }catch(err){errorLog('err', err.stack)}
@@ -369,9 +414,10 @@ function createTask(that, pTask, callback) {
 
   // 如果计算时间区间
   if (that.data.deadlineTimeType ==  gConst.TIME_SELECTOR_TYPE.PERIOD){
-    let deadline = new Date(new Date().getTime() - that.data.deadlineTimePeriod)
+    let deadline = new Date(task.assignTime + that.data.deadlineTimePeriod)
     task.deadline.date = utils.formatDate(deadline)
     task.deadline.time = utils.formatOnlyTime(deadline)
+    task.deadline['period'] = that.data.deadlineTimePeriod
   }
 
 

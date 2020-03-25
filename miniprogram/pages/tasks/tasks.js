@@ -159,26 +159,8 @@ Page({
    */
   copyCurrentTask: function (e) {
     let that = this
-    let dataset = utils.getEventDataset(e)
-    let curTask = dataset.task
-    let copyTask = taskCommon.getTaskTemplate()
-    let now = new Date()
-    Object.assign(copyTask, {
-      fromWho: curTask.fromWho,
-      toWho: curTask.toWho,
-      content: curTask.content,
-      bonus: curTask.bonus,
-      deadline: {
-        date: utils.formatDate(now),
-        time: curTask.deadline.time,
-      },
-      status: that.data.TASK_STATUS_OBJ.COPY
-    })
-    that.setData({
-      curTask: copyTask,
-    }, () => {
-      taskCommon.showTaskEditor(that)
-    })
+
+    taskCommon.showTaskEditor(that)
   },
 
   /**

@@ -35,6 +35,7 @@
         <!-- 完成任务的时间区间 -->
         <view wx:if="{{deadlineTimeType == gConst.TIME_SELECTOR_TYPE.PERIOD}}" name="deadlineDate" class='form_item'>
           <periodSelector
+            period='{{curTask.deadline.period}}'
             showUnits="时分"
             prefix='在'
             subfix='内完成'

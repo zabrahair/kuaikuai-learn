@@ -17,6 +17,10 @@ Component({
    * 组件的属性列表
    */
   properties: {
+    period: {
+      type: Number,
+      value: 0,
+    },
     showUnits: {
       type: String,
       value: '',
@@ -37,6 +41,7 @@ Component({
   data: {
     period_units: utils.getTimePeriodPickerData(),
     selPeriod: utils.getTimePeriodObj(),
+    curMillSecsPeriod: 0,
   },
   lifetimes: {
     attached: function () {
@@ -59,6 +64,17 @@ Component({
   observers: {
     'showUnits': function(showUnits){
       let that = this
+    },
+    'period': function (period) {
+      let that = this
+      if (period != that.data.curMillSecsPeriod){
+        let selPeriod = utils.convertMillSecs2PeriodObj(period)
+        // debugLog('selPeriod', selPeriod)
+        that.setData({
+          selPeriod: selPeriod,
+          curMillSecsPeriod: period
+        })
+      }
     }
   },
   /**

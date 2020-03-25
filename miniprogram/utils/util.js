@@ -921,6 +921,25 @@ function getMillSecsFromPeriod(timePeriod){
   return totalMillSecs
 }
 
+/**
+ * 将毫秒转换成timePeriod对象
+ */
+function convertMillSecs2PeriodObj(millSecs){
+  let curMillSecs = millSecs
+  let object = getTimePeriodObj()
+  let keys = Object.keys(object)
+  for(let i in keys){
+    let key = keys[i]
+    let period = object[key]
+    if (Math.floor(curMillSecs / period.unitMillSecs) > 0){
+      let value = Math.floor(curMillSecs / period.unitMillSecs)
+      curMillSecs -= value * period.unitMillSecs
+      period.value = value
+    }
+  }
+  return object;
+}
+
 module.exports = {
   /** 工具型方法 */
 
@@ -970,6 +989,7 @@ module.exports = {
   getMillSecsFromPeriod: getMillSecsFromPeriod,
   getTimePeriodObj: getTimePeriodObj,
   getTimePeriodPickerData: getTimePeriodPickerData,
+  convertMillSecs2PeriodObj: convertMillSecs2PeriodObj,
 
   /* -- 方法流程 -- */
   runCallback: runCallback,
