@@ -55,6 +55,8 @@ function defaultEditorData(selfData){
     selBonusIdx: 0,
     deadlineDate: utils.formatDate(new Date()),
     deadlineTime: utils.formatOnlyTime(new Date()),
+    deadlineTimeType: gConst.TIME_SELECTOR_TYPE.PERIOD,
+    deadlineTimePeriod: 0,  //单位：毫秒
     
     // 提交业务内容相关字段
 
@@ -364,6 +366,15 @@ function createTask(that, pTask, callback) {
     value: TASK_STATUS_OBJ.ASSIGNED.value,
     orderIdx: TASK_STATUS_OBJ.ASSIGNED.orderIdx,
   }
+
+  // 如果计算时间区间
+  if (that.data.deadlineTimeType ==  gConst.TIME_SELECTOR_TYPE.PERIOD){
+    let deadline = new Date(new Date().getTime() - that.data.deadlineTimePeriod)
+    task.deadline.date = utils.formatDate(deadline)
+    task.deadline.time = utils.formatOnlyTime(deadline)
+  }
+
+
   // debugLog('createTask.task', task)
   taskApi.create(task, res => {
     if(task.toWho.openid == that.data.userInfo.openId){

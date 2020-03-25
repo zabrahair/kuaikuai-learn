@@ -17,7 +17,18 @@ Component({
    * 组件的属性列表
    */
   properties: {
-
+    showUnits: {
+      type: String,
+      value: '',
+    },
+    prefix: {
+      type: String,
+      value: '',
+    },
+    subfix: {
+      type: String,
+      value: '',
+    },
   },
 
   /**
@@ -46,7 +57,9 @@ Component({
     }
   },
   observers: {
-
+    'showUnits': function(showUnits){
+      let that = this
+    }
   },
   /**
    * 组件的方法列表
@@ -66,8 +79,9 @@ Component({
           selPeriod: selPeriod,
           totalMillSecs: totalMillSecs
         }, () => {
-          debugLog('selPeriod', selPeriod)
+          // debugLog('selPeriod', selPeriod)
           debugLog('totalMillSecs', totalMillSecs)
+          that.triggerEvent('changed', { millSecs: that.data.totalMillSecs})
         })
       }catch(e){
         errorLog('onPeriodChange.e', e.stack)

@@ -32,14 +32,17 @@
           奖励: 【{{curTask.bonus.name}}】勋章 ▾
           </view>
         </picker> 
-        <!-- 完成时间区间 -->
-        <view name="deadlineDate" class='form_item'>
+        <!-- 完成任务的时间区间 -->
+        <view wx:if="{{deadlineTimeType == gConst.TIME_SELECTOR_TYPE.PERIOD}}" name="deadlineDate" class='form_item'>
           <periodSelector
+            showUnits="时分"
+            prefix='在'
+            subfix='内完成'
             bindchanged="onTaskPeriodChange"
           />
         </view>
-        <!-- 完成时间        -->
-        <view name="deadlineDate" class='form_item'>
+        <!-- 完成任务的最后期限       -->
+        <view wx:if="{{deadlineTimeType == gConst.TIME_SELECTOR_TYPE.ABSOLUTE}}" name="deadlineDate" class='form_item'>
           <picker disabled="{{task.isDisabled(curTask, TASK_STATUS_OBJ)}}" 
            mode="date" value="{{curTask.deadline.date}}" 
            start="{{deadlineDate}}" end="2099-12-31" 

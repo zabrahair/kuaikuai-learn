@@ -174,4 +174,8 @@ module.exports = {
     ENGLISH: 'en_US'
   },
   TASK_FINISH_STATUS: TASK_FINISH_STATUS,
+  TIME_SELECTOR_TYPE: {
+    PERIOD: 'PERIOD',
+    ABSOLUTE: 'ABSOLUTE'
+  }
 }

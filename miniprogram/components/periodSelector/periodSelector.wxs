@@ -1,0 +1,9 @@
+function isShowThisUnit(unitName, units){
+  var rst = units.indexOf(unitName)
+  return rst != -1 ? true : false
+}
+
+// 导出对外暴露的属性
+module.exports = {
+  isShowThisUnit: isShowThisUnit,
+}

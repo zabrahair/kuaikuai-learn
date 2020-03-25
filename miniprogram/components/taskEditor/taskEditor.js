@@ -33,12 +33,14 @@ Component({
     },
   }),
 
+
+
   /**
    * 组件的初始数据
    */
   data: taskCommon.defaultEditorData(
         dialogCommon.defaultDialogData({
-
+      
   })),
   lifetimes: {
     attached: function () {
@@ -218,12 +220,11 @@ Component({
      * 当更新留言
      */
     onRenewComment: function(e){
-      debugLog('aaa')
       let that = this
       let detail = utils.getEventDetail(e)
       let renewComment = detail.comment
       let comments = that.data.curTask.comments ? that.data.curTask.comments : []
-      debugLog('renewComment', renewComment)
+      // debugLog('renewComment', renewComment)
       // 追加或者更新留言
       if(comments.length < 1){
         comments.unshift(renewComment)
@@ -246,6 +247,28 @@ Component({
       that.setData({
         curTask: that.data.curTask
       })
+    },
+    /**
+    * 当完成任务的时限改变时
+    */
+    onTaskPeriodChange: function (e) {
+      let that = this
+      try {
+        // let dataset = utils.getEventDataset(e)
+        // debugLog('dataset', dataset)
+        
+        let detail = utils.getEventDetail(e)
+        // debugLog('detail', detail)
+        let deadlineTimePeriod = detail.millSecs
+
+        that.setData({
+          deadlineTimePeriod: deadlineTimePeriod
+        }, () => {
+
+        })
+      } catch (e) {
+        errorLog('onTaskPeriodChange.e')
+      }
     }
-  }
+  },
 })
